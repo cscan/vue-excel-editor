@@ -700,9 +700,6 @@ export default {
         this.processing = false
       }, 500)
     },
-    exportCSV () {
-
-    },
     topLeftClick () {
       this.toggleSelectAllRecords()
     },

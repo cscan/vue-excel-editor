@@ -1,6 +1,23 @@
 # Excel Editor for VUE 2
 
-Vue2 plugin for displaying and editing the array-of-object in Excel style 
+Vue2 plugin for displaying and editing the array-of-object in Excel style. It supports the following features:
+
+- Excel-like UI
+- Up, down, left, right Navigation
+- Column Filter
+- Column Sort (One column only)
+- Multi-select row (Shift support)
+- Update the cells in selected rows
+- Remember the selection during paging
+- PageUp, PageDown key support
+- Select-all, De-Select-all
+- Custom Column Validation
+- Custom Error Tooltip
+- Custom Record Label
+- Custom Column Header
+- Predefine the Column Width, User-adjustable Column Width
+- Auto and Custom Page size (Responsive)
+- Custom Readonly Column
 
 ## Getting started
 
@@ -35,10 +52,55 @@ In your template
 
 ## Props List
 
-| Name             | Type  | Description |
-| :---             | :---: | ---         | 
-| v-model  | Array Of Objects  | Data to be edited | 
-| n-fields  | Number  | Number of fields in table | 
+#### Component: vue-excel-editor
+| Name             | Type              | Description |
+| :---             | :---:             | ---         |
+| v-model          | Array Of Objects  | AOO Data to be edited | 
+| n-fields         | Number            | Number of fields in table |
+| page             | Number            | Specific page size. If not provided, component will calculate automatically |
+| n-filter-count   | Number            | Number of items to be listed in filter dialog. Default is 200 |
+| new-record       | Function          | The handler of the new record request (Under testing) |
+| :---             | :---:             | ---         |
+
+(TBD)
+
+#### Component: vue-excel-column
+| Name             | Type              | Description |
+| :---             | :---:             | ---         |
+| v-model          | String            | The Object to be edited |
+| field            | String            | Object Key |
+| label            | String            | Header Label |
+| type             | String            | Column type: 'string', 'number', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| readonly         | Boolean           | Allow to edit or not |
+| init-style       | String            | Additional Column CSS |
+| validate         | Function          | Function to return the error message |
+| interactive      | Boolean           | Specify true if the update event will be trigger during editing |
+| upper-case       | Boolean           | Specify True if you want to force upper-case |
+| accept-enter     | Boolean           | Allow multi-line in cell |
+| to-text          | Function          | The conversion function from object value to edit-text |
+| to-value         | Function          | The conversion function from edit-text to object value |
+| :---             | :---:             | ---         |
+
+(TBD)
+
+## Events List
+
+#### Component: vue-excel-editor
+| Name             | Argument          | Description |
+| :---             | :---:             | ---         |
+| update           | Array Of Array    | Update Cell information |
+| :---             | :---:             | ---         |
+
+(TBD)
+
+## Methods List
+
+#### Component: vue-excel-editor
+| Name             | Argument          | Description |
+| :---             | :---:             | ---         |
+| :---             | :---:             | ---         |
+
+(TBD)
 
 ## Example
 
@@ -62,7 +124,10 @@ const app = new Vue({
 })
 ```
 
-In your HTML call it like
+#### Important
+The Array-Of-Object (AOO) data is required an unique "key" field to operate
+
+In your HTML call it likes
 
 ```html
 <vue-excel-editor v-model="json_data" :n-fields="5">
@@ -75,11 +140,12 @@ In your HTML call it like
     </template>
 </vue-excel-editor>
 ```
-REQUIRED
-- json_data: Contains the data you want to display and edit,
 
 ## License
 MIT
 
-#### Status
+## Status
 This project is in an early stage of development. Any contribution is welcome :D
+
+## Keywords
+vue vue2 vuejs excel data grid table v-model editor editable javascript DHTML no-jquery grid-editor online-editor data-grid data-table spreadsheet tabular-data edit-cell editable-table data-spreadsheet bootstrap responsive navigatable contenteditable
