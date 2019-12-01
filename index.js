@@ -1,14 +1,13 @@
-// SysComponent.js
+// index.js
 
-import SysHTable from './SysHTable'
-import SysColumn from './SysColumn'
+import VueExcelEditor from './VueExcelEditor'
+import VueExcelColumn from './VueExcelColumn'
 
 export default {
   install (Vue) {
-    Vue.yourMethod = (value) => value
 
-    Vue.component('sys-htable', SysHTable)
-    Vue.component('sys-column', SysColumn)
+    Vue.component('vue-excel-editor', VueExcelEditor)
+    Vue.component('vue-excel-column', VueExcelColumn)
 
     Vue.mixin({
       created() {

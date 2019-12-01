@@ -127,7 +127,7 @@ export default {
   beforeMount () {
     if (!['string', 'number', 'money', 'check10', 'checkYN', 'checkTF',
       'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick'].includes(this.type))
-      throw new Error('SysColumn: Invalid type ' + this.type)
+      throw new Error('VueExcelColumn: Invalid type ' + this.type)
   },
   mounted () {
     this.uid = 'uid' + this._uid

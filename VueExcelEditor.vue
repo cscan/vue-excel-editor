@@ -45,7 +45,7 @@
               <font-awesome-icon v-if="selectedCount==table.length" icon="times-circle" size="sm" />
               <font-awesome-icon v-else icon="check-circle" size="sm" />
             </th>
-            <sys-column-filter v-for="item in nFields" :key="`th2-${item}`" v-model="columnFilter[item]" class="column-filter" />
+            <vue-excel-filter v-for="item in nFields" :key="`th2-${item}`" v-model="columnFilter[item]" class="column-filter" />
           </tr>
         </thead>
         <tbody>
@@ -66,7 +66,7 @@
                   :record="record"
                   :recordPosition="recordPosition">
               <template v-for="(fieldValue, fieldName, fieldPosition) in record">
-                <sys-column :key="`f${fieldPosition}`" v-model="record[fieldName]" />
+                <vue-excel-column :key="`f${fieldPosition}`" v-model="record[fieldName]" />
               </template>
             </slot>
           </tr>
@@ -246,8 +246,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import SysColumn from './SysColumn'
-import SysColumnFilter from './SysColumnFilter'
+import VueExcelColumn from './VueExcelColumn'
+import VueExcelFilter from './VueExcelFilter'
 import XLSX from 'xlsx'
 
 library.add(fas)
@@ -256,8 +256,8 @@ Vue.use(BootstrapVue)
 export default {
   components: {
     'font-awesome-icon': FontAwesomeIcon,
-    'sys-column': SysColumn,
-    'sys-column-filter': SysColumnFilter
+    'vue-excel-column': VueExcelColumn,
+    'vue-excel-filter': VueExcelFilter
   },
   props: {
     value: {type: Array,                            // actual table content
@@ -284,8 +284,8 @@ export default {
       filterTr: null,               // THEAD filter dom node
       recordBody: null,             // TBODY dom node
       footer: null,                 // TFOOTER dom node
-      colFields: [],                // array of field names (propagate from SysColumn in correct col pos)
-      colTypes: [],                 // array of types (propagate from SysColumn in correct col pos)
+      colFields: [],                // array of field names (propagate from VueExcelColumn in correct col pos)
+      colTypes: [],                 // array of types (propagate from VueExcelColumn in correct col pos)
 
       colLabels: [],                // Temporary list of labels for paenlGrid
 
@@ -862,7 +862,7 @@ export default {
           const table = this.value
           const newRow = this.newRecord()
           if (!newRow.key)
-            throw new Error('SysHTable: The key of new record cannot be null')
+            throw new Error('VueExcelEditor: The key of new record cannot be null')
           if (table.find(rec => rec.key === newRow.key))
             throw new Error('SysHTable: The current table contains the specified key during new record')
           table.push(newRow)
@@ -871,9 +871,9 @@ export default {
             if (err)
               throw new Error(err)
             if (!newRow.key)
-              throw new Error('SysHTable: The key of new record cannot be null')
+              throw new Error('VueExcelEditor: The key of new record cannot be null')
             if (this.table.find(rec => rec.key === newRow.key))
-              throw new Error('SysHTable: The current table contains the specified key during new record')
+              throw new Error('VueExcelEditor: The current table contains the specified key during new record')
 
             const rowPos = this.table.push(newRow) - 1
             Object.keys(newRow).forEach(k => this.updateCell(rowPos, k, newRow[k]))
