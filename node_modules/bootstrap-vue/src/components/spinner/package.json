@@ -1,0 +1,34 @@
+{
+  "name": "@bootstrap-vue/spinner",
+  "version": "1.0.0",
+  "meta": {
+    "title": "Spinner",
+    "description": "The <b-spinner> component can be used to show the loading state in your projects. They're rendered only with basic HTML and CSS as a lightweight Vue functional component.",
+    "slug": "spinner",
+    "components": [
+      {
+        "component": "BSpinner",
+        "props": [
+          {
+            "prop": "type",
+            "description": "Type of spinner to show. Current supported types are 'border' and 'grow'"
+          },
+          {
+            "prop": "label",
+            "description": "Text content to place in the sr-only label"
+          },
+          {
+            "prop": "small",
+            "description": "When set, rendered a smaller spinner suitable for placing in buttons"
+          }
+        ],
+        "slots": [
+          {
+            "name": "label",
+            "description": "Content to place in the sr-only label"
+          }
+        ]
+      }
+    ]
+  }
+}

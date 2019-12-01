@@ -1,0 +1,64 @@
+{
+  "name": "@bootstrap-vue/alert",
+  "version": "1.0.0",
+  "meta": {
+    "title": "Alert",
+    "description": "Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages.",
+    "components": [
+      {
+        "component": "BAlert",
+        "props": [
+          {
+            "prop": "dismissible",
+            "description": "When set, enables the dismiss close button"
+          },
+          {
+            "prop": "dismissLabel",
+            "description": "Value for the 'aria-label' attribute on the dismiss button"
+          },
+          {
+            "prop": "show",
+            "description": "When set, shows the alert. Set to a number (seconds) to show and automatically dismiss the alert after the number of seconds has elapsed"
+          }
+        ],
+        "events": [
+          {
+            "event": "dismissed",
+            "description": "Alert dismissed either via the dismiss close button or when the dismiss countdown has expired"
+          },
+          {
+            "event": "dismiss-count-down",
+            "description": "When prop show is a number, this event emits every second on countdown.",
+            "args": [
+              {
+                "arg": "dismissCountDown",
+                "type": "Number",
+                "description": "Time remaining to dismissed"
+              }
+            ]
+          },
+          {
+            "event": "input",
+            "description": "Used to update the v-model show value",
+            "args": [
+              {
+                "arg": "show",
+                "type": [
+                  "Boolean",
+                  "Number"
+                ],
+                "description": "Boolean state of alert, or Number for current countdown value"
+              }
+            ]
+          }
+        ],
+        "slots": [
+          {
+            "name": "dismiss",
+            "description": "Content for the dismiss button."
+          }
+        ]
+      }
+    ]
+  }
+}

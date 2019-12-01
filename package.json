@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/vue-fontawesome": "^0.1.8",
+    "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.1.0",
+    "moment": "^2.24.0",
+    "xlsx": "^0.15.3"
+  }
+}

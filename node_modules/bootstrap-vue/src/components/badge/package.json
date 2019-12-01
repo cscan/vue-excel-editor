@@ -1,0 +1,19 @@
+{
+  "name": "@bootstrap-vue/badge",
+  "version": "1.0.0",
+  "meta": {
+    "title": "Badge",
+    "description": "Small and adaptive tag for adding context to just about any content.",
+    "components": [
+      {
+        "component": "BBadge",
+        "props": [
+          {
+            "prop": "pill",
+            "description": "When set to 'true', renders the badge in pill style"
+          }
+        ]
+      }
+    ]
+  }
+}

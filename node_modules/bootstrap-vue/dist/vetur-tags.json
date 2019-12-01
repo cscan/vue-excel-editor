@@ -1,0 +1,2023 @@
+{
+  "b-alert": {
+    "description": "Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages.",
+    "attributes": [
+      "variant",
+      "dismissible",
+      "dismiss-label",
+      "show",
+      "fade"
+    ]
+  },
+  "b-badge": {
+    "description": "Small and adaptive tag for adding context to just about any content.",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "tag",
+      "variant",
+      "pill"
+    ]
+  },
+  "b-breadcrumb": {
+    "description": "Indicate the current page's location within a navigational hierarchy. Separators are automatically added in CSS through ::before and content.",
+    "attributes": [
+      "items"
+    ]
+  },
+  "b-breadcrumb-item": {
+    "description": "Indicate the current page's location within a navigational hierarchy. Separators are automatically added in CSS through ::before and content.",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "text",
+      "html",
+      "aria-current"
+    ]
+  },
+  "b-button": {
+    "description": "Use BootstrapVue's <b-button> component for actions in forms, dialogs, and more. Includes support for a handful of contextual variations, sizes, states, and more.",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "block",
+      "size",
+      "variant",
+      "type",
+      "tag",
+      "pill",
+      "squared",
+      "pressed"
+    ]
+  },
+  "b-btn": {
+    "description": "Use BootstrapVue's <b-button> component for actions in forms, dialogs, and more. Includes support for a handful of contextual variations, sizes, states, and more.\n\n*Alias for BButton*",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "block",
+      "size",
+      "variant",
+      "type",
+      "tag",
+      "pill",
+      "squared",
+      "pressed"
+    ]
+  },
+  "b-button-close": {
+    "description": "Use BootstrapVue's <b-button> component for actions in forms, dialogs, and more. Includes support for a handful of contextual variations, sizes, states, and more.",
+    "attributes": [
+      "disabled",
+      "aria-label",
+      "text-variant"
+    ]
+  },
+  "b-btn-close": {
+    "description": "Use BootstrapVue's <b-button> component for actions in forms, dialogs, and more. Includes support for a handful of contextual variations, sizes, states, and more.\n\n*Alias for BButtonClose*",
+    "attributes": [
+      "disabled",
+      "aria-label",
+      "text-variant"
+    ]
+  },
+  "b-button-group": {
+    "description": "Group a series of buttons together on a single line with <b-button-group>.",
+    "attributes": [
+      "vertical",
+      "size",
+      "tag",
+      "aria-role"
+    ]
+  },
+  "b-btn-group": {
+    "description": "Group a series of buttons together on a single line with <b-button-group>.\n\n*Alias for BButtonGroup*",
+    "attributes": [
+      "vertical",
+      "size",
+      "tag",
+      "aria-role"
+    ]
+  },
+  "b-button-toolbar": {
+    "description": "Group a series of <b-button-group> and/or <b-input-group> together on a single line, with optional keyboard navigation.",
+    "attributes": [
+      "justify",
+      "key-nav"
+    ]
+  },
+  "b-btn-toolbar": {
+    "description": "Group a series of <b-button-group> and/or <b-input-group> together on a single line, with optional keyboard navigation.\n\n*Alias for BButtonToolbar*",
+    "attributes": [
+      "justify",
+      "key-nav"
+    ]
+  },
+  "b-card": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "body-tag",
+      "body-bg-variant",
+      "body-border-variant",
+      "body-text-variant",
+      "body-class",
+      "title",
+      "title-tag",
+      "sub-title",
+      "sub-title-tag",
+      "sub-title-text-variant",
+      "overlay",
+      "header-tag",
+      "header-bg-variant",
+      "header-border-variant",
+      "header-text-variant",
+      "header",
+      "header-html",
+      "header-class",
+      "footer-tag",
+      "footer-bg-variant",
+      "footer-border-variant",
+      "footer-text-variant",
+      "footer",
+      "footer-html",
+      "footer-class",
+      "img-src",
+      "img-alt",
+      "img-top",
+      "img-bottom",
+      "img-start",
+      "img-left",
+      "img-end",
+      "img-right",
+      "img-height",
+      "img-width",
+      "tag",
+      "bg-variant",
+      "border-variant",
+      "text-variant",
+      "align",
+      "no-body"
+    ]
+  },
+  "b-card-header": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "header-tag",
+      "header-bg-variant",
+      "header-border-variant",
+      "header-text-variant",
+      "header",
+      "header-html",
+      "header-class"
+    ]
+  },
+  "b-card-footer": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "footer-tag",
+      "footer-bg-variant",
+      "footer-border-variant",
+      "footer-text-variant",
+      "footer",
+      "footer-html",
+      "footer-class"
+    ]
+  },
+  "b-card-body": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "body-tag",
+      "body-bg-variant",
+      "body-border-variant",
+      "body-text-variant",
+      "body-class",
+      "title",
+      "title-tag",
+      "sub-title",
+      "sub-title-tag",
+      "sub-title-text-variant",
+      "overlay"
+    ]
+  },
+  "b-card-title": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "title",
+      "title-tag"
+    ]
+  },
+  "b-card-sub-title": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "sub-title",
+      "sub-title-tag",
+      "sub-title-text-variant"
+    ]
+  },
+  "b-card-img": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "src",
+      "alt",
+      "top",
+      "bottom",
+      "start",
+      "left",
+      "end",
+      "right",
+      "height",
+      "width"
+    ]
+  },
+  "b-card-img-lazy": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "src",
+      "srcset",
+      "sizes",
+      "alt",
+      "width",
+      "height",
+      "blank-src",
+      "blank-color",
+      "blank-width",
+      "blank-height",
+      "show",
+      "offset",
+      "top",
+      "bottom",
+      "start",
+      "left",
+      "end",
+      "right"
+    ]
+  },
+  "b-card-text": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "text-tag"
+    ]
+  },
+  "b-card-group": {
+    "description": "A card is a flexible and extensible content container. It includes options for headers and footers, a wide variety of content, contextual background colors, and powerful display options.",
+    "attributes": [
+      "tag",
+      "deck",
+      "columns"
+    ]
+  },
+  "b-carousel": {
+    "description": "The <b-carousel> component is a slideshow for cycling through a series of content, built with CSS 3D transforms. It works with a series of images, text, or custom markup.",
+    "attributes": [
+      "id",
+      "label-prev",
+      "label-next",
+      "label-goto-slide",
+      "label-indicators",
+      "interval",
+      "indicators",
+      "controls",
+      "no-animation",
+      "fade",
+      "no-wrap",
+      "no-touch",
+      "no-hover-pause",
+      "img-width",
+      "img-height",
+      "background",
+      "value"
+    ]
+  },
+  "b-carousel-slide": {
+    "description": "The <b-carousel> component is a slideshow for cycling through a series of content, built with CSS 3D transforms. It works with a series of images, text, or custom markup.",
+    "attributes": [
+      "id",
+      "img-src",
+      "img-alt",
+      "img-width",
+      "img-height",
+      "img-blank",
+      "img-blank-color",
+      "content-visible-up",
+      "content-tag",
+      "caption",
+      "caption-html",
+      "caption-tag",
+      "text",
+      "text-html",
+      "text-tag",
+      "background"
+    ]
+  },
+  "b-collapse": {
+    "description": "Easily toggle content visibility on your pages. Includes support for making accordions.",
+    "attributes": [
+      "id",
+      "is-nav",
+      "accordion",
+      "visible",
+      "tag"
+    ]
+  },
+  "b-dropdown": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "id",
+      "disabled",
+      "text",
+      "html",
+      "dropup",
+      "dropright",
+      "dropleft",
+      "right",
+      "offset",
+      "no-flip",
+      "lazy",
+      "popper-opts",
+      "toggle-text",
+      "size",
+      "variant",
+      "block",
+      "menu-class",
+      "toggle-tag",
+      "toggle-class",
+      "no-caret",
+      "split",
+      "split-href",
+      "split-to",
+      "split-variant",
+      "split-button-type",
+      "role",
+      "boundary"
+    ]
+  },
+  "b-dd": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdown*",
+    "attributes": [
+      "id",
+      "disabled",
+      "text",
+      "html",
+      "dropup",
+      "dropright",
+      "dropleft",
+      "right",
+      "offset",
+      "no-flip",
+      "lazy",
+      "popper-opts",
+      "toggle-text",
+      "size",
+      "variant",
+      "block",
+      "menu-class",
+      "toggle-tag",
+      "toggle-class",
+      "no-caret",
+      "split",
+      "split-href",
+      "split-to",
+      "split-variant",
+      "split-button-type",
+      "role",
+      "boundary"
+    ]
+  },
+  "b-dropdown-item": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "variant"
+    ]
+  },
+  "b-dd-item": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownItem*",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "variant"
+    ]
+  },
+  "b-dropdown-item-button": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "active",
+      "active-class",
+      "disabled",
+      "variant"
+    ]
+  },
+  "b-dropdown-item-btn": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownItemButton*",
+    "attributes": [
+      "active",
+      "active-class",
+      "disabled",
+      "variant"
+    ]
+  },
+  "b-dd-item-button": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownItemButton*",
+    "attributes": [
+      "active",
+      "active-class",
+      "disabled",
+      "variant"
+    ]
+  },
+  "b-dd-item-btn": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownItemButton*",
+    "attributes": [
+      "active",
+      "active-class",
+      "disabled",
+      "variant"
+    ]
+  },
+  "b-dropdown-divider": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "tag"
+    ]
+  },
+  "b-dd-divider": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownDivider*",
+    "attributes": [
+      "tag"
+    ]
+  },
+  "b-dropdown-form": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "id",
+      "inline",
+      "novalidate",
+      "validated",
+      "disabled"
+    ]
+  },
+  "b-dd-form": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownForm*",
+    "attributes": [
+      "id",
+      "inline",
+      "novalidate",
+      "validated",
+      "disabled"
+    ]
+  },
+  "b-dropdown-text": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "tag",
+      "variant"
+    ]
+  },
+  "b-dd-text": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownText*",
+    "attributes": [
+      "tag",
+      "variant"
+    ]
+  },
+  "b-dropdown-group": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "id",
+      "header",
+      "header-tag",
+      "header-variant",
+      "header-classes",
+      "aria-describedby"
+    ]
+  },
+  "b-dd-group": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownGroup*",
+    "attributes": [
+      "id",
+      "header",
+      "header-tag",
+      "header-variant",
+      "header-classes",
+      "aria-describedby"
+    ]
+  },
+  "b-dropdown-header": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.",
+    "attributes": [
+      "id",
+      "tag",
+      "variant"
+    ]
+  },
+  "b-dd-header": {
+    "description": "Dropdowns are toggleable, contextual overlays for displaying lists of links and actions in a dropdown menu format.\n\n*Alias for BDropdownHeader*",
+    "attributes": [
+      "id",
+      "tag",
+      "variant"
+    ]
+  },
+  "b-embed": {
+    "description": "Create responsive video or slideshow embeds based on the width of the parent by creating an intrinsic ratio that scales on any device.",
+    "attributes": [
+      "type",
+      "tag",
+      "aspect"
+    ]
+  },
+  "b-form": {
+    "description": "Form component and form helper components that optionally supports inline form styles and validation states",
+    "attributes": [
+      "id",
+      "inline",
+      "novalidate",
+      "validated"
+    ]
+  },
+  "b-form-text": {
+    "description": "Form component and form helper components that optionally supports inline form styles and validation states",
+    "attributes": [
+      "id",
+      "tag",
+      "text-variant",
+      "inline"
+    ]
+  },
+  "b-form-invalid-feedback": {
+    "description": "Form component and form helper components that optionally supports inline form styles and validation states",
+    "attributes": [
+      "id",
+      "tag",
+      "tooltip",
+      "force-show",
+      "state",
+      "aria-live",
+      "role"
+    ]
+  },
+  "b-form-valid-feedback": {
+    "description": "Form component and form helper components that optionally supports inline form styles and validation states",
+    "attributes": [
+      "id",
+      "tag",
+      "tooltip",
+      "force-show",
+      "state",
+      "aria-live",
+      "role"
+    ]
+  },
+  "b-form-datalist": {
+    "description": "Form component and form helper components that optionally supports inline form styles and validation states",
+    "attributes": [
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "id"
+    ]
+  },
+  "b-datalist": {
+    "description": "Form component and form helper components that optionally supports inline form styles and validation states\n\n*Alias for BFormDatalist*",
+    "attributes": [
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "id"
+    ]
+  },
+  "b-form-checkbox-group": {
+    "description": "Custom checkbox input and checkbox group to replace the browser default checkbox input, built on top of semantic and accessible markup. Optionally supports switch styling.",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "validated",
+      "aria-invalid",
+      "stacked",
+      "plain",
+      "buttons",
+      "button-variant",
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "size",
+      "state",
+      "switches",
+      "checked"
+    ]
+  },
+  "b-checkbox-group": {
+    "description": "Custom checkbox input and checkbox group to replace the browser default checkbox input, built on top of semantic and accessible markup. Optionally supports switch styling.\n\n*Alias for BFormCheckboxGroup*",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "validated",
+      "aria-invalid",
+      "stacked",
+      "plain",
+      "buttons",
+      "button-variant",
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "size",
+      "state",
+      "switches",
+      "checked"
+    ]
+  },
+  "b-check-group": {
+    "description": "Custom checkbox input and checkbox group to replace the browser default checkbox input, built on top of semantic and accessible markup. Optionally supports switch styling.\n\n*Alias for BFormCheckboxGroup*",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "validated",
+      "aria-invalid",
+      "stacked",
+      "plain",
+      "buttons",
+      "button-variant",
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "size",
+      "state",
+      "switches",
+      "checked"
+    ]
+  },
+  "b-form-checkbox": {
+    "description": "Custom checkbox input and checkbox group to replace the browser default checkbox input, built on top of semantic and accessible markup. Optionally supports switch styling.",
+    "attributes": [
+      "value",
+      "checked",
+      "inline",
+      "plain",
+      "button",
+      "button-variant",
+      "aria-label",
+      "aria-labelledby",
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "unchecked-value",
+      "indeterminate",
+      "switch"
+    ]
+  },
+  "b-checkbox": {
+    "description": "Custom checkbox input and checkbox group to replace the browser default checkbox input, built on top of semantic and accessible markup. Optionally supports switch styling.\n\n*Alias for BFormCheckbox*",
+    "attributes": [
+      "value",
+      "checked",
+      "inline",
+      "plain",
+      "button",
+      "button-variant",
+      "aria-label",
+      "aria-labelledby",
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "unchecked-value",
+      "indeterminate",
+      "switch"
+    ]
+  },
+  "b-check": {
+    "description": "Custom checkbox input and checkbox group to replace the browser default checkbox input, built on top of semantic and accessible markup. Optionally supports switch styling.\n\n*Alias for BFormCheckbox*",
+    "attributes": [
+      "value",
+      "checked",
+      "inline",
+      "plain",
+      "button",
+      "button-variant",
+      "aria-label",
+      "aria-labelledby",
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "unchecked-value",
+      "indeterminate",
+      "switch"
+    ]
+  },
+  "b-form-file": {
+    "description": "Customized, cross-browser consistent, file input control that supports single file, multiple files, and directory upload.",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "state",
+      "plain",
+      "size",
+      "value",
+      "accept",
+      "capture",
+      "placeholder",
+      "browse-text",
+      "drop-placeholder",
+      "multiple",
+      "directory",
+      "no-traverse",
+      "no-drop",
+      "file-name-formatter"
+    ]
+  },
+  "b-file": {
+    "description": "Customized, cross-browser consistent, file input control that supports single file, multiple files, and directory upload.\n\n*Alias for BFormFile*",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "state",
+      "plain",
+      "size",
+      "value",
+      "accept",
+      "capture",
+      "placeholder",
+      "browse-text",
+      "drop-placeholder",
+      "multiple",
+      "directory",
+      "no-traverse",
+      "no-drop",
+      "file-name-formatter"
+    ]
+  },
+  "b-form-group": {
+    "description": "Easily add some structure to forms. Its purpose is to pair form controls with a legend or label, and to provide help text and invalid/valid feedback text, as well as visual (color) contextual state feedback.",
+    "attributes": [
+      "label",
+      "label-for",
+      "label-size",
+      "label-sr-only",
+      "label-cols",
+      "label-cols-sm",
+      "label-cols-md",
+      "label-cols-lg",
+      "label-cols-xl",
+      "label-align",
+      "label-align-sm",
+      "label-align-md",
+      "label-align-lg",
+      "label-align-xl",
+      "label-class",
+      "description",
+      "invalid-feedback",
+      "valid-feedback",
+      "tooltip",
+      "feedback-aria-live",
+      "validated",
+      "disabled"
+    ]
+  },
+  "b-form-input": {
+    "description": "Create various type inputs such as: text, password, number, url, email, search, range, date and more.",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "value",
+      "aria-invalid",
+      "readonly",
+      "plaintext",
+      "autocomplete",
+      "placeholder",
+      "formatter",
+      "lazy-formatter",
+      "trim",
+      "number",
+      "lazy",
+      "debounce",
+      "type",
+      "no-wheel",
+      "min",
+      "max",
+      "step",
+      "list"
+    ]
+  },
+  "b-input": {
+    "description": "Create various type inputs such as: text, password, number, url, email, search, range, date and more.\n\n*Alias for BFormInput*",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "value",
+      "aria-invalid",
+      "readonly",
+      "plaintext",
+      "autocomplete",
+      "placeholder",
+      "formatter",
+      "lazy-formatter",
+      "trim",
+      "number",
+      "lazy",
+      "debounce",
+      "type",
+      "no-wheel",
+      "min",
+      "max",
+      "step",
+      "list"
+    ]
+  },
+  "b-form-radio-group": {
+    "description": "Cross browser consistent radio inputs and radio groups, using Bootstrap's custom radio input to replace the browser default radio input.",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "validated",
+      "aria-invalid",
+      "stacked",
+      "plain",
+      "buttons",
+      "button-variant",
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "size",
+      "state",
+      "checked"
+    ]
+  },
+  "b-radio-group": {
+    "description": "Cross browser consistent radio inputs and radio groups, using Bootstrap's custom radio input to replace the browser default radio input.\n\n*Alias for BFormRadioGroup*",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "validated",
+      "aria-invalid",
+      "stacked",
+      "plain",
+      "buttons",
+      "button-variant",
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "size",
+      "state",
+      "checked"
+    ]
+  },
+  "b-form-radio": {
+    "description": "Cross browser consistent radio inputs and radio groups, using Bootstrap's custom radio input to replace the browser default radio input.",
+    "attributes": [
+      "id",
+      "value",
+      "checked",
+      "inline",
+      "plain",
+      "button",
+      "button-variant",
+      "aria-label",
+      "aria-labelledby",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state"
+    ]
+  },
+  "b-radio": {
+    "description": "Cross browser consistent radio inputs and radio groups, using Bootstrap's custom radio input to replace the browser default radio input.\n\n*Alias for BFormRadio*",
+    "attributes": [
+      "id",
+      "value",
+      "checked",
+      "inline",
+      "plain",
+      "button",
+      "button-variant",
+      "aria-label",
+      "aria-labelledby",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state"
+    ]
+  },
+  "b-form-select": {
+    "description": "Custom <select> component using cross-browser custom styles. Optionally generate <option> entries based on an array, array of objects.",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "plain",
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "value",
+      "multiple",
+      "select-size",
+      "aria-invalid"
+    ]
+  },
+  "b-select": {
+    "description": "Custom <select> component using cross-browser custom styles. Optionally generate <option> entries based on an array, array of objects.\n\n*Alias for BFormSelect*",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "plain",
+      "options",
+      "value-field",
+      "text-field",
+      "html-field",
+      "disabled-field",
+      "value",
+      "multiple",
+      "select-size",
+      "aria-invalid"
+    ]
+  },
+  "b-form-textarea": {
+    "description": "Create multi-line text inputs with support for auto height sizing, minimum and maximum number of rows, and contextual validation states.",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "value",
+      "aria-invalid",
+      "readonly",
+      "plaintext",
+      "autocomplete",
+      "placeholder",
+      "formatter",
+      "lazy-formatter",
+      "trim",
+      "number",
+      "lazy",
+      "debounce",
+      "rows",
+      "max-rows",
+      "wrap",
+      "no-resize",
+      "no-auto-shrink"
+    ]
+  },
+  "b-textarea": {
+    "description": "Create multi-line text inputs with support for auto height sizing, minimum and maximum number of rows, and contextual validation states.\n\n*Alias for BFormTextarea*",
+    "attributes": [
+      "id",
+      "name",
+      "disabled",
+      "required",
+      "form",
+      "autofocus",
+      "size",
+      "state",
+      "value",
+      "aria-invalid",
+      "readonly",
+      "plaintext",
+      "autocomplete",
+      "placeholder",
+      "formatter",
+      "lazy-formatter",
+      "trim",
+      "number",
+      "lazy",
+      "debounce",
+      "rows",
+      "max-rows",
+      "wrap",
+      "no-resize",
+      "no-auto-shrink"
+    ]
+  },
+  "b-img": {
+    "description": "Create responsive images, optionally adding lightweight styles to them — all via props. Support for rounded images, thumbnail styling, alignment, and even the ability to create blank images with an optional solid background color, and lazy loaded images.",
+    "attributes": [
+      "src",
+      "srcset",
+      "sizes",
+      "alt",
+      "width",
+      "height",
+      "block",
+      "fluid",
+      "fluid-grow",
+      "rounded",
+      "thumbnail",
+      "left",
+      "right",
+      "center",
+      "blank",
+      "blank-color"
+    ]
+  },
+  "b-img-lazy": {
+    "description": "Create responsive images, optionally adding lightweight styles to them — all via props. Support for rounded images, thumbnail styling, alignment, and even the ability to create blank images with an optional solid background color, and lazy loaded images.",
+    "attributes": [
+      "src",
+      "srcset",
+      "sizes",
+      "alt",
+      "width",
+      "height",
+      "blank-src",
+      "blank-color",
+      "blank-width",
+      "blank-height",
+      "show",
+      "fluid",
+      "fluid-grow",
+      "block",
+      "thumbnail",
+      "rounded",
+      "left",
+      "right",
+      "center",
+      "offset"
+    ]
+  },
+  "b-input-group": {
+    "description": "Easily extend form controls by adding text, buttons, or button groups on either side of textual inputs.",
+    "attributes": [
+      "id",
+      "size",
+      "prepend",
+      "prepend-html",
+      "append",
+      "append-html",
+      "tag"
+    ]
+  },
+  "b-input-group-prepend": {
+    "description": "Easily extend form controls by adding text, buttons, or button groups on either side of textual inputs.",
+    "attributes": [
+      "id",
+      "tag",
+      "is-text"
+    ]
+  },
+  "b-input-group-append": {
+    "description": "Easily extend form controls by adding text, buttons, or button groups on either side of textual inputs.",
+    "attributes": [
+      "id",
+      "tag",
+      "is-text"
+    ]
+  },
+  "b-input-group-text": {
+    "description": "Easily extend form controls by adding text, buttons, or button groups on either side of textual inputs.",
+    "attributes": [
+      "tag"
+    ]
+  },
+  "b-input-group-addon": {
+    "description": "Easily extend form controls by adding text, buttons, or button groups on either side of textual inputs.",
+    "attributes": [
+      "id",
+      "tag",
+      "is-text",
+      "append"
+    ]
+  },
+  "b-jumbotron": {
+    "description": "A lightweight, flexible component that can optionally extend the entire viewport to showcase key marketing messages on your site.",
+    "attributes": [
+      "fluid",
+      "container-fluid",
+      "header",
+      "header-html",
+      "header-tag",
+      "header-level",
+      "lead",
+      "lead-html",
+      "lead-tag",
+      "tag",
+      "bg-variant",
+      "border-variant",
+      "text-variant"
+    ]
+  },
+  "b-container": {
+    "description": "Use the powerful mobile-first flexbox grid (via the <b-container>, <b-row>, <b-form-row> and <b-col> components) to build layouts of all shapes and sizes thanks to a twelve column system, five default responsive tiers, CSS Sass variables and mixins, and dozens of predefined classes.",
+    "attributes": [
+      "tag",
+      "fluid"
+    ]
+  },
+  "b-row": {
+    "description": "Use the powerful mobile-first flexbox grid (via the <b-container>, <b-row>, <b-form-row> and <b-col> components) to build layouts of all shapes and sizes thanks to a twelve column system, five default responsive tiers, CSS Sass variables and mixins, and dozens of predefined classes.",
+    "attributes": [
+      "tag",
+      "no-gutters",
+      "align-v",
+      "align-h",
+      "align-content"
+    ]
+  },
+  "b-col": {
+    "description": "Use the powerful mobile-first flexbox grid (via the <b-container>, <b-row>, <b-form-row> and <b-col> components) to build layouts of all shapes and sizes thanks to a twelve column system, five default responsive tiers, CSS Sass variables and mixins, and dozens of predefined classes.",
+    "attributes": [
+      "col",
+      "cols",
+      "sm",
+      "md",
+      "lg",
+      "xl",
+      "offset",
+      "offset-sm",
+      "offset-md",
+      "offset-lg",
+      "offset-xl",
+      "order",
+      "order-sm",
+      "order-md",
+      "order-lg",
+      "order-xl",
+      "align-self",
+      "tag"
+    ]
+  },
+  "b-form-row": {
+    "description": "Use the powerful mobile-first flexbox grid (via the <b-container>, <b-row>, <b-form-row> and <b-col> components) to build layouts of all shapes and sizes thanks to a twelve column system, five default responsive tiers, CSS Sass variables and mixins, and dozens of predefined classes.",
+    "attributes": [
+      "tag"
+    ]
+  },
+  "b-link": {
+    "description": "Use BootstrapVue's custom <b-link> component for generating a standard <a> link or <router-link>. <b-link> supports the disabled state and click event propagation.",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch"
+    ]
+  },
+  "b-list-group": {
+    "description": "List groups are a flexible and powerful component for displaying a series of content. List group items can be modified to support just about any content within. They can also be used as navigation via various props.",
+    "attributes": [
+      "tag",
+      "flush",
+      "horizontal"
+    ]
+  },
+  "b-list-group-item": {
+    "description": "List groups are a flexible and powerful component for displaying a series of content. List group items can be modified to support just about any content within. They can also be used as navigation via various props.",
+    "attributes": [
+      "tag",
+      "action",
+      "button",
+      "variant",
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch"
+    ]
+  },
+  "b-media": {
+    "description": "The media object helps build complex and repetitive components where some media is positioned alongside content that doesn't wrap around said media.",
+    "attributes": [
+      "tag",
+      "right-align",
+      "vertical-align",
+      "no-body"
+    ]
+  },
+  "b-media-aside": {
+    "description": "The media object helps build complex and repetitive components where some media is positioned alongside content that doesn't wrap around said media.",
+    "attributes": [
+      "tag",
+      "vertical-align"
+    ]
+  },
+  "b-media-body": {
+    "description": "The media object helps build complex and repetitive components where some media is positioned alongside content that doesn't wrap around said media.",
+    "attributes": [
+      "tag"
+    ]
+  },
+  "b-modal": {
+    "description": "Modals are streamlined, but flexible dialog prompts powered by JavaScript and CSS. They support a number of use cases from user notification to completely custom content and feature a handful of helpful sub-components, sizes, variants, accessibility, and more.",
+    "attributes": [
+      "id",
+      "size",
+      "centered",
+      "scrollable",
+      "button-size",
+      "no-stacking",
+      "no-fade",
+      "no-close-on-backdrop",
+      "no-close-on-esc",
+      "no-enforce-focus",
+      "title",
+      "title-html",
+      "title-tag",
+      "title-class",
+      "title-sr-only",
+      "aria-label",
+      "header-bg-variant",
+      "header-border-variant",
+      "header-text-variant",
+      "header-close-variant",
+      "header-class",
+      "body-bg-variant",
+      "body-text-variant",
+      "modal-class",
+      "dialog-class",
+      "content-class",
+      "body-class",
+      "footer-bg-variant",
+      "footer-border-variant",
+      "footer-text-variant",
+      "footer-class",
+      "hide-header",
+      "hide-footer",
+      "hide-header-close",
+      "hide-backdrop",
+      "ok-only",
+      "ok-disabled",
+      "cancel-disabled",
+      "visible",
+      "return-focus",
+      "header-close-label",
+      "cancel-title",
+      "cancel-title-html",
+      "ok-title",
+      "ok-title-html",
+      "cancel-variant",
+      "ok-variant",
+      "lazy",
+      "busy",
+      "static",
+      "auto-focus-button"
+    ]
+  },
+  "b-nav": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.",
+    "attributes": [
+      "tag",
+      "fill",
+      "justified",
+      "align",
+      "tabs",
+      "pills",
+      "vertical",
+      "small",
+      "card-header"
+    ]
+  },
+  "b-nav-item": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "link-attrs",
+      "link-classes"
+    ]
+  },
+  "b-nav-text": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.",
+    "attributes": []
+  },
+  "b-nav-form": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.",
+    "attributes": [
+      "id",
+      "novalidate",
+      "validated",
+      "form-class"
+    ]
+  },
+  "b-nav-item-dropdown": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.",
+    "attributes": [
+      "id",
+      "disabled",
+      "text",
+      "html",
+      "dropup",
+      "dropright",
+      "dropleft",
+      "right",
+      "offset",
+      "no-flip",
+      "lazy",
+      "popper-opts",
+      "menu-class",
+      "toggle-class",
+      "no-caret",
+      "role"
+    ]
+  },
+  "b-nav-item-dd": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.\n\n*Alias for BNavItemDropdown*",
+    "attributes": [
+      "id",
+      "disabled",
+      "text",
+      "html",
+      "dropup",
+      "dropright",
+      "dropleft",
+      "right",
+      "offset",
+      "no-flip",
+      "lazy",
+      "popper-opts",
+      "menu-class",
+      "toggle-class",
+      "no-caret",
+      "role"
+    ]
+  },
+  "b-nav-dropdown": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.\n\n*Alias for BNavItemDropdown*",
+    "attributes": [
+      "id",
+      "disabled",
+      "text",
+      "html",
+      "dropup",
+      "dropright",
+      "dropleft",
+      "right",
+      "offset",
+      "no-flip",
+      "lazy",
+      "popper-opts",
+      "menu-class",
+      "toggle-class",
+      "no-caret",
+      "role"
+    ]
+  },
+  "b-nav-dd": {
+    "description": "Navigation components that share general markup and styles, from the base <b-nav> class to the active and disabled states. Swap modifier props to switch between each style.\n\n*Alias for BNavItemDropdown*",
+    "attributes": [
+      "id",
+      "disabled",
+      "text",
+      "html",
+      "dropup",
+      "dropright",
+      "dropleft",
+      "right",
+      "offset",
+      "no-flip",
+      "lazy",
+      "popper-opts",
+      "menu-class",
+      "toggle-class",
+      "no-caret",
+      "role"
+    ]
+  },
+  "b-navbar": {
+    "description": "The component <b-navbar> is a responsive wrapper that positions branding, navigation, and other elements into a concise header. It's easily extensible and thanks to the <b-collapse> component.",
+    "attributes": [
+      "tag",
+      "type",
+      "variant",
+      "toggleable",
+      "fixed",
+      "sticky",
+      "print"
+    ]
+  },
+  "b-navbar-nav": {
+    "description": "The component <b-navbar> is a responsive wrapper that positions branding, navigation, and other elements into a concise header. It's easily extensible and thanks to the <b-collapse> component.",
+    "attributes": [
+      "tag",
+      "fill",
+      "justified",
+      "align",
+      "small"
+    ]
+  },
+  "b-navbar-brand": {
+    "description": "The component <b-navbar> is a responsive wrapper that positions branding, navigation, and other elements into a concise header. It's easily extensible and thanks to the <b-collapse> component.",
+    "attributes": [
+      "href",
+      "rel",
+      "target",
+      "active",
+      "disabled",
+      "to",
+      "append",
+      "replace",
+      "event",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "router-tag",
+      "no-prefetch",
+      "tag"
+    ]
+  },
+  "b-navbar-toggle": {
+    "description": "The component <b-navbar> is a responsive wrapper that positions branding, navigation, and other elements into a concise header. It's easily extensible and thanks to the <b-collapse> component.",
+    "attributes": [
+      "label",
+      "target"
+    ]
+  },
+  "b-nav-toggle": {
+    "description": "The component <b-navbar> is a responsive wrapper that positions branding, navigation, and other elements into a concise header. It's easily extensible and thanks to the <b-collapse> component.\n\n*Alias for BNavbarToggle*",
+    "attributes": [
+      "label",
+      "target"
+    ]
+  },
+  "b-pagination": {
+    "description": "Quick first, previous, next, last, and page buttons for pagination control of another component (such as <b-table> or lists).",
+    "attributes": [
+      "disabled",
+      "value",
+      "limit",
+      "align",
+      "pills",
+      "hide-goto-end-buttons",
+      "aria-label",
+      "label-first-page",
+      "first-text",
+      "label-prev-page",
+      "prev-text",
+      "label-next-page",
+      "next-text",
+      "label-last-page",
+      "last-text",
+      "label-page",
+      "hide-ellipsis",
+      "ellipsis-text",
+      "size",
+      "per-page",
+      "total-rows",
+      "aria-controls"
+    ]
+  },
+  "b-pagination-nav": {
+    "description": "Quick first, previous, next, last, and page buttons for navigation based pagination, supporting regular links or router links.",
+    "attributes": [
+      "disabled",
+      "value",
+      "limit",
+      "align",
+      "pills",
+      "hide-goto-end-buttons",
+      "aria-label",
+      "label-first-page",
+      "first-text",
+      "label-prev-page",
+      "prev-text",
+      "label-next-page",
+      "next-text",
+      "label-last-page",
+      "last-text",
+      "label-page",
+      "hide-ellipsis",
+      "ellipsis-text",
+      "size",
+      "number-of-pages",
+      "base-url",
+      "use-router",
+      "link-gen",
+      "page-gen",
+      "pages",
+      "no-page-detect",
+      "active-class",
+      "exact",
+      "exact-active-class",
+      "no-prefetch"
+    ]
+  },
+  "b-popover": {
+    "description": "The Popover feature provides a tooltip-like behavior, can be easily applied to any interactive element via the <b-popover> component or v-b-popover directive",
+    "attributes": [
+      "title",
+      "target",
+      "triggers",
+      "placement",
+      "fallback-placement",
+      "variant",
+      "custom-class",
+      "delay",
+      "boundary",
+      "boundary-padding",
+      "offset",
+      "no-fade",
+      "container",
+      "show",
+      "disabled",
+      "id",
+      "content"
+    ]
+  },
+  "b-progress": {
+    "description": "A custom progress component for displaying simple or complex progress bars, featuring support for horizontally stacked bars, animated backgrounds, and text labels.",
+    "attributes": [
+      "variant",
+      "striped",
+      "animated",
+      "height",
+      "precision",
+      "show-progress",
+      "show-value",
+      "max",
+      "value"
+    ]
+  },
+  "b-progress-bar": {
+    "description": "A custom progress component for displaying simple or complex progress bars, featuring support for horizontally stacked bars, animated backgrounds, and text labels.",
+    "attributes": [
+      "value",
+      "label",
+      "label-html",
+      "max",
+      "precision",
+      "variant",
+      "striped",
+      "animated",
+      "show-progress",
+      "show-value"
+    ]
+  },
+  "b-spinner": {
+    "description": "The <b-spinner> component can be used to show the loading state in your projects. They're rendered only with basic HTML and CSS as a lightweight Vue functional component.",
+    "attributes": [
+      "type",
+      "label",
+      "variant",
+      "small",
+      "role",
+      "tag"
+    ]
+  },
+  "b-table": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "id",
+      "items",
+      "fields",
+      "primary-key",
+      "value",
+      "striped",
+      "bordered",
+      "borderless",
+      "outlined",
+      "dark",
+      "hover",
+      "small",
+      "fixed",
+      "responsive",
+      "sticky-header",
+      "no-border-collapse",
+      "caption-top",
+      "table-variant",
+      "table-class",
+      "stacked",
+      "head-variant",
+      "head-row-variant",
+      "thead-class",
+      "thead-tr-class",
+      "foot-clone",
+      "foot-variant",
+      "foot-row-variant",
+      "tfoot-class",
+      "tfoot-tr-class",
+      "tbody-tr-class",
+      "details-td-class",
+      "tbody-transition-props",
+      "tbody-transition-handlers",
+      "tbody-class",
+      "filter",
+      "filter-function",
+      "filter-ignored-fields",
+      "filter-included-fields",
+      "filter-debounce",
+      "sort-by",
+      "sort-desc",
+      "sort-direction",
+      "sort-compare",
+      "sort-compare-options",
+      "sort-compare-locale",
+      "sort-null-last",
+      "no-sort-reset",
+      "label-sort-asc",
+      "label-sort-desc",
+      "label-sort-clear",
+      "no-local-sorting",
+      "no-footer-sorting",
+      "sort-icon-left",
+      "per-page",
+      "current-page",
+      "caption",
+      "caption-html",
+      "selectable",
+      "select-mode",
+      "selected-variant",
+      "no-select-on-click",
+      "show-empty",
+      "empty-text",
+      "empty-html",
+      "empty-filtered-text",
+      "empty-filtered-html",
+      "busy",
+      "no-provider-paging",
+      "no-provider-sorting",
+      "no-provider-filtering",
+      "api-url"
+    ]
+  },
+  "b-table-lite": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "id",
+      "items",
+      "fields",
+      "primary-key",
+      "value",
+      "striped",
+      "bordered",
+      "borderless",
+      "outlined",
+      "dark",
+      "hover",
+      "small",
+      "fixed",
+      "responsive",
+      "sticky-header",
+      "no-border-collapse",
+      "caption-top",
+      "table-variant",
+      "table-class",
+      "stacked",
+      "head-variant",
+      "head-row-variant",
+      "thead-class",
+      "thead-tr-class",
+      "foot-clone",
+      "foot-variant",
+      "foot-row-variant",
+      "tfoot-class",
+      "tfoot-tr-class",
+      "tbody-tr-class",
+      "details-td-class",
+      "tbody-transition-props",
+      "tbody-transition-handlers",
+      "tbody-class",
+      "caption",
+      "caption-html"
+    ]
+  },
+  "b-table-simple": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "id",
+      "striped",
+      "bordered",
+      "borderless",
+      "outlined",
+      "dark",
+      "hover",
+      "small",
+      "fixed",
+      "responsive",
+      "sticky-header",
+      "no-border-collapse",
+      "caption-top",
+      "table-variant",
+      "table-class",
+      "stacked"
+    ]
+  },
+  "b-tbody": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "tbody-transition-props",
+      "tbody-transition-handlers"
+    ]
+  },
+  "b-thead": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "head-variant"
+    ]
+  },
+  "b-tfoot": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "foot-variant"
+    ]
+  },
+  "b-tr": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "variant"
+    ]
+  },
+  "b-td": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "variant",
+      "colspan",
+      "rowspan",
+      "stacked-heading",
+      "sticky-column"
+    ]
+  },
+  "b-th": {
+    "description": "For displaying tabular data. <b-table> supports pagination, filtering, sorting, custom rendering, events, and asynchronous data. For simple display of tabular data without all the fancy features, BootstrapVue also provides lightweight alternative components <b-table-lite> and <b-table-simple>",
+    "attributes": [
+      "variant",
+      "colspan",
+      "rowspan",
+      "stacked-heading",
+      "sticky-column"
+    ]
+  },
+  "b-tabs": {
+    "description": "Create a widget of tabbable panes of local content. The tabs component is built upon navs and cards internally, and provides full keyboard navigation control of the tabs.",
+    "attributes": [
+      "id",
+      "tag",
+      "fill",
+      "justified",
+      "align",
+      "pills",
+      "vertical",
+      "small",
+      "card",
+      "end",
+      "no-fade",
+      "no-nav-style",
+      "no-key-nav",
+      "lazy",
+      "content-class",
+      "nav-class",
+      "nav-wrapper-class",
+      "active-nav-item-class",
+      "active-tab-class",
+      "value"
+    ]
+  },
+  "b-tab": {
+    "description": "Create a widget of tabbable panes of local content. The tabs component is built upon navs and cards internally, and provides full keyboard navigation control of the tabs.",
+    "attributes": [
+      "id",
+      "active",
+      "tag",
+      "button-id",
+      "title",
+      "title-item-class",
+      "title-link-class",
+      "disabled",
+      "no-body",
+      "lazy"
+    ]
+  },
+  "b-toast": {
+    "description": "Push notifications to your visitors with a toast, a lightweight and easily customizable alert message.",
+    "attributes": [
+      "id",
+      "title",
+      "toaster",
+      "visible",
+      "variant",
+      "is-status",
+      "append-toast",
+      "no-auto-hide",
+      "auto-hide-delay",
+      "no-close-button",
+      "no-fade",
+      "no-hover-pause",
+      "solid",
+      "toast-class",
+      "header-class",
+      "body-class",
+      "href",
+      "to",
+      "static"
+    ]
+  },
+  "b-toaster": {
+    "description": "Push notifications to your visitors with a toast, a lightweight and easily customizable alert message.",
+    "attributes": [
+      "name",
+      "aria-live",
+      "aria-atomic",
+      "role"
+    ]
+  },
+  "b-tooltip": {
+    "description": "Easily add tooltips to elements or components via the <b-tooltip> component or v-b-tooltip directive.",
+    "attributes": [
+      "title",
+      "target",
+      "triggers",
+      "placement",
+      "fallback-placement",
+      "variant",
+      "custom-class",
+      "delay",
+      "boundary",
+      "boundary-padding",
+      "offset",
+      "no-fade",
+      "container",
+      "show",
+      "disabled",
+      "id"
+    ]
+  }
+}
