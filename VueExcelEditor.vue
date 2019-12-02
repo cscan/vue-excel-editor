@@ -51,16 +51,9 @@
         <tbody>
           <tr v-for="(record, recordPosition) in pagingTable" :key="recordPosition" :pos="recordPosition"
               :class="{select: selected[pageTop + recordPosition]}">
-            <template v-if="recordLabel">
-              <td class="text-center first-col"
-                  scope="row"
-                  @click="rowLabelClick">{{ recordLabel(record, recordPosition) }}</td>
-            </template>
-            <template v-else>
-              <td class="text-center first-col"
-                  scope="row"
-                  @click="rowLabelClick">{{ pageTop + recordPosition + 1 }}</td>
-            </template>
+            <td class="text-center first-col"
+                scope="row"
+                @click="rowLabelClick">{{ recordLabel(record, recordPosition) }}</td>
             <slot name="body"
                   :table="table"
                   :record="record"
@@ -264,7 +257,12 @@ export default {
       }
     },
     nFields: {type: Number, default: 0},            // number of columns/fields
-    recordLabel: {type: Function, default: null},   // ???
+    recordLabel: {                                  // return the row header
+      type: Function,
+      default (record, recordPosition) {
+        return this.pageTop + recordPosition + 1
+      }
+    },
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     newRecord: {type: Function, default: null},     // return the new record from caller if provided
     nFilterCount: {type: Number, default: 200}      // show top n values in filter dialog
@@ -941,6 +939,12 @@ export default {
   }
 }
 </script>
+
+<style scoped src="bootstrap/dist/css/bootstrap.css">
+</style>
+
+<style scoped src="bootstrap-vue/dist/bootstrap-vue.css">
+</style>
 
 <style scoped>
 .table-content {
