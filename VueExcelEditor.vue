@@ -35,6 +35,7 @@
                 :class="{'sort-asc-sign': sortPos==p && sortDir==1,
                          'sort-des-sign': sortPos==p && sortDir==-1}"
                 class="table-col-header"
+                :style="item.initStyle"
                 @mousedown="headerClick($event, p)">
               <div :class="{'filter-sign': columnFilter[p]}">
                 {{ item.label }}
