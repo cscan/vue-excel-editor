@@ -10,6 +10,8 @@
     v-on="listeners"
     @focus="onFocus"
     @blur="onBlur"
+    @keydown.exact.37="keyWest"
+    @keydown.exact.39="keyEast"
     @keydown.exact.enter="keyEnter"
     @keyup.exact.delete="keyDelete"
     @mousemove="mouseMove"
@@ -60,9 +62,9 @@ export default {
 
     // Store the DOM neighbour
     this.row = this.cell.parentNode
-    this.table = this.row.parentNode.parentNode
-    this.colPos = Array.from(this.row.children).indexOf(this.cell)
-    this.colLabel = this.table.children[1].children[0].children[this.colPos]
+    this.thead = this.row.parentNode
+    this.colPos = Array.from(this.row.children).indexOf(this.cell) - 1
+    this.colLabel = this.thead.children[0].children[this.colPos + 1]
   },
   methods: {
     updateValue (e) {
@@ -79,20 +81,43 @@ export default {
         this.colLabel.classList.add('focus')
         document.execCommand('selectAll', false, null)
         this.$parent.currentColPos = this.colPos
+        this.$parent.currentRowPos = -1
+        this.$parent.labelTr.children[this.$parent.currentColPos + 1].classList.add('focus')
       }, 0)
     },
     onBlur (e) {
-      setTimeout(() => {
-        this.updateValue(e)
-        this.colLabel.classList.remove('focus')
-        e.target.classList.remove('edit')
-      }, 0)
+      this.updateValue(e)
+      this.colLabel.classList.remove('focus')
+      e.target.classList.remove('edit')
+    },
+    keyWest (e) {
+      const sel = document.getSelection()
+      if (e.target.textContent === sel.toString() || sel.focusOffset === 0) {
+        let td = e.target.previousSibling
+        if (td && td.style.display === 'none') td = td.previousSibling
+        if (!td) return td
+        if (!td.tagName) td = td.previousSibling
+        if (td.focus) td.focus()
+        return td
+      }
+    },
+    keyEast (e) {
+      const sel = document.getSelection()
+      if (e.target.textContent === sel.toString() || sel.focusOffset >= e.target.textContent.length) {
+        let td = e.target.nextSibling
+        if (td && td.style.display === 'none') td = td.nextSibling
+        if (!td) return td
+        if (!td.tagName) td = td.nextSibling
+        if (td.focus) td.focus()
+        return td
+      }
+      return e.target
     },
     keyEnter (e) {
       e.preventDefault()
       document.execCommand('selectAll', false, null)
-      if (!this.$parent.keyEast(e))
-        this.updateValue(e)
+      // if (!this.$parent.keyEast(e))
+      this.updateValue(e)
     },
     keyDelete (e) {
       if (e.target.textContent === '')

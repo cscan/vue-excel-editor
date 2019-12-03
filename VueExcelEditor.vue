@@ -1,20 +1,24 @@
 <template>
   <div>
-    <div class="table-content">
+    <div class="table-content"
+         @mouseover="mouseOver"
+         @mouseout="mouseOut"
+         @mousemove="mouseMove"
+         @mouseup="mouseUp">
+      <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
+        <div style="position: relative; height: 100%">
+          <textarea ref="inputBox"
+                    class="input-box"
+                    @blur="inputBoxBlur"
+                    @keydown="inputBoxKeydown"></textarea>
+          <div class="rb-square" />
+        </div>
+      </div>
       <table ref="systable"
              style="table-layout: fixed"
              class="systable table table-bordered table-sm"
              ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
-             ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
-             @mousedown.exact="mouseDown"
-             @keydown.exact.37="keyWest"
-             @keydown.exact.39="keyEast"
-             @keydown.exact.38="keyNorth"
-             @keydown.exact.40="keySouth"
-             @mousemove="colSepMouseMove"
-             @mouseup="colSepMouseUp"
-             @keydown.exact.page-down="nextPage"
-             @keydown.exact.page-up="prevPage">
+             ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
         <colgroup>
           <!--col class="first-col">
           <col v-for="item in nFields" :key="`col-${item}`" style="width: 100px"-->
@@ -25,14 +29,15 @@
               <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" />
               <font-awesome-icon v-else icon="bars" size="sm" />
             </th>
-            <th v-for="item in nFields"
-                :key="`th-${item}`"
-                :class="{'sort-asc-sign': sortPos==item && sortDir==1,
-                         'sort-des-sign': sortPos==item && sortDir==-1}"
+            <th v-for="(item, p) in fields"
+                v-show="item.visible"
+                :key="`th-${p}`"
+                :class="{'sort-asc-sign': sortPos==p && sortDir==1,
+                         'sort-des-sign': sortPos==p && sortDir==-1}"
                 class="table-col-header"
-                @mousedown="headerClick($event, item)">
-              <div :class="{'filter-sign': columnFilter[item]}">
-                {{ colFields[item-1] }}
+                @mousedown="headerClick($event, p)">
+              <div :class="{'filter-sign': columnFilter[p]}">
+                {{ item.label }}
               </div>
               <div class="col-sep"
                    @mousedown="colSepMouseDown"
@@ -41,193 +46,194 @@
             </th>
           </tr>
           <tr>
-            <th class="text-center first-col" @click="topLeftClick">
+            <td class="text-center first-col" @click="selectAllClick">
               <font-awesome-icon v-if="selectedCount==table.length" icon="times-circle" size="sm" />
               <font-awesome-icon v-else icon="check-circle" size="sm" />
-            </th>
-            <vue-excel-filter v-for="item in nFields" :key="`th2-${item}`" v-model="columnFilter[item]" class="column-filter" />
+            </td>
+            <vue-excel-filter v-for="(item, p) in fields"
+                              v-show="item.visible"
+                              :key="`th2-${p}`"
+                              v-model="columnFilter[p]"
+                              class="column-filter" />
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="(record, recordPosition) in pagingTable" :key="recordPosition" :pos="recordPosition"
-              :class="{select: selected[pageTop + recordPosition]}">
+        <tbody @mousedown.exact="mouseDown">
+          <tr v-for="(record, rowPos) in pagingTable" :key="rowPos" :pos="rowPos"
+              :class="{select: selected[pageTop + rowPos]}">
             <td class="text-center first-col"
                 scope="row"
-                @click="rowLabelClick">{{ recordLabel(record, recordPosition) }}</td>
-            <slot name="body"
-                  :table="table"
-                  :record="record"
-                  :recordPosition="recordPosition">
-              <template v-for="(fieldValue, fieldName, fieldPosition) in record">
-                <vue-excel-column :key="`f${fieldPosition}`" v-model="record[fieldName]" />
-              </template>
-            </slot>
+                @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
+            <td v-for="(item, p) in fields"
+                v-show="item.visible"
+                :key="`f${p}`">{{ record[item.name] }}</td>
           </tr>
         </tbody>
+        <slot></slot>
       </table>
-    </div>
-    <div ref="footer" class="footer col col-12 text-center">
-      <span style="float: left">
-        Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
-      </span>
-      <span style="position: absolute; left: 0; right: 0">
-        <template v-if="processing">
-          <font-awesome-icon icon="spinner" spin size="sm" /> Processing
-        </template>
-        <template v-else>
-          <b-link :disabled="pageTop <= 0" @click="firstPage">
-            <font-awesome-icon icon="step-backward" size="sm" /> First
-          </b-link>
-          &nbsp;|&nbsp;
-          <b-link :disabled="pageTop <= 0" @click="prevPage">
-            <font-awesome-icon icon="backward" size="sm" /> Previous
-          </b-link>
-          &nbsp;|&nbsp;
-          <b-link :disabled="pageTop + pageSize >= table.length" @click="nextPage">
-            Next <font-awesome-icon icon="forward" size="sm" />
-          </b-link>
-          &nbsp;|&nbsp;
-          <b-link :disabled="pageTop + pageSize >= table.length" @click="lastPage">
-            Last <font-awesome-icon icon="step-forward" size="sm" />
-          </b-link>
-        </template>
-      </span>
-      <span style="float: right">
-        Selected: {{ Object.keys(selected).length }} | Filtered: {{ table.length }} | Loaded: {{ value.length }}
-      </span>
-    </div>
-    <b-modal id="panelFilter" ref="panelFilter" centered @shown="freezePanelSizeAfterShown($refs.panelList)">
-      <template v-slot:modal-title>
-        <font-awesome-icon icon="sort-amount-down" size="xs" />
-        &nbsp;&nbsp;Sorting and Filter
-      </template>
-      <b-form-group style="white-space: nowrap">
-        <b-button class="float-left" variant="info" style="width:48%" @click="sort(1)">
-          <font-awesome-icon icon="sort-alpha-down" />
-          &nbsp;&nbsp;Sort Ascending
-        </b-button>
-        <b-button class="float-right" variant="info" style="width:48%" @click="sort(-1)">
-          <font-awesome-icon icon="sort-alpha-up-alt" />
-          &nbsp;&nbsp;Sort Descending
-        </b-button>
-      </b-form-group>
-      <b-form-group>
-        <b-input-group>
-          <template v-slot:prepend>
-            <b-dropdown no-caret variant="success">
-              <template slot="button-content">
-                <font-awesome-icon v-if="inputFilterCondition=='='" icon="equals" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='>'" icon="greater-than" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='>='" icon="greater-than-equal" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='<'" icon="less-than" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='<='" icon="less-than-equal" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='~'" icon="percentage" size="sm" />
-              </template>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='='">
-                  <font-awesome-icon icon="equals" size="sm" />
-                  &nbsp;&nbsp;Wildcard Match
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='>'">
-                  <font-awesome-icon icon="greater-than" size="sm" />
-                  &nbsp;&nbsp;Greater than
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='>='">
-                  <font-awesome-icon icon="greater-than-equal" size="sm" />
-                  &nbsp;&nbsp;Greater than or Equal to
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='<'">
-                  <font-awesome-icon icon="less-than" size="sm" />
-                  &nbsp;&nbsp;Less than
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='<='">
-                  <font-awesome-icon icon="less-than-equal" size="sm" />
-                  &nbsp;&nbsp;Less than or Equal to
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='~'">
-                  <font-awesome-icon icon="percentage" size="sm" />
-                  &nbsp;&nbsp;Regular Expression
-                </a>
-              </b-dropdown-item>
-            </b-dropdown>
+      <div ref="footer" class="footer col col-12 text-center">
+        <span v-show="!noPaging" style="float: left">
+          Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
+        </span>
+        <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
+          <template v-if="processing">
+            <font-awesome-icon icon="spinner" spin size="sm" /> Processing
           </template>
-          <b-form-input ref="inputFilter"
-                        placeholder="Custom Filter"
-                        autofocus
-                        trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                        @keyup="doInputFilter"
-                        @keydown.exact.enter="doFilter" />
-        </b-input-group>
-      </b-form-group>
-      <div ref="panelList" class="list-group list-group-flush panel-list">
-        <a v-for="(item, k) in filteredSortedUniqueValueList.slice(0, nFilterCount)" :key="k"
-           href="#"
-           class="list-group-item list-group-item-action panel-list-item"
-           @click.prevent="filterPanelSelect(item)">
-          <b-checkbox size="sm">
-            {{ item }}
-          </b-checkbox>
-        </a>
+          <template v-else>
+            <b-link :disabled="pageTop <= 0" @click="firstPage">
+              <font-awesome-icon icon="step-backward" size="sm" /> First
+            </b-link>
+            &nbsp;|&nbsp;
+            <b-link :disabled="pageTop <= 0" @click="prevPage">
+              <font-awesome-icon icon="backward" size="sm" /> Previous
+            </b-link>
+            &nbsp;|&nbsp;
+            <b-link :disabled="pageTop + pageSize >= table.length" @click="nextPage">
+              Next <font-awesome-icon icon="forward" size="sm" />
+            </b-link>
+            &nbsp;|&nbsp;
+            <b-link :disabled="pageTop + pageSize >= table.length" @click="lastPage">
+              Last <font-awesome-icon icon="step-forward" size="sm" />
+            </b-link>
+          </template>
+        </span>
+        <span style="float: right">
+          Selected: {{ Object.keys(selected).length }} | Filtered: {{ table.length }} | Loaded: {{ value.length }}
+        </span>
       </div>
-      <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">List first {{ nFilterCount }} values only</div>
-      <template v-slot:modal-footer>
-        <b-button variant="primary input-button" @click="doFilter">
-          <span>
-            <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
-            <font-awesome-icon v-else icon="sign-in-alt" size="sm" fixed-width />
-          </span>
-          Apply
-        </b-button>
-      </template>
-    </b-modal>
-    <b-modal id="panelGrid" ref="panelGrid" centered>
-      <template v-slot:modal-title>
-        <font-awesome-icon icon="bars" size="xs" />
-        &nbsp;&nbsp;Table Setting
-      </template>
-      <b-form-group style="white-space: nowrap">
-        <b-button class="float-left" variant="info" style="width:48%" @click="exportTable('excel')">
-          <font-awesome-icon icon="file-excel" />
-          &nbsp;&nbsp;Export Excel
-        </b-button>
-        <b-button class="float-right" variant="info" style="width:48%" @click="exportTable('csv')">
-          <font-awesome-icon icon="file-csv" />
-          &nbsp;&nbsp;Export CSV
-        </b-button>
-      </b-form-group>
-      <div ref="fieldList" class="list-group list-group-flush panel-list">
-        <a v-for="(item, k) in colLabels" :key="k"
-           href="#"
-           class="list-group-item list-group-item-action panel-list-item"
-           @click.prevent="">
-          <b-checkbox size="sm" :checked="item.visible">
-            {{ item.text }}
-          </b-checkbox>
-        </a>
+      <b-modal id="panelFilter" ref="panelFilter" centered @shown="freezePanelSizeAfterShown($refs.panelList)">
+        <template v-slot:modal-title>
+          <font-awesome-icon icon="sort-amount-down" size="xs" />
+          &nbsp;&nbsp;Sorting and Filter
+        </template>
+        <b-form-group style="white-space: nowrap">
+          <b-button class="float-left" variant="info" style="width:48%" @click="sort(1)">
+            <font-awesome-icon icon="sort-alpha-down" />
+            &nbsp;&nbsp;Sort Ascending
+          </b-button>
+          <b-button class="float-right" variant="info" style="width:48%" @click="sort(-1)">
+            <font-awesome-icon icon="sort-alpha-up-alt" />
+            &nbsp;&nbsp;Sort Descending
+          </b-button>
+        </b-form-group>
+        <b-form-group>
+          <b-input-group>
+            <template v-slot:prepend>
+              <b-dropdown no-caret variant="success">
+                <template slot="button-content">
+                  <font-awesome-icon v-if="inputFilterCondition=='='" icon="equals" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='>'" icon="greater-than" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='>='" icon="greater-than-equal" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='<'" icon="less-than" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='<='" icon="less-than-equal" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='~'" icon="percentage" size="sm" />
+                </template>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='='">
+                    <font-awesome-icon icon="equals" size="sm" />
+                    &nbsp;&nbsp;Wildcard Match
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='>'">
+                    <font-awesome-icon icon="greater-than" size="sm" />
+                    &nbsp;&nbsp;Greater than
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='>='">
+                    <font-awesome-icon icon="greater-than-equal" size="sm" />
+                    &nbsp;&nbsp;Greater than or Equal to
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='<'">
+                    <font-awesome-icon icon="less-than" size="sm" />
+                    &nbsp;&nbsp;Less than
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='<='">
+                    <font-awesome-icon icon="less-than-equal" size="sm" />
+                    &nbsp;&nbsp;Less than or Equal to
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='~'">
+                    <font-awesome-icon icon="percentage" size="sm" />
+                    &nbsp;&nbsp;Regular Expression
+                  </a>
+                </b-dropdown-item>
+              </b-dropdown>
+            </template>
+            <b-form-input ref="inputFilter"
+                          placeholder="Custom Filter"
+                          autofocus
+                          trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                          @keyup="doInputFilter"
+                          @keydown.exact.enter="doFilter" />
+          </b-input-group>
+        </b-form-group>
+        <div ref="panelList" class="list-group list-group-flush panel-list">
+          <a v-for="(item, k) in filteredSortedUniqueValueList.slice(0, nFilterCount)" :key="k"
+            href="#"
+            class="list-group-item list-group-item-action panel-list-item"
+            @click.prevent="filterPanelSelect(item)">
+            <b-checkbox size="sm">
+              {{ item }}
+            </b-checkbox>
+          </a>
+        </div>
+        <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">List first {{ nFilterCount }} values only</div>
+        <template v-slot:modal-footer>
+          <b-button variant="primary input-button" @click="doFilter">
+            <span>
+              <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
+              <font-awesome-icon v-else icon="sign-in-alt" size="sm" fixed-width />
+            </span>
+            Apply
+          </b-button>
+        </template>
+      </b-modal>
+      <b-modal id="panelGrid" ref="panelGrid" centered>
+        <template v-slot:modal-title>
+          <font-awesome-icon icon="bars" size="xs" />
+          &nbsp;&nbsp;Table Setting
+        </template>
+        <b-form-group style="white-space: nowrap">
+          <b-button class="float-left" variant="info" style="width:48%" @click="exportTable('excel')">
+            <font-awesome-icon icon="file-excel" />
+            &nbsp;&nbsp;Export Excel
+          </b-button>
+          <b-button class="float-right" variant="info" style="width:48%" @click="exportTable('csv')">
+            <font-awesome-icon icon="file-csv" />
+            &nbsp;&nbsp;Export CSV
+          </b-button>
+        </b-form-group>
+        <div ref="fieldList" class="list-group list-group-flush panel-list">
+          <a v-for="(item, k) in fields" :key="k"
+            href="#"
+            class="list-group-item list-group-item-action panel-list-item"
+            @click.prevent="">
+            <b-checkbox size="sm" :checked="item.visible">
+              {{ item.label }}
+            </b-checkbox>
+          </a>
+        </div>
+        <template v-slot:modal-footer>
+          <b-button variant="primary input-button" @click="saveSetting">
+            <span>
+              <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
+              <font-awesome-icon v-else icon="save" size="sm" fixed-width />
+            </span>
+            Apply
+          </b-button>
+        </template>
+      </b-modal>
+      <div v-show="processing" ref="frontdrop" class="front-drop">
+        <font-awesome-icon icon="spinner" spin size="3x" />
       </div>
-      <template v-slot:modal-footer>
-        <b-button variant="primary input-button" @click="saveSetting">
-          <span>
-            <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
-            <font-awesome-icon v-else icon="save" size="sm" fixed-width />
-          </span>
-          Apply
-        </b-button>
-      </template>
-    </b-modal>
-    <div v-show="processing" ref="frontdrop" class="front-drop">
-      <font-awesome-icon icon="spinner" spin size="3x" />
     </div>
+    <br>
   </div>
 </template>
 
@@ -237,7 +243,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import BootstrapVue from 'bootstrap-vue'
-import VueExcelColumn from './VueExcelColumn'
 import VueExcelFilter from './VueExcelFilter'
 import XLSX from 'xlsx'
 
@@ -247,7 +252,6 @@ Vue.use(BootstrapVue)
 export default {
   components: {
     'font-awesome-icon': FontAwesomeIcon,
-    'vue-excel-column': VueExcelColumn,
     'vue-excel-filter': VueExcelFilter
   },
   props: {
@@ -256,16 +260,17 @@ export default {
         return []
       }
     },
-    nFields: {type: Number, default: 0},            // number of columns/fields
     recordLabel: {                                  // return the row header
       type: Function,
       default (record, recordPosition) {
         return this.pageTop + recordPosition + 1
       }
     },
+    noPaging: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     newRecord: {type: Function, default: null},     // return the new record from caller if provided
-    nFilterCount: {type: Number, default: 200}      // show top n values in filter dialog
+    nFilterCount: {type: Number, default: 200},     // show top n values in filter dialog
+    height: {type: Number, default: 0}
   },
   data () {
     return {
@@ -280,10 +285,6 @@ export default {
       filterTr: null,               // THEAD filter dom node
       recordBody: null,             // TBODY dom node
       footer: null,                 // TFOOTER dom node
-      colFields: [],                // array of field names (propagate from VueExcelColumn in correct col pos)
-      colTypes: [],                 // array of types (propagate from VueExcelColumn in correct col pos)
-
-      colLabels: [],                // Temporary list of labels for paenlGrid
 
       pageSize: 20,                 // Default page size
       pageTop: 0,                   // Current page top pos of [table] array
@@ -298,6 +299,16 @@ export default {
       currentRecord: null,          // focusing TR dom node
       currentRowPos: -1,            // focusing array pos of [table] array
       currentColPos: -1,            // focusing pos of column/field
+      currentCell: null,
+      inputBox: null,
+      inputSquare: null,
+
+      gridHeight: -1,               // -1: free, 0: auto-cal by screen height, >0 exact height
+
+      fields: [],
+      focused: false,
+      mousein: false,
+      inputBoxChanged: false,
 
       columnFilter: {},             // set filter storage in hash, key is the column pos
       columnFilterRef: null,        // temporary remember the Vue reference of the filter for filter dialog
@@ -307,9 +318,6 @@ export default {
 
       frontdrop: null,              // frontdrop dom node
       sep: {},                      // temporary varialbe for sep to operate the column adjustment
-
-      delayTimeout: null,           // general delay timeout for batch processing
-      saveLazyBuffer: [],           // temporary storage the update queue during delay of batch processing
 
       sortPos: 0,                   // Sort column position
       sortDir: 0,                   // Sort direction, 1=Ascending, -1=Descending
@@ -334,19 +342,19 @@ export default {
         switch (true) {
           case this.columnFilter[k].startsWith('<='):
             filter[k] = {type: 1, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
-            if (this.colTypes[k] === 'number') filter[k].value = Number(filter[k].value)
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
             break
           case this.columnFilter[k].startsWith('<'):
             filter[k] = {type: 2, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
-            if (this.colTypes[k] === 'number') filter[k].value = Number(filter[k].value)
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
             break
           case this.columnFilter[k].startsWith('>='):
             filter[k] = {type: 3, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
-            if (this.colTypes[k] === 'number') filter[k].value = Number(filter[k].value)
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
             break
           case this.columnFilter[k].startsWith('>'):
             filter[k] = {type: 4, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
-            if (this.colTypes[k] === 'number') filter[k].value = Number(filter[k].value)
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
             break
           case this.columnFilter[k].startsWith('='):
             filter[k] = {type: 5, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
@@ -374,26 +382,26 @@ export default {
       return this.value.filter((record) => {
         const content = {}
         filterColumnList.forEach((k) => {
-          const val = record[this.colFields[k]]
+          const val = record[this.fields[k].name]
           content[k] = typeof val === 'undefined' ? '' : val.toUpperCase()
         })
         for (let i = 0; i < filterColumnList.length; i++) {
           const k = filterColumnList[i]
           switch (filter[k].type) {
             case 1:
-              if (this.colTypes[k] === 'number') content[k] = Number(content[k])
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
               if (filter[k].value < content[k]) return false
               break
             case 2:
-              if (this.colTypes[k] === 'number') content[k] = Number(content[k])
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
               if (filter[k].value <= content[k]) return false
               break
             case 3:
-              if (this.colTypes[k] === 'number') content[k] = Number(content[k])
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
               if (filter[k].value > content[k]) return false
               break
             case 4:
-              if (this.colTypes[k] === 'number') content[k] = Number(content[k])
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
               if (filter[k].value >= content[k]) return false
               break
             case 5:
@@ -449,11 +457,19 @@ export default {
     this.filterTr = this.systable.children[1].children[1]
     this.recordBody = this.systable.children[2]
     this.footer = this.$refs.footer
+    this.inputSquare = this.$refs.inputSquare
+    this.inputBox = this.$refs.inputBox
+    if (this.height)
+      this.systable.parentNode.style.height = this.height
+    this.reset()
     this.refreshPageSize()
+    // this.moveInputSquare(0, 0)
     window.onresize = () => {
+      this.moveInputSquare(this.currentRowPos, this.currentColPos)
       this.lazy(this.refreshPageSize, 200)
     }
     window.addEventListener('keydown', (e) => {
+      if (!this.mousein && !this.focused) return
       if (e.ctrlKey || e.metaKey)
         switch (e.keyCode) {
           case 90: // z
@@ -465,29 +481,100 @@ export default {
             e.preventDefault()
             break
         }
-      else
-        switch (e.keyCode) {
-          case 33:
+      else {
+        if (this.currentRowPos < 0) return
+        this.focused = true
+        switch (true) {
+          case e.keyCode === 33:
             this.prevPage()
             e.preventDefault()
             break
-          case 34:
+          case e.keyCode === 34:
             this.nextPage()
             e.preventDefault()
             break
+          case e.keyCode === 9 && e.shiftKey:
+          case e.keyCode === 37:
+            this.moveWest(e)
+            e.preventDefault()
+            break;
+          case e.keyCode === 38:
+            this.moveNorth()
+            e.preventDefault()
+            break;
+          case e.keyCode === 9 && !e.shiftKey:
+          case e.keyCode === 39:
+            this.moveEast(e)
+            e.preventDefault()
+            break;
+          case e.keyCode === 13:
+          case e.keyCode === 40:
+            this.moveSouth(e)
+            e.preventDefault()
+            break
+          default:
+            if (this.inputBox.style.opacity * 1 === 0) {
+              this.inputBox.value = ''
+              this.inputBox.style.opacity = 1
+              if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)
+                this.inputBoxChanged = true
+              if (e.keyCode === 8 || e.keyCode === 46)
+                this.inputBoxChanged = true
+            }
+            break
         }
+      }
     })
   },
   methods: {
+    registerColumn (field) {
+      let pos = this.fields.findIndex(item => item.pos > field.pos)
+      if (pos === -1) pos = this.fields.length
+      this.fields.splice(pos, 0, field)
+    },
+    moveInputSquare (rowPos, colPos) {
+      if (colPos < 0) return
+      if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
+        this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
+        this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
+      }
+
+      const row = this.recordBody.children[rowPos]
+      if (!row) return
+      const cell = row.children[colPos + 1]
+      if (!cell) return
+      const cellRect = cell.getBoundingClientRect()
+      const tableRect = this.systable.getBoundingClientRect()
+      this.inputSquare.style.left = (cellRect.left - tableRect.left) + 'px'
+      this.inputSquare.style.top =  (cellRect.top - tableRect.top) + 'px'
+      this.inputSquare.style.width = cellRect.width + 'px'
+      this.inputSquare.style.height = cellRect.height + 'px'
+
+      this.inputBox.style.opacity = 0
+      if (this.inputBoxChanged) {
+        if (this.selected[this.currentRowPos])
+          this.updateSelectedRowsByCol(this.fields[this.currentColPos].name, this.inputBox.value)
+        else
+          this.updateCell(this.currentRowPos, this.fields[this.currentColPos].name, this.inputBox.value)
+        this.inputBoxChanged = false
+      }
+
+      this.currentRowPos = rowPos
+      this.currentColPos = colPos
+      this.currentCell = cell
+      if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
+        this.lazy(() => {
+          this.inputBox.focus()
+          this.focused = true
+          this.recordBody.children[this.currentRowPos].children[0].classList.add('focus')
+          this.labelTr.children[this.currentColPos + 1].classList.add('focus')
+        }, 0)
+      }
+    },
     reset () {
       this.pageTop = 0
       this.prevSelect = -1
       this.reviseSelectedAfterTableChange()
-    },
-    refreshColumnAttribute () {
-      const filterTr = this.$refs.systable.children[1].children[1]
-      this.colFields = Array.from(filterTr.children).map(td => td.getAttribute('field'))
-      this.colTypes = Array.from(filterTr.children).map(td => td.getAttribute('type'))
     },
     colSepMouseDown (e) {
       e.preventDefault()
@@ -495,6 +582,7 @@ export default {
       const getStyleVal = (elm, css) => {
         window.getComputedStyle(elm, null).getPropertyValue(css)
       }
+      this.sep = {}
       this.sep.curCol = e.target.parentElement
       this.sep.nxtCol = this.sep.curCol.nextElementSibling
       this.sep.pageX = e.pageX
@@ -515,19 +603,21 @@ export default {
     },
     colSepMouseOut (e) {
       e.target.style.borderRight = ''
-      e.target.style.height = '100px'
+      e.target.style.height = '100%'
     },
-    colSepMouseMove (e) {
-      if (!this.sep.curCol) return
+    mouseMove (e) {
+      if (!this.sep || !this.sep.curCol) return
       const diffX = e.pageX - this.sep.pageX
-      // if (this.sep.nxtCol)
-      //   this.sep.nxtCol.style.width = (this.sep.nxtColWidth - diffX) + 'px'
+      // if (this.systable.getBoundingClientRect().right === window.innerWidth)
+      //   if (this.sep.nxtCol)
+      //     this.sep.nxtCol.style.width = (this.sep.nxtColWidth - diffX) + 'px'
       this.sep.curCol.style.width = (this.sep.curColWidth + diffX) + 'px'
     },
-    colSepMouseUp (e) {
+    mouseUp (e) {
+      // this.focused = true
       e.preventDefault()
       e.stopPropagation()
-      this.sep = {}
+      delete this.sep
     },
     doInputFilter () {
       if (window.delay) clearTimeout(window.delay)
@@ -547,11 +637,10 @@ export default {
     sort (n, pos) {
       this.processing = true
       const colPos = pos || this.columnFilterRef.colPos
-      const fieldName = this.colFields[colPos]
-      const type = this.colTypes[colPos]
+      const fieldName = this.fields[colPos].name
+      const type = this.fields[colPos].type
       setTimeout(() => {
-        if (this.$refs.panelFilter.visible) this.$bvModal.hide('panelFilter')
-        // this.clearAllSelected()
+        this.$bvModal.hide('panelFilter')
         if (type === 'number')
           this.value.sort((a, b) => {
             if (Number(a[fieldName]) > Number(b[fieldName])) return n
@@ -590,7 +679,7 @@ export default {
       this.columnFilterRef.$el.textContent = ''
       this.columnFilterRef.$emit('input', '')
       const hash = {}
-      const fieldName = this.colFields[ref.colPos]
+      const fieldName = this.fields[ref.colPos].name
       this.table.forEach(record => (hash[record[fieldName]] = true))
       const keys = Object.keys(hash)
       keys.sort()
@@ -608,6 +697,10 @@ export default {
       target.setAttribute('style', `width:${rect.width}px; height:${rect.height}px;`)
     },
     refreshPageSize () {
+      if (this.noPaging) {
+        this.pageSize = 999999999
+        return
+      }
       this.pageSize = this.page || Math.floor((
         window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.children[0].getBoundingClientRect().height - 25) / 24)
     },
@@ -659,14 +752,6 @@ export default {
       this.prevSelect = rowPos
     },
     settingClick () {
-      this.colLabels = Array.from(this.labelTr.children).slice(1).map((tag, i) => {
-        return {
-          text: tag.children[0].innerHTML,
-          colPos: i + 1,
-          field: this.filterTr.children[i + 1].getAttribute('field'),
-          visible: tag.style.display !== 'none'
-        }
-      })
       this.$bvModal.show('panelGrid')
     },
     saveSetting () {
@@ -677,7 +762,7 @@ export default {
       setTimeout(() => {
         const wb = XLSX.utils.book_new()
         const ws1 = XLSX.utils.json_to_sheet(this.table, {
-          header: this.colFields.slice(1)
+          header: this.fields.map(field => field.name)
         })
         const labels = Array.from(this.labelTr.children).slice(1).map(t => t.children[0].innerHTML)
         XLSX.utils.sheet_add_aoa(ws1, [labels], {origin: 0})
@@ -698,7 +783,7 @@ export default {
         this.processing = false
       }, 500)
     },
-    topLeftClick () {
+    selectAllClick () {
       this.toggleSelectAllRecords()
     },
     reviseSelectedAfterTableChange () {
@@ -763,7 +848,10 @@ export default {
         newVal: content,
         oldVal: this.table[row][name]
       }
+
       this.table[row][name] = content
+
+      if (!this.saveLazyBuffer) this.saveLazyBuffer = []
       this.saveLazyBuffer.push(transaction)
 
       // Delay the propagation so that it can accumulate the result until no update
@@ -775,117 +863,91 @@ export default {
         this.saveLazyBuffer = []
       }, 50)
     },
-    updateSelectedRowsByCol (col, content) {
+    updateSelectedRowsByCol (field, content) {
       this.processing = true
       setTimeout(() => {
-        const field = this.colFields[col]
-        for (let i = 0; i < this.table.length; i++)
-          if (this.selected[i])
-            this.updateCell(i, field, content)
+        Object.keys(this.selected).forEach(i => this.updateCell(i, field, content))
         this.processing = false
       }, 0)
     },
+    moveWest () {
+      if (this.focused && this.currentColPos > 0) {
+        let goColPos = this.currentColPos - 1
+        while (!this.fields[goColPos].visible && goColPos >= 0) goColPos--
+        if (goColPos === -1) return
+        this.moveInputSquare(this.currentRowPos, goColPos)
+      }
+    },
+    moveEast () {
+      if (this.focused && this.currentColPos < this.fields.length - 1) {
+        let goColPos = this.currentColPos + 1
+        while (!this.fields[goColPos].visible && goColPos < this.fields.length - 1) goColPos++
+        if (goColPos === this.fields.length) return
+        this.moveInputSquare(this.currentRowPos, goColPos)
+      }
+    },
+    moveNorth () {
+      if (this.focused && this.currentRowPos > 0)
+        this.moveInputSquare(this.currentRowPos - 1, this.currentColPos)
+    },
+    moveSouth () {
+      if (this.focused && this.currentRowPos < this.table.length)
+        this.moveInputSquare(this.currentRowPos + 1, this.currentColPos)
+    },
     mouseDown (e) {
-      if (document.activeElement === e.target) {
-        e.target.classList.add('edit')
-        // workaround for the problem of the cursor cannot positioned after selectAll
-        window.getSelection().removeAllRanges()
+      if (e.target.parentNode.parentNode.tagName === 'TBODY' && !e.target.classList.contains('first-col')) {
+        this.inputBox.focus()
+        this.focused = true
+        e.preventDefault()
+        const row = e.target.parentNode
+        const colPos = Array.from(row.children).indexOf(e.target) - 1
+        const rowPos = Array.from(row.parentNode.children).indexOf(row)
+        this.moveInputSquare(rowPos, colPos)
       }
     },
-    keyWest (e) {
-      const sel = document.getSelection()
-      if (e.target.textContent === sel.toString() || sel.focusOffset === 0) {
-        let td = e.target.previousSibling
-        if (!td) return td
-        if (!td.tagName) td = td.previousSibling
-        if (td.focus) td.focus()
-        return td
-      }
+    mouseOver () {
+      this.mousein = true
     },
-    keyEast (e) {
-      const sel = document.getSelection()
-      if (e.target.textContent === sel.toString() || sel.focusOffset >= e.target.textContent.length) {
-        let td = e.target.nextSibling
-        if (!td) return td
-        if (!td.tagName) td = td.nextSibling
-        if (td.focus) td.focus()
-        return td
-      }
-      return e.target
+    mouseOut () {
+      this.mousein = false
     },
-    keyNorth (e) {
-      e.preventDefault()
-      const thisTr = e.target.parentNode
-      if (thisTr.parentNode.tagName === 'THEAD') return
-      const prevTr = thisTr.previousSibling
-      if (!prevTr) {
-        // focus the filter row
-        const td = this.filterTr.children[this.currentColPos]
-        if (td) td.focus()
-        return td
+    inputSquareClick (e) {
+      if (this.inputBox.style.opacity * 1 === 0) {
+        e.preventDefault()
+        this.inputBox.value = this.currentCell.innerText
+        this.inputBox.style.opacity = 1
+        this.inputBox.focus()
+        this.inputBoxChanged = false
+        this.focused = true
+        //this.inputBox.select()
       }
-      // Clear the last line if empty
-      const nextTr = thisTr.nextSibling
-      if (!nextTr)
-        if (this.newRecord) {
-          const table = this.value
-          if (table.length > 1) {
-            const lastRow = this.value[this.value.length - 1]
-            if (Object.values(lastRow).join('') === '')
-              table.pop()
-          }
-        }
-      const td = prevTr.children[this.currentColPos]
-      if (td) td.focus()
-      return td
-    },
-    keySouth (e) {
-      e.preventDefault()
-      const thisTr = e.target.parentNode
-      if (thisTr.parentNode.tagName === 'THEAD') {
-        // focus first record
-        const td = this.recordBody.children[0].children[this.currentColPos]
-        if (td) td.focus()
-        return td
-      }
-      const nextTr = thisTr.nextSibling
-      if (!nextTr) {
-        if (this.newRecord)
-          /*
-          const table = this.value
-          const newRow = this.newRecord()
-          if (!newRow.key)
-            throw new Error('VueExcelEditor: The key of new record cannot be null')
-          if (table.find(rec => rec.key === newRow.key))
-            throw new Error('SysHTable: The current table contains the specified key during new record')
-          table.push(newRow)
-          */
-          this.newRecord((err, newRow) => {
-            if (err)
-              throw new Error(err)
-            if (!newRow.key)
-              throw new Error('VueExcelEditor: The key of new record cannot be null')
-            if (this.table.find(rec => rec.key === newRow.key))
-              throw new Error('VueExcelEditor: The current table contains the specified key during new record')
-
-            const rowPos = this.table.push(newRow) - 1
-            Object.keys(newRow).forEach(k => this.updateCell(rowPos, k, newRow[k]))
-            setTimeout(() => {
-              const nextTr = thisTr.nextSibling
-              if (nextTr) {
-                const colPos = Array.from(thisTr.children).indexOf(e.target)
-                const td = nextTr.children[colPos]
-                if (td) td.focus()
-              }
-            }, 300)
-          })
-      }
+      /*
+      // fix the browser cannot show the curser after selectAll
       else {
-        const td = nextTr.children[this.currentColPos]
-        if (td) td.focus()
-        return td
+        const sel = document.getSelection()
+        if (e.target.textContent === sel.toString() || sel.focusOffset >= e.target.textContent.length)
+          sel.removeAllRanges()
       }
-      return null
+      */
+    },
+    inputBoxKeydown (e) {
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)
+        this.inputBoxChanged = true
+    },
+    inputBoxBlur () {
+      if (this.inputBoxChanged) {
+        if (this.selected[this.currentRowPos])
+          this.updateSelectedRowsByCol(this.fields[this.currentColPos].name, this.inputBox.value)
+        else
+          this.updateCell(this.currentRowPos, this.fields[this.currentColPos].name, this.inputBox.value)
+        this.inputBoxChanged = false
+      }
+      this.inputBox.style.opacity = 0
+      this.focused = false
+      if (this.currentRowPos !== -1) {
+        this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
+        this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
+      }
     },
     lazy (p, delay) {
       if (!delay) delay = 20
@@ -897,7 +959,6 @@ export default {
       this.selTarget = target
       this.selx = Array.from(target.parentNode.children).indexOf(target) - 1
       this.sely = target.parentNode.getAttribute('pos')
-      console.log('s')
     },
     selProcess (target) {
       if (target === null) return
@@ -906,7 +967,6 @@ export default {
       this.selEnd(target)
     },
     selEnd (target) {
-      console.log('e')
       if (target !== null && target !== this.selTarget) {
         const st = this.selTarget.getBoundingClientRect()
         const ed = target.getBoundingClientRect()
@@ -940,13 +1000,27 @@ export default {
 }
 </script>
 
-<style scoped src="bootstrap/dist/css/bootstrap.css">
-</style>
-
-<style scoped src="bootstrap-vue/dist/bootstrap-vue.css">
-</style>
-
 <style scoped>
+.input-square {
+  position: absolute;
+  padding: 0;
+  z-index: 100;
+  border: 2px solid darkseagreen;
+}
+.input-box {
+  opacity: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: 0;
+  background: white;
+  font-size: 0.88rem;
+}
+.table-content :focus {
+  outline: none;
+}
+
 .table-content {
   font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-size: 1rem;
@@ -958,6 +1032,7 @@ export default {
 .systable {
   z-index: -1;
   margin-bottom: 4px;
+  overflow: scroll;
 }
 .systable tr.select {
   background-color: #d6d6d6
@@ -965,9 +1040,11 @@ export default {
 .systable tr.select td:first-child {
   font-weight: 800;
 }
+/*
 .systable .table-col-header {
   position: relative
 }
+*/
 .systable td.table-bordered {
   border: 1px solid lightgray;
 }
@@ -979,6 +1056,9 @@ export default {
   padding: 0.4rem 0.3rem;
   font-weight: 400;
   cursor: s-resize !important;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 .systable th.focus {
   border-bottom: 2px solid darkseagreen !important;
@@ -1035,10 +1115,19 @@ export default {
 .systable td.first-col.focus {
   border-right: 2px solid darkseagreen !important;
 }
+.systable thead td {
+  height: 1.8rem;
+}
 .footer {
   padding: 8px;
   font-size: 0.9rem;
   color: dimgray;
+  height: 32px;
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  border-top: 1px solid lightgray;
+  margin-top: -6px;
 }
 .panel-list-item {
   padding: 10px 5px;
@@ -1094,5 +1183,15 @@ a.disabled {
 @keyframes fadein {
   from {opacity: 0}
   to {opacity: 1}
+}
+.rb-square {
+  width: 10px;
+  height: 10px;
+  border: 2px solid white;
+  background-color:darkseagreen;
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  cursor: crosshair;
 }
 </style>
