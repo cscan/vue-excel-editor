@@ -1126,6 +1126,7 @@ export default {
   height: 32px;
   position: sticky;
   bottom: 0;
+  left: 0;
   background-color: white;
   border-top: 1px solid lightgray;
   margin-top: -6px;
@@ -1144,7 +1145,7 @@ export default {
   border-top: 0
 }
 .front-drop {
-  position: absolute;
+  position: fixed;
   display:flex;
   justify-content:center;
   align-items:center;
