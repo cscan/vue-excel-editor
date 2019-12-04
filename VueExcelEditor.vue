@@ -6,7 +6,7 @@
          @mousemove="mouseMove"
          @mouseup="mouseUp">
       <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
-        <div style="position: relative; height: 100%">
+        <div style="position: relative; height: 100%; padding: 2px">
           <textarea ref="inputBox"
                     class="input-box"
                     @blur="inputBoxBlur"
@@ -64,16 +64,33 @@
           </tr>
         </thead>
         <tbody @mousedown.exact="mouseDown">
-          <tr v-for="(record, rowPos) in pagingTable" :key="rowPos" :pos="rowPos"
-              :class="{select: selected[pageTop + rowPos]}">
+          <tr v-for="(record, rowPos) in pagingTable"
+              :key="rowPos"
+              :pos="rowPos"
+              :class="{select: selected[pageTop + rowPos]}"
+              :style="rowStyle(record)">
             <td class="text-center first-col"
                 scope="row"
                 @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
-            <td v-for="(item, p) in fields"
-                v-show="item.visible"
-                :class="{readonly: item.readonly}"
-                :style="item.initStyle"
-                :key="`f${p}`">{{ item.toText(record[item.name]) }}</td>
+            <template v-for="(item, p) in fields">
+              <td v-if="item.validate"
+                  v-show="item.visible"
+                  :id="`cell-${p+rowPos*fields.length}`"
+                  :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`]}"
+                  :style="item.initStyle"
+                  :key="`f${p}`">{{ item.toText(record[item.name]) }}
+                <b-tooltip v-if="errmsg[`${record.key}:${item.name}`]"
+                          variant="danger"
+                          :target="`cell-${p+rowPos*fields.length}`"
+                          placement="right"
+                          trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip>
+              <td v-else
+                  v-show="item.visible"
+                  :class="{readonly: item.readonly}"
+                  :style="item.initStyle"
+                  :key="`f${p}`">{{ item.toText(record[item.name]) }}
+              </td>
+            </template>
           </tr>
         </tbody>
         <slot></slot>
@@ -221,7 +238,7 @@
           <a v-for="(item, k) in fields" :key="k"
             href="#"
             class="list-group-item list-group-item-action panel-list-item"
-            @click.prevent="">
+            @click.prevent="item.visible = !item.visible">
             <b-checkbox size="sm" :checked="item.visible">
               {{ item.label }}
             </b-checkbox>
@@ -233,7 +250,7 @@
               <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
               <font-awesome-icon v-else icon="save" size="sm" fixed-width />
             </span>
-            Apply
+            Back
           </b-button>
         </template>
       </b-modal>
@@ -265,6 +282,12 @@ export default {
     value: {type: Array,                            // actual table content
       default () {
         return []
+      }
+    },
+    rowStyle: {                                    // return the row style
+      type: Function,
+      default () {
+        return {}
       }
     },
     recordLabel: {                                  // return the row header
@@ -310,7 +333,7 @@ export default {
       inputBox: null,
       inputSquare: null,
 
-      gridHeight: -1,               // -1: free, 0: auto-cal by screen height, >0 exact height
+      errmsg: {},
 
       fields: [],
       focused: false,
@@ -440,7 +463,12 @@ export default {
     value () {
       // detect a loading process, reset something
       this.redo = []
-      this.reset()
+      this.errmsg = []
+      this.processing = true
+      setTimeout(() => {
+        this.reset()
+        this.processing = false
+      }, 0)
     },
     columnFilterString () {
       this.processing = true
@@ -452,8 +480,10 @@ export default {
     processing (newVal) {
       if (newVal) {
         const rect = this.$el.getBoundingClientRect()
-        this.$refs.frontdrop.setAttribute('style',
-          `top:${rect.top}px; left:${rect.left}px; height:${rect.height}px; width:${rect.width}px;`)
+        this.frontdrop.style.top = rect.top + 'px'
+        this.frontdrop.style.left = rect.left + 'px'
+        this.frontdrop.style.height = rect.height + 'px'
+        this.frontdrop.style.width = rect.width + 'px'
       }
     }
   },
@@ -466,6 +496,7 @@ export default {
     this.footer = this.$refs.footer
     this.inputSquare = this.$refs.inputSquare
     this.inputBox = this.$refs.inputBox
+    this.frontdrop = this.$refs.frontdrop
     if (this.height)
       this.systable.parentNode.style.height = this.height
     this.reset()
@@ -775,6 +806,7 @@ export default {
       this.$bvModal.show('panelGrid')
     },
     saveSetting () {
+      this.$bvModal.hide('panelGrid')
     },
     exportTable (format) {
       this.$bvModal.hide('panelGrid')
@@ -858,17 +890,27 @@ export default {
       if (this.redo.length === 0) return
       const transaction = this.redo.pop()
       transaction.forEach((rec) => {
-        this.updateCell(this.rowIndex[rec.key], rec.field, rec.oldVal, true)
+        this.updateCell(this.rowIndex[rec.key], rec.colPos, rec.field, rec.oldVal, true)
       })
     },
-    updateCell (row, name, content, restore) {
+    updateCell (row, colPos, name, content, restore) {
       const transaction = {
         key: this.table[row].key,
+        colPos: colPos,
         field: name,
         newVal: content,
-        oldVal: this.table[row][name]
+        oldVal: this.table[row][name],
+        err: ''
       }
 
+      if (this.fields[colPos].validate !== null) {
+        const err = this.fields[colPos].validate(content)
+        if (err) {
+          this.errmsg[`${transaction.key}:${name}`] = err
+          transaction.err = err
+        }
+        else delete this.errmsg[`${transaction.key}:${name}`]
+      }
       this.table[row][name] = content
 
       if (!this.saveLazyBuffer) this.saveLazyBuffer = []
@@ -883,10 +925,10 @@ export default {
         this.saveLazyBuffer = []
       }, 50)
     },
-    updateSelectedRowsByCol (field, content) {
+    updateSelectedRowsByCol (colPos, field, content) {
       this.processing = true
       setTimeout(() => {
-        Object.keys(this.selected).forEach(i => this.updateCell(i, field, content))
+        Object.keys(this.selected).forEach(i => this.updateCell(i, colPos, field, content))
         this.processing = false
       }, 0)
     },
@@ -957,9 +999,9 @@ export default {
       if (typeof col === 'undefined') col = this.currentColPos
       if (typeof row === 'undefined') row = this.currentRowPos
       if (typeof this.selected[row] !== 'undefined')
-        this.updateSelectedRowsByCol(this.fields[col].name, setText)
+        this.updateSelectedRowsByCol(col, this.fields[col].name, setText)
       else
-        this.updateCell(row, this.fields[col].name, setText)
+        this.updateCell(row, col, this.fields[col].name, setText)
     },
     inputBoxBlur () {
       if (this.inputBoxChanged) {
@@ -1038,7 +1080,8 @@ export default {
   height: 100%;
   resize: none;
   border: 0;
-  padding: 3px 4px;
+  padding: 2px;
+  white-space: nowrap;
   font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans serif;
   overflow: hidden;
   background: white;
@@ -1055,6 +1098,12 @@ export default {
   word-spacing: 0.02rem;
   overflow-x: scroll;
   position: relative;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .systable {
   z-index: -1;
@@ -1153,6 +1202,7 @@ export default {
 }
 .front-drop {
   position: fixed;
+  opacity: 0.4;
   display:flex;
   justify-content:center;
   align-items:center;
