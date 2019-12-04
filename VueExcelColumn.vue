@@ -11,6 +11,7 @@ export default {
     validate: {type: Function, default: null},
     initStyle: {type: String, default: 'width:100px'},
     visible: {type: Boolean, default: true},
+    readonly: {type: Boolean, default: false},
     pos: {type: Number, default: 0}
   },
   created () {
@@ -21,6 +22,7 @@ export default {
       validate: this.validate,
       initStyle: this.initStyle,
       visible: this.visible,
+      readonly: this.readonly,
       pos: this.pos
     })
   }

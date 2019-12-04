@@ -66,6 +66,7 @@
                 @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
             <td v-for="(item, p) in fields"
                 v-show="item.visible"
+                :class="{readonly: item.readonly}"
                 :key="`f${p}`">{{ record[item.name] }}</td>
           </tr>
         </tbody>
@@ -234,7 +235,6 @@
         <font-awesome-icon icon="spinner" spin size="3x" />
       </div>
     </div>
-    <br>
   </div>
 </template>
 
@@ -481,6 +481,15 @@ export default {
             this.toggleSelectAllRecords()
             e.preventDefault()
             break
+          case 67: // c
+            this.inputCopy = this.currentCell.innerText
+            e.preventDefault()
+            break;
+          case 86: // v
+            if (!this.fields[this.currentColPos].readonly && this.inputCopy !== null)
+              this.inputCellWrite(this.inputCopy)
+            e.preventDefault()
+            break;
         }
       else {
         if (this.currentRowPos < 0) return
@@ -514,11 +523,12 @@ export default {
             e.preventDefault()
             break
           default:
-            if (this.inputBox.style.opacity * 1 === 0) {
-              this.inputBox.value = ''
-              this.inputBox.style.opacity = 1
-              if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)
+            if (!this.fields[this.currentColPos].readonly && this.inputBox.style.opacity * 1 === 0) {
+              if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                this.inputBox.value = ''
+                this.inputBox.style.opacity = 1
                 this.inputBoxChanged = true
+              }
               if (e.keyCode === 8 || e.keyCode === 46)
                 this.inputBoxChanged = true
             }
@@ -553,10 +563,7 @@ export default {
 
       this.inputBox.style.opacity = 0
       if (this.inputBoxChanged) {
-        if (this.selected[this.currentRowPos])
-          this.updateSelectedRowsByCol(this.fields[this.currentColPos].name, this.inputBox.value)
-        else
-          this.updateCell(this.currentRowPos, this.fields[this.currentColPos].name, this.inputBox.value)
+        this.inputCellWrite(this.inputBox.value)
         this.inputBoxChanged = false
       }
 
@@ -703,7 +710,7 @@ export default {
         return
       }
       this.pageSize = this.page || Math.floor((
-        window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.children[0].getBoundingClientRect().height - 25) / 24)
+        window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.children[0].getBoundingClientRect().height - 37) / 24)
     },
     firstPage () {
       this.processing = true
@@ -800,7 +807,7 @@ export default {
       this.selectedCount = Object.keys(this.selected).length
     },
     toggleSelectRecord (rowPos) {
-      if (this.selected[rowPos]) this.unSelectRecord(rowPos)
+      if (this.selected[rowPos] >= 0) this.unSelectRecord(rowPos)
       else this.selectRecord(rowPos)
     },
     selectRecord (rowPos) {
@@ -912,10 +919,10 @@ export default {
     mouseOut () {
       this.mousein = false
     },
-    inputSquareClick (e) {
-      if (this.inputBox.style.opacity * 1 === 0) {
-        e.preventDefault()
-        this.inputBox.value = this.currentCell.innerText
+    inputSquareClick (e, setText) {
+      if (!this.fields[this.currentColPos].readonly && this.inputBox.style.opacity * 1 === 0) {
+        if (e) e.preventDefault()
+        this.inputBox.value = typeof setText !== 'undefined' ? setText : this.currentCell.innerText
         this.inputBox.style.opacity = 1
         this.inputBox.focus()
         this.inputBoxChanged = false
@@ -932,15 +939,20 @@ export default {
       */
     },
     inputBoxKeydown (e) {
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)
+      if (!this.fields[this.currentColPos].readonly && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)
         this.inputBoxChanged = true
+    },
+    inputCellWrite (setText, col, row) {
+      if (typeof col === 'undefined') col = this.currentColPos
+      if (typeof row === 'undefined') row = this.currentRowPos
+      if (this.selected[row] >= 0)
+        this.updateSelectedRowsByCol(this.fields[col].name, setText)
+      else
+        this.updateCell(row, this.fields[col].name, setText)
     },
     inputBoxBlur () {
       if (this.inputBoxChanged) {
-        if (this.selected[this.currentRowPos])
-          this.updateSelectedRowsByCol(this.fields[this.currentColPos].name, this.inputBox.value)
-        else
-          this.updateCell(this.currentRowPos, this.fields[this.currentColPos].name, this.inputBox.value)
+        this.inputCellWrite(this.inputBox.value)
         this.inputBoxChanged = false
       }
       this.inputBox.style.opacity = 0
@@ -1015,6 +1027,9 @@ export default {
   height: 100%;
   resize: none;
   border: 0;
+  padding: 3px 4px;
+  font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans serif;
+  overflow: hidden;
   background: white;
   font-size: 0.88rem;
 }
@@ -1123,7 +1138,7 @@ export default {
   padding: 8px;
   font-size: 0.9rem;
   color: dimgray;
-  height: 32px;
+  height: 30px;
   position: sticky;
   bottom: 0;
   left: 0;
