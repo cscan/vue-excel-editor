@@ -10,7 +10,12 @@
           <textarea ref="inputBox"
                     class="input-box"
                     @blur="inputBoxBlur"
-                    @keydown="inputBoxKeydown"></textarea>
+                    @keydown="inputBoxKeydown"
+                    trim
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocompitaize="off"
+                    spellcheck="false"></textarea>
           <div class="rb-square" />
         </div>
       </div>
@@ -35,7 +40,7 @@
                 :class="{'sort-asc-sign': sortPos==p && sortDir==1,
                          'sort-des-sign': sortPos==p && sortDir==-1}"
                 class="table-col-header"
-                :style="item.initStyle"
+                :style="{width: item.width}"
                 @mousedown="headerClick($event, p)">
               <div :class="{'filter-sign': columnFilter[p]}">
                 {{ item.label }}
@@ -67,7 +72,8 @@
             <td v-for="(item, p) in fields"
                 v-show="item.visible"
                 :class="{readonly: item.readonly}"
-                :key="`f${p}`">{{ record[item.name] }}</td>
+                :style="item.initStyle"
+                :key="`f${p}`">{{ item.toText(record[item.name]) }}</td>
           </tr>
         </tbody>
         <slot></slot>
@@ -505,8 +511,10 @@ export default {
             break
           case e.keyCode === 9 && e.shiftKey:
           case e.keyCode === 37:
-            this.moveWest(e)
-            e.preventDefault()
+            if (this.inputBox.style.opacity * 1 === 0) {
+              this.moveWest(e)
+              e.preventDefault()
+            }
             break;
           case e.keyCode === 38:
             this.moveNorth()
@@ -514,8 +522,10 @@ export default {
             break;
           case e.keyCode === 9 && !e.shiftKey:
           case e.keyCode === 39:
-            this.moveEast(e)
-            e.preventDefault()
+            if (this.inputBox.style.opacity * 1 === 0) {
+              this.moveEast(e)
+              e.preventDefault()
+            }
             break;
           case e.keyCode === 13:
           case e.keyCode === 40:
@@ -529,8 +539,10 @@ export default {
                 this.inputBox.style.opacity = 1
                 this.inputBoxChanged = true
               }
-              if (e.keyCode === 8 || e.keyCode === 46)
-                this.inputBoxChanged = true
+              if (e.keyCode === 8 || e.keyCode === 46) {
+                this.inputBox.value = ''
+                this.inputCellWrite('')
+              }
             }
             break
         }
@@ -563,7 +575,7 @@ export default {
 
       this.inputBox.style.opacity = 0
       if (this.inputBoxChanged) {
-        this.inputCellWrite(this.inputBox.value)
+        this.inputCellWrite(this.fields[this.currentColPos].toValue(this.inputBox.value))
         this.inputBoxChanged = false
       }
 
@@ -919,10 +931,9 @@ export default {
     mouseOut () {
       this.mousein = false
     },
-    inputSquareClick (e, setText) {
+    inputSquareClick () {
       if (!this.fields[this.currentColPos].readonly && this.inputBox.style.opacity * 1 === 0) {
-        if (e) e.preventDefault()
-        this.inputBox.value = typeof setText !== 'undefined' ? setText : this.currentCell.innerText
+        this.inputBox.value = this.currentCell.innerText
         this.inputBox.style.opacity = 1
         this.inputBox.focus()
         this.inputBoxChanged = false
@@ -1096,25 +1107,6 @@ export default {
   background-size: 8px 8px;
   background-position: right 0px top 0px;
 }
-.systable td[contenteditable]:focus {
-  outline: 2px solid darkseagreen;
-  cursor: text;
-  text-overflow: inherit;
-}
-.systable td[contenteditable]::selection {
-  /* background: white; /* WebKit/Blink Browsers */
-  background: transparent;
-}
-.systable td[contenteditable]::-moz-selection {
-  /* background: white; /* Gecko Browsers */
-  background: transparent;
-}
-.systable td.edit[contenteditable]::selection {
-  background: lightblue; /* WebKit/Blink Browsers */
-}
-.systable td.edit[contenteditable]::-moz-selection {
-  background: lightblue; /* Gecko Browsers */
-}
 .systable td.readonly {
   color: #90A4BE
 }
@@ -1125,7 +1117,7 @@ export default {
   max-width: 36px;
   cursor: e-resize !important;
 }
-.systable th.first-col {
+.systable thead td.first-col, .systable thead th.first-col {
   cursor: pointer !important;
 }
 .systable td.first-col.focus {
