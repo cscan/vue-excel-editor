@@ -807,7 +807,7 @@ export default {
       this.selectedCount = Object.keys(this.selected).length
     },
     toggleSelectRecord (rowPos) {
-      if (this.selected[rowPos] >= 0) this.unSelectRecord(rowPos)
+      if (typeof this.selected[rowPos] !== 'undefined') this.unSelectRecord(rowPos)
       else this.selectRecord(rowPos)
     },
     selectRecord (rowPos) {
@@ -945,7 +945,7 @@ export default {
     inputCellWrite (setText, col, row) {
       if (typeof col === 'undefined') col = this.currentColPos
       if (typeof row === 'undefined') row = this.currentRowPos
-      if (this.selected[row] >= 0)
+      if (typeof this.selected[row] !== 'undefined')
         this.updateSelectedRowsByCol(this.fields[col].name, setText)
       else
         this.updateCell(row, this.fields[col].name, setText)
