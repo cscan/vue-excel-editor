@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="conponent-content">
     <div class="table-content"
          @mouseover="mouseOver"
          @mouseout="mouseOut"
@@ -95,36 +95,6 @@
         </tbody>
         <slot></slot>
       </table>
-      <div ref="footer" class="footer col col-12 text-center">
-        <span v-show="!noPaging" style="float: left">
-          Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
-        </span>
-        <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
-          <template v-if="processing">
-            <font-awesome-icon icon="spinner" spin size="sm" /> Processing
-          </template>
-          <template v-else>
-            <b-link :disabled="pageTop <= 0" @click="firstPage">
-              <font-awesome-icon icon="step-backward" size="sm" /> First
-            </b-link>
-            &nbsp;|&nbsp;
-            <b-link :disabled="pageTop <= 0" @click="prevPage">
-              <font-awesome-icon icon="backward" size="sm" /> Previous
-            </b-link>
-            &nbsp;|&nbsp;
-            <b-link :disabled="pageTop + pageSize >= table.length" @click="nextPage">
-              Next <font-awesome-icon icon="forward" size="sm" />
-            </b-link>
-            &nbsp;|&nbsp;
-            <b-link :disabled="pageTop + pageSize >= table.length" @click="lastPage">
-              Last <font-awesome-icon icon="step-forward" size="sm" />
-            </b-link>
-          </template>
-        </span>
-        <span style="float: right">
-          Selected: {{ Object.keys(selected).length }} | Filtered: {{ table.length }} | Loaded: {{ value.length }}
-        </span>
-      </div>
       <b-modal id="panelFilter" ref="panelFilter" centered @shown="freezePanelSizeAfterShown($refs.panelList)">
         <template v-slot:modal-title>
           <font-awesome-icon icon="sort-amount-down" size="xs" />
@@ -257,6 +227,36 @@
       <div v-show="processing" ref="frontdrop" class="front-drop">
         <font-awesome-icon icon="spinner" spin size="3x" />
       </div>
+    </div>
+    <div ref="footer" class="footer col col-12 text-center">
+      <span v-show="!noPaging" style="float: left">
+        Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
+      </span>
+      <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
+        <template v-if="processing">
+          <font-awesome-icon icon="spinner" spin size="sm" /> Processing
+        </template>
+        <template v-else>
+          <b-link :disabled="pageTop <= 0" @click="firstPage">
+            <font-awesome-icon icon="step-backward" size="sm" /> First
+          </b-link>
+          &nbsp;|&nbsp;
+          <b-link :disabled="pageTop <= 0" @click="prevPage">
+            <font-awesome-icon icon="backward" size="sm" /> Previous
+          </b-link>
+          &nbsp;|&nbsp;
+          <b-link :disabled="pageTop + pageSize >= table.length" @click="nextPage">
+            Next <font-awesome-icon icon="forward" size="sm" />
+          </b-link>
+          &nbsp;|&nbsp;
+          <b-link :disabled="pageTop + pageSize >= table.length" @click="lastPage">
+            Last <font-awesome-icon icon="step-forward" size="sm" />
+          </b-link>
+        </template>
+      </span>
+      <span style="float: right">
+        Selected: {{ Object.keys(selected).length }} | Filtered: {{ table.length }} | Loaded: {{ value.length }}
+      </span>
     </div>
   </div>
 </template>
@@ -1090,13 +1090,17 @@ export default {
 .table-content :focus {
   outline: none;
 }
-
+.component-content {
+  display: flex;
+  flex-flow: column;
+}
 .table-content {
+  flex: 1 1 auto;
   font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-size: 1rem;
   line-height: 1.1;
   word-spacing: 0.02rem;
-  overflow-x: scroll;
+  overflow: scroll;
   position: relative;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -1107,7 +1111,7 @@ export default {
 }
 .systable {
   z-index: -1;
-  margin-bottom: 4px;
+  margin-bottom: 0;
   overflow: scroll;
 }
 .systable tr.select {
@@ -1176,16 +1180,16 @@ export default {
   height: 1.8rem;
 }
 .footer {
+  flex: 0 1 30px;
   padding: 8px;
   font-size: 0.9rem;
   color: dimgray;
-  height: 30px;
   position: sticky;
   bottom: 0;
   left: 0;
   background-color: white;
   border-top: 1px solid lightgray;
-  margin-top: -6px;
+  margin-top: -2px
 }
 .panel-list-item {
   padding: 10px 5px;
