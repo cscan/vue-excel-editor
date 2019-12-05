@@ -1118,7 +1118,7 @@ export default {
   overflow: scroll;
 }
 .systable tr.select {
-  background-color: #d6d6d6
+  filter: invert(100%)
 }
 .systable tr.select td:first-child {
   font-weight: 800;
