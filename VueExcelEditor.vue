@@ -115,17 +115,24 @@
             <template v-slot:prepend>
               <b-dropdown no-caret variant="success">
                 <template slot="button-content">
+                  <font-awesome-icon v-if="inputFilterCondition==''" icon="percentage" size="sm" />
                   <font-awesome-icon v-if="inputFilterCondition=='='" icon="equals" size="sm" />
                   <font-awesome-icon v-if="inputFilterCondition=='>'" icon="greater-than" size="sm" />
                   <font-awesome-icon v-if="inputFilterCondition=='>='" icon="greater-than-equal" size="sm" />
                   <font-awesome-icon v-if="inputFilterCondition=='<'" icon="less-than" size="sm" />
                   <font-awesome-icon v-if="inputFilterCondition=='<='" icon="less-than-equal" size="sm" />
-                  <font-awesome-icon v-if="inputFilterCondition=='~'" icon="percentage" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='~'" icon="plus" size="sm" />
                 </template>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition=''">
+                    <font-awesome-icon icon="percentage" size="sm" />
+                    &nbsp;&nbsp;Near
+                  </a>
+                </b-dropdown-item>
                 <b-dropdown-item>
                   <a href="#" @click.prevent="inputFilterCondition='='">
                     <font-awesome-icon icon="equals" size="sm" />
-                    &nbsp;&nbsp;Wildcard Match
+                    &nbsp;&nbsp;Exact Match
                   </a>
                 </b-dropdown-item>
                 <b-dropdown-item>
@@ -154,7 +161,7 @@
                 </b-dropdown-item>
                 <b-dropdown-item>
                   <a href="#" @click.prevent="inputFilterCondition='~'">
-                    <font-awesome-icon icon="percentage" size="sm" />
+                    <font-awesome-icon icon="plus" size="sm" />
                     &nbsp;&nbsp;Regular Expression
                   </a>
                 </b-dropdown-item>
@@ -419,7 +426,7 @@ export default {
           const k = filterColumnList[i]
           switch (filter[k].type) {
             case 0:
-              if (!`${content[k]}` === `${filter[k].value}`) return false
+              if (`${content[k]}` !== `${filter[k].value}`) return false
               break
             case 1:
               if (this.fields[k].type === 'number') content[k] = Number(content[k])
@@ -720,14 +727,14 @@ export default {
     },
     filterPanelSelect (opt) {
       // this.columnFilter[this.columnFilterRef.colPos] = el  // Cannot use this, dunno why
-      this.columnFilterRef.$el.textContent = opt
-      this.columnFilterRef.$emit('input', opt)
+      this.columnFilterRef.$el.textContent = '=' + opt
+      this.columnFilterRef.$emit('input', '=' + opt)
       this.hideFilterPanel()
     },
     showFilterPanel (ref) {
       this.columnFilterRef = ref
       this.inputFilter = ''
-      this.inputFilterCondition = '='
+      this.inputFilterCondition = ''
       this.sortedUniqueValueList = []
       this.$bvModal.show('panelFilter')
       this.columnFilterRef.$el.textContent = ''
