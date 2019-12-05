@@ -1117,17 +1117,12 @@ export default {
   margin-bottom: 2px;
   overflow: scroll;
 }
+.systable tr {
+  background-color: white
+}
 .systable tr.select {
   filter: invert(100%)
 }
-.systable tr.select td:first-child {
-  font-weight: 800;
-}
-/*
-.systable .table-col-header {
-  position: relative
-}
-*/
 .systable td.table-bordered {
   border: 1px solid lightgray;
 }
