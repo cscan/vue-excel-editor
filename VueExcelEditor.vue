@@ -387,7 +387,7 @@ export default {
             if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
             break
           case this.columnFilter[k].startsWith('='):
-            filter[k] = {type: 5, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
+            filter[k] = {type: 0, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
             break
           case this.columnFilter[k].startsWith('*') && this.columnFilter[k].endsWith('*'):
             filter[k] = {type: 5, value: this.columnFilter[k].slice(1).slice(0, -1).trim().toUpperCase()}
@@ -418,6 +418,9 @@ export default {
         for (let i = 0; i < filterColumnList.length; i++) {
           const k = filterColumnList[i]
           switch (filter[k].type) {
+            case 0:
+              if (!`${content[k]}` === `${filter[k].value}`) return false
+              break
             case 1:
               if (this.fields[k].type === 'number') content[k] = Number(content[k])
               if (filter[k].value < content[k]) return false
@@ -687,7 +690,7 @@ export default {
     },
     sort (n, pos) {
       this.processing = true
-      const colPos = pos || this.columnFilterRef.colPos
+      const colPos = typeof pos === 'undefined' ? this.columnFilterRef.colPos : pos
       const fieldName = this.fields[colPos].name
       const type = this.fields[colPos].type
       setTimeout(() => {
@@ -1111,7 +1114,7 @@ export default {
 }
 .systable {
   z-index: -1;
-  margin-bottom: 0;
+  margin-bottom: 2px;
   overflow: scroll;
 }
 .systable tr.select {
@@ -1161,7 +1164,7 @@ export default {
   background-position: right 0px top 0px;
 }
 .systable td.readonly {
-  color: #90A4BE
+  color: #2084EE
 }
 .systable .first-col {
   background:#e9ecef;
@@ -1188,8 +1191,6 @@ export default {
   bottom: 0;
   left: 0;
   background-color: white;
-  border-top: 1px solid lightgray;
-  margin-top: -2px
 }
 .panel-list-item {
   padding: 10px 5px;
