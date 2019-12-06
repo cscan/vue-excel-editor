@@ -1,6 +1,6 @@
 <template>
   <div class="conponent-content">
-    <div class="table-content"
+    <div ref="tableContent" class="table-content"
          @mouseover="mouseOver"
          @mouseout="mouseOut"
          @mousemove="mouseMove"
@@ -316,6 +316,7 @@ export default {
       // selx: 0,
       // sely: 0,
 
+      tableContent: null,           // Table parent
       systable: null,               // TABLE dom node
       colgroupTr: null,             // colgroup TR dom node
       labelTr: null,                // THEAD label dom node
@@ -498,6 +499,7 @@ export default {
     }
   },
   mounted () {
+    this.tableContent = this.$refs.tableContent
     this.systable = this.$refs.systable
     this.colgroupTr = this.systable.children[0]
     this.labelTr = this.systable.children[1].children[0]
@@ -529,13 +531,21 @@ export default {
             e.preventDefault()
             break
           case 67: // c
-            this.inputCopy = this.currentCell.innerText
+            this.inputBox.value = this.currentCell.innerText
+            this.inputBox.focus()
+            this.inputBox.select()
+            document.execCommand('copy')
             e.preventDefault()
             break;
           case 86: // v
-            if (!this.fields[this.currentColPos].readonly && this.inputCopy !== null)
-              this.inputCellWrite(this.inputCopy)
-            e.preventDefault()
+            if (this.fields[this.currentColPos].readonly) return
+            this.inputBoxChanged = true
+            this.inputBox.focus()
+            this.inputBox.select()
+            document.execCommand('paste')
+            this.inputCellWrite(this.inputBox.value)
+            if (this.inputBox.style.opacity * 1 === 0)
+              e.preventDefault()
             break;
         }
       else {
@@ -613,6 +623,12 @@ export default {
       this.inputSquare.style.top =  (cellRect.top - tableRect.top) + 'px'
       this.inputSquare.style.width = cellRect.width + 'px'
       this.inputSquare.style.height = cellRect.height + 'px'
+
+      const inputRect = this.inputSquare.getBoundingClientRect()
+      if (inputRect.right >= screen.availWidth)
+        this.tableContent.scrollBy(inputRect.width, 0)
+      if (inputRect.left <= this.tableContent.getBoundingClientRect().left)
+        this.tableContent.scrollBy(-inputRect.width, 0)
 
       this.inputBox.style.opacity = 0
       if (this.inputBoxChanged) {
@@ -763,7 +779,7 @@ export default {
         return
       }
       this.pageSize = this.page || Math.floor((
-        window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.children[0].getBoundingClientRect().height - 37) / 24)
+        window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.getBoundingClientRect().height - 42) / 24)
     },
     firstPage () {
       this.processing = true
@@ -1002,8 +1018,10 @@ export default {
       */
     },
     inputBoxKeydown (e) {
-      if (!this.fields[this.currentColPos].readonly && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)
-        this.inputBoxChanged = true
+      if (this.fields[this.currentColPos].readonly) return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      if (e.keyCode === 8 || e.keyCode === 46) this.inputBoxChanged = true
+      if (e.key.length === 1) this.inputBoxChanged = true
     },
     inputCellWrite (setText, col, row) {
       if (typeof col === 'undefined') col = this.currentColPos
