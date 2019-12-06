@@ -9,6 +9,7 @@
         <div style="position: relative; height: 100%; padding: 2px">
           <textarea ref="inputBox"
                     class="input-box"
+                    :style="{opacity: inputBoxShow}"
                     @blur="inputBoxBlur"
                     @keydown="inputBoxKeydown"
                     trim
@@ -20,6 +21,7 @@
         </div>
       </div>
       <table ref="systable"
+             id="systable"
              style="table-layout: fixed"
              class="systable table table-bordered table-sm"
              ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
@@ -38,17 +40,15 @@
                 v-show="item.visible"
                 :key="`th-${p}`"
                 :class="{'sort-asc-sign': sortPos==p && sortDir==1,
-                         'sort-des-sign': sortPos==p && sortDir==-1}"
+                        'sort-des-sign': sortPos==p && sortDir==-1}"
                 class="table-col-header"
                 :style="{width: item.width}"
-                @mousedown="headerClick($event, p)">
-              <div :class="{'filter-sign': columnFilter[p]}">
-                {{ item.label }}
-              </div>
+                @click.prevent="headerClick($event, p)">
+              <div :class="{'filter-sign': columnFilter[p]}">{{ item.label }}</div>
               <div class="col-sep"
-                   @mousedown="colSepMouseDown"
-                   @mouseover="colSepMouseOver"
-                   @mouseout="colSepMouseOut" />
+                  @mousedown="colSepMouseDown"
+                  @mouseover="colSepMouseOver"
+                  @mouseout="colSepMouseOut" />
             </th>
           </tr>
           <tr>
@@ -212,14 +212,16 @@
           </b-button>
         </b-form-group>
         <div ref="fieldList" class="list-group list-group-flush panel-list">
-          <a v-for="(item, k) in fields" :key="k"
-            href="#"
-            class="list-group-item list-group-item-action panel-list-item"
-            @click.prevent="item.visible = !item.visible">
-            <b-checkbox size="sm" :checked="item.visible">
-              {{ item.label }}
-            </b-checkbox>
-          </a>
+          <draggable v-model="fields" draggable=".panel-list-item">
+            <a v-for="(item, k) in fields" :key="k"
+              href="#"
+              class="list-group-item list-group-item-action panel-list-item"
+              @click.prevent="item.visible = !item.visible">
+              <b-checkbox size="sm" :checked="item.visible">
+                {{ item.label }}
+              </b-checkbox>
+            </a>
+          </draggable>
         </div>
         <template v-slot:modal-footer>
           <b-button variant="primary input-button" @click="saveSetting">
@@ -276,6 +278,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import BootstrapVue from 'bootstrap-vue'
 import VueExcelFilter from './VueExcelFilter'
 import XLSX from 'xlsx'
+// import tableDragger from 'table-dragger'
+import draggable from 'vuedraggable'
 
 library.add(fas)
 Vue.use(BootstrapVue)
@@ -283,7 +287,8 @@ Vue.use(BootstrapVue)
 export default {
   components: {
     'font-awesome-icon': FontAwesomeIcon,
-    'vue-excel-filter': VueExcelFilter
+    'vue-excel-filter': VueExcelFilter,
+    'draggable': draggable
   },
   props: {
     value: {type: Array,                            // actual table content
@@ -339,6 +344,7 @@ export default {
       currentColPos: -1,            // focusing pos of column/field
       currentCell: null,
       inputBox: null,
+      inputBoxShow: 0,
       inputSquare: null,
 
       errmsg: {},
@@ -509,6 +515,33 @@ export default {
     this.inputSquare = this.$refs.inputSquare
     this.inputBox = this.$refs.inputBox
     this.frontdrop = this.$refs.frontdrop
+    /*
+    setTimeout(() => {
+      const dragger = tableDragger(this.systable, {
+        mode: 'column',
+        dragHandler: '.table-col-header'
+      })
+      dragger.on('drag', () => {
+        // eslint-disable-next-line
+        console.log( this.fields.map(f => f.name))
+      })
+      dragger.on('drop', (from, to) => {
+          // eslint-disable-next-line
+          console.log( this.fields.map(f => f.name))
+          const f = from - 1;
+          const t = to - 1;
+          // const temp = this.fields[f]
+          // this.fields[f] = this.fields[t]
+          // this.fields[t] = temp
+          if (this.redo.length > 0)
+            this.redo = this.redo.map(tran => {
+              if (tran.colPos === f) tran.colPos = t
+              else if (tran.colPos === t) tran.colPos = f
+              return tran
+            })
+      })
+    })
+    */
     if (this.height)
       this.systable.parentNode.style.height = this.height
     this.reset()
@@ -544,7 +577,7 @@ export default {
             this.inputBox.select()
             document.execCommand('paste')
             this.inputCellWrite(this.inputBox.value)
-            if (this.inputBox.style.opacity * 1 === 0)
+            if (!this.inputBoxShow)
               e.preventDefault()
             break;
         }
@@ -562,9 +595,15 @@ export default {
             break
           case e.keyCode === 9 && e.shiftKey:
           case e.keyCode === 37:
-            if (this.inputBox.style.opacity * 1 === 0) {
+            if (!this.inputBoxShow) {
               this.moveWest(e)
               e.preventDefault()
+            }
+            else {
+              if (this.inputBox.selectionStart === 0) {
+                this.moveWest(e)
+                e.preventDefault()
+              }
             }
             break;
           case e.keyCode === 38:
@@ -573,9 +612,15 @@ export default {
             break;
           case e.keyCode === 9 && !e.shiftKey:
           case e.keyCode === 39:
-            if (this.inputBox.style.opacity * 1 === 0) {
+            if (!this.inputBoxShow) {
               this.moveEast(e)
               e.preventDefault()
+            }
+            else {
+              if (this.inputBox.selectionEnd === this.inputBox.value.length) {
+                this.moveEast(e)
+                e.preventDefault()
+              }
             }
             break;
           case e.keyCode === 13:
@@ -584,13 +629,13 @@ export default {
             e.preventDefault()
             break
           default:
-            if (!this.fields[this.currentColPos].readonly && this.inputBox.style.opacity * 1 === 0) {
+            if (!this.fields[this.currentColPos].readonly && !this.inputBoxShow) {
               if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
                 this.inputBox.value = ''
-                this.inputBox.style.opacity = 1
+                this.inputBoxShow = 1
                 this.inputBoxChanged = true
               }
-              if (e.keyCode === 8 || e.keyCode === 46) {
+              if (e.keyCode === 8 || e.keyCode === 46) {  // Delete/BS
                 this.inputBox.value = ''
                 this.inputCellWrite('')
               }
@@ -630,7 +675,7 @@ export default {
       if (inputRect.left <= this.tableContent.getBoundingClientRect().left)
         this.tableContent.scrollBy(-inputRect.width, 0)
 
-      this.inputBox.style.opacity = 0
+      this.inputBoxShow = 0
       if (this.inputBoxChanged) {
         this.inputCellWrite(this.fields[this.currentColPos].toValue(this.inputBox.value))
         this.inputBoxChanged = false
@@ -652,6 +697,9 @@ export default {
       this.pageTop = 0
       this.prevSelect = -1
       this.reviseSelectedAfterTableChange()
+    },
+    getSelectedRecords () {
+      return this.table.filter((rec, i) => this.selected[i])
     },
     colSepMouseDown (e) {
       e.preventDefault()
@@ -842,7 +890,7 @@ export default {
         const ws1 = XLSX.utils.json_to_sheet(this.table, {
           header: this.fields.map(field => field.name)
         })
-        const labels = Array.from(this.labelTr.children).slice(1).map(t => t.children[0].innerHTML)
+        const labels = Array.from(this.labelTr.children).slice(1).map(t => t.children[0].innerText)
         XLSX.utils.sheet_add_aoa(ws1, [labels], {origin: 0})
         ws1['!cols'] = Array.from(this.labelTr.children).slice(1).map((t) => {
           return {
@@ -1000,9 +1048,9 @@ export default {
       this.mousein = false
     },
     inputSquareClick () {
-      if (!this.fields[this.currentColPos].readonly && this.inputBox.style.opacity * 1 === 0) {
+      if (!this.fields[this.currentColPos].readonly && !this.inputBoxShow) {
         this.inputBox.value = this.currentCell.innerText
-        this.inputBox.style.opacity = 1
+        this.inputBoxShow = 1
         this.inputBox.focus()
         this.inputBoxChanged = false
         this.focused = true

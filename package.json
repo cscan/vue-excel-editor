@@ -6,6 +6,7 @@
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.1.0",
     "moment": "^2.24.0",
+    "vuedraggable": "^2.23.2",
     "xlsx": "^0.15.3"
   },
   "name": "vue-excel-editor",
