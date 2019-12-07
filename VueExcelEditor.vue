@@ -43,7 +43,7 @@
                         'sort-des-sign': sortPos==p && sortDir==-1}"
                 class="table-col-header"
                 :style="{width: item.width}"
-                @click.prevent="headerClick($event, p)">
+                @mousedown="headerClick($event, p)">
               <div :class="{'filter-sign': columnFilter[p]}">{{ item.label }}</div>
               <div class="col-sep"
                   @mousedown="colSepMouseDown"
@@ -966,6 +966,12 @@ export default {
       transaction.forEach((rec) => {
         this.updateCell(this.rowIndex[rec.key], rec.colPos, rec.field, rec.oldVal, true)
       })
+    },
+    updateCellByColPos (row, colPos, content) {
+      return this.updateCell(row, colPos, this.fields[colPos], content)
+    },
+    updateCellByName (row, name, content) {
+      return this.updateCell(row, this.fields.findIndex(f => f.field === name), name, content)
     },
     updateCell (row, colPos, name, content, restore) {
       const transaction = {
