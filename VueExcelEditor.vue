@@ -971,7 +971,7 @@ export default {
       return this.updateCell(row, colPos, this.fields[colPos], content)
     },
     updateCellByName (row, name, content) {
-      return this.updateCell(row, this.fields.findIndex(f => f.field === name), name, content)
+      return this.updateCell(row, this.fields.findIndex(f => f.name === name), name, content)
     },
     updateCell (row, colPos, name, content, restore) {
       const transaction = {
