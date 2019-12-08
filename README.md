@@ -39,10 +39,10 @@ In your template
 ```html
 <template>
     <vue-excel-editor v-model="jsondata">
-        <vue-excel-column field="user" label="User" />
-        <vue-excel-column field="name" label="Name" />
+        <vue-excel-column field="user"  label="User" />
+        <vue-excel-column field="name"  label="Name" />
         <vue-excel-column field="phone" label="Phone" />
-        <vue-excel-column field="age" label="Age" />
+        <vue-excel-column field="age"   label="Age" />
         <vue-excel-column field="birth" label="Birth" />
     </vue-excel-editor>
 </template>
@@ -102,23 +102,25 @@ In your template
 ## Example
 
 ```js
-import Vue from 'vue'
-import VueExcelEditor from 'vue-excel-editor'
-
-Vue.component('vue-excel-editor', VueExcelEditor)
-
-const app = new Vue({
-    el: '#app',
+export default {
+    name: 'app',
     data: {
-        json_data: [
+        jsondata: [
             {key: 'U0001', user: 'kc', name: 'Kenneth Cheng', phone: '852-1234-5678', age: 25, birth: '1997-07-01'},
             {key: 'U0002', user: 'sm', name: 'Simon Minolta', phone: '852-1234-5682', age: 20, birth: '1999-11-12'},
             {key: 'U0003', user: 'ra', name: 'Raymond Atom', phone: '852-1234-5683', age: 18, birth: '2000-06-11'},
             {key: 'U0004', user: 'ag', name: 'Anderson George', phone: '852-1234-5684', age: 22, birth: '2002-08-01'},
             {key: 'U0005', user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', age: 29, birth: '1990-09-01'}
         ]
+    },
+    method: {
+        validPhoneNum (content) {
+            if (content === '') return 'Mandatory field'
+            if (!/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(content)) return 'Invalid Phone Number'
+            return ''
+        }
     }
-})
+}
 ```
 
 #### Important
@@ -129,11 +131,11 @@ In your HTML call it likes
 ```html
 <template>
     <vue-excel-editor v-model="jsondata">
-        <vue-excel-column field="user" label="User ID" type="string" width="80px" readonly />
-        <vue-excel-column field="name" label="Name" type="string" width="150px" />
-        <vue-excel-column field="phone" label="Phone Number" type="string" width="130px" :validate="validPhoneNum" />
-        <vue-excel-column field="age" label="Age" type="number" width="70px" />
-        <vue-excel-column field="birth" label="Date Of Birth" type="date" width="80px" />
+        <vue-excel-column field="user"  label="User ID"       type="string" width="80px" readonly />
+        <vue-excel-column field="name"  label="Name"          type="string" width="150px" />
+        <vue-excel-column field="phone" label="Phone Number"  type="string" width="130px" :validate="validPhoneNum" />
+        <vue-excel-column field="age"   label="Age"           type="number" width="70px" />
+        <vue-excel-column field="birth" label="Date Of Birth" type="date"   width="80px" />
     </vue-excel-editor>
 </template>
 ```
