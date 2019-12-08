@@ -515,33 +515,7 @@ export default {
     this.inputSquare = this.$refs.inputSquare
     this.inputBox = this.$refs.inputBox
     this.frontdrop = this.$refs.frontdrop
-    /*
-    setTimeout(() => {
-      const dragger = tableDragger(this.systable, {
-        mode: 'column',
-        dragHandler: '.table-col-header'
-      })
-      dragger.on('drag', () => {
-        // eslint-disable-next-line
-        console.log( this.fields.map(f => f.name))
-      })
-      dragger.on('drop', (from, to) => {
-          // eslint-disable-next-line
-          console.log( this.fields.map(f => f.name))
-          const f = from - 1;
-          const t = to - 1;
-          // const temp = this.fields[f]
-          // this.fields[f] = this.fields[t]
-          // this.fields[t] = temp
-          if (this.redo.length > 0)
-            this.redo = this.redo.map(tran => {
-              if (tran.colPos === f) tran.colPos = t
-              else if (tran.colPos === t) tran.colPos = f
-              return tran
-            })
-      })
-    })
-    */
+
     if (this.height)
       this.systable.parentNode.style.height = this.height
     this.reset()

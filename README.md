@@ -3,21 +3,22 @@
 Vue2 plugin for displaying and editing the array-of-object in Excel style. It supports the following features:
 
 - Excel-like UI
-- Up, down, left, right Navigation
-- Column Filter
-- Column Sort (One column only)
-- Multi-select row (Shift support)
-- Update the cells in selected rows
-- Remember the selection during paging
-- PageUp, PageDown key support
-- Select-all, De-Select-all
-- Custom Column Validation
-- Custom Error Tooltip
+- Column Filtering
+- Column Sorting
+- Pagination
+- Row selection
+- Update the cells in all selected rows
+- Key support: Up, down, left, right, PageUp, PageDown, tab, shift-tab
+- Column Valiation
+- Cell Error Tooltip
 - Custom Record Label
 - Custom Column Header
-- Predefine the Column Width, User-adjustable Column Width
-- Auto and Custom Page size (Responsive)
-- Custom Readonly Column
+- Readonly Column
+- Column Visibility
+- Column Sequence
+- Column Width Adjustment
+- Undo
+- Copy & Paste (Under Testing)
 
 ## Getting started
 
@@ -37,14 +38,12 @@ Vue.component('vue-excel-editor', VueExcelEditor)
 In your template
 ```html
 <template>
-    <vue-excel-editor v-model="jsondata" :n-fields="5">
-        <template v-slot:body="props">
-            <vue-excel-column v-model="props.record['user']" field="user" label="User" />
-            <vue-excel-column v-model="props.record['name']" field="name" label="Name" />
-            <vue-excel-column v-model="props.record['phone']" field="phone" label="Phone" />
-            <vue-excel-column v-model="props.record['age']" field="age" label="Age" />
-            <vue-excel-column v-model="props.record['birth']" field="birth" label="Birth" />
-        </template>
+    <vue-excel-editor v-model="jsondata">
+        <vue-excel-column field="user" label="User" />
+        <vue-excel-column field="name" label="Name" />
+        <vue-excel-column field="phone" label="Phone" />
+        <vue-excel-column field="age" label="Age" />
+        <vue-excel-column field="birth" label="Birth" />
     </vue-excel-editor>
 </template>
 
@@ -53,33 +52,30 @@ In your template
 ## Props List
 
 #### Component: vue-excel-editor
-| Name             | Type              | Description |
-| :---             | :---:             | ---         |
-| v-model          | Array Of Objects  | AOO Data to be edited | 
-| n-fields         | Number            | Number of fields in table |
-| page             | Number            | Specific page size. If not provided, component will calculate automatically |
-| n-filter-count   | Number            | Number of items to be listed in filter dialog. Default is 200 |
-| new-record       | Function          | The handler of the new record request (Under testing) |
-| :---             | :---:             | ---         |
+| Name           | Mandatory | Type              | Description |
+| :---           | :---      | :---:             | ---         |
+| v-model        | Mandatory | Array Of Objects  | AOO Data to be edited | 
+| page           | Optional  | Number            | Specific page size, default is auto-calculating by screen height |
+| n-filter-count | Optional  | Number            | Number of items to be listed in filter dialog. Default is 200 |
+| row-style      | Optional  | Function          | Conditional row formatting, default is null |
+| no-paging      | Optional  | Boolean           | Disable paging feature, default is false |
 
 (TBD)
 
 #### Component: vue-excel-column
-| Name             | Type              | Description |
-| :---             | :---:             | ---         |
-| v-model          | String            | The Object to be edited |
-| field            | String            | Object Key |
-| label            | String            | Header Label |
-| type             | String            | Column type: 'string', 'number', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
-| readonly         | Boolean           | Allow to edit or not |
-| init-style       | String            | Additional Column CSS |
-| validate         | Function          | Function to return the error message |
-| interactive      | Boolean           | Specify true if the update event will be trigger during editing |
-| upper-case       | Boolean           | Specify True if you want to force upper-case |
-| accept-enter     | Boolean           | Allow multi-line in cell |
-| to-text          | Function          | The conversion function from object value to edit-text |
-| to-value         | Function          | The conversion function from edit-text to object value |
-| :---             | :---:             | ---         |
+| Name         | Mandatory | Type     | Description |
+| :---         | :---      | :---:    | ---         |
+| field        | Mandatory | String   | Row Object Key |
+| label        | Optional  | String   | Header Label, default is field |
+| type         | Optional  | String   | Column type: 'string' (default), 'number', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| readonly     | Optional  | Boolean  | Read-only, default is false |
+| init-style   | Optional  | String   | Style in CSS |
+| width        | Optional  | String   | Specified Column Width, default is 100px |
+| validate     | Optional  | Function | Custom Function to validate and return the error message |
+| pos          | Optional  | Number   | Specified column sequence |
+| upper-case   | Optional  | Boolean  | Specify True if you want to force upper-case |
+| to-text      | Optional  | Function | The custom conversion function from object value to edit-text |
+| to-value     | Optional  | Function | The custom conversion function from edit-text to object value |
 
 (TBD)
 
@@ -89,16 +85,17 @@ In your template
 | Name             | Argument          | Description |
 | :---             | :---:             | ---         |
 | update           | Array Of Array    | Update Cell information |
-| :---             | :---:             | ---         |
 
 (TBD)
 
 ## Methods List
 
 #### Component: vue-excel-editor
-| Name             | Argument          | Description |
-| :---             | :---:             | ---         |
-| :---             | :---:             | ---         |
+| Name             | Argument  | Description |
+| :---             | :---:     | ---         |
+| exportTable      | format    | export the filtered table as xlsx/csv |
+| clearAllSelected |           | Unselect all selected rows |
+| undoTransaction  |           | Undo the latest update |
 
 (TBD)
 
@@ -130,15 +127,15 @@ The Array-Of-Object (AOO) data is required an unique "key" field to operate
 In your HTML call it likes
 
 ```html
-<vue-excel-editor v-model="json_data" :n-fields="5">
-    <template v-slot:body="props">
-        <vue-excel-column v-model="props.record['user']" field="user" label="User" />
-        <vue-excel-column v-model="props.record['name']" field="name" label="Name" />
-        <vue-excel-column v-model="props.record['phone']" field="phone" label="Phone" />
-        <vue-excel-column v-model="props.record['age']" field="age" label="Age" />
-        <vue-excel-column v-model="props.record['birth']" field="birth" label="Birth" />
-    </template>
-</vue-excel-editor>
+<template>
+    <vue-excel-editor v-model="jsondata">
+        <vue-excel-column field="user" label="User ID" type="string" width="80px" readonly />
+        <vue-excel-column field="name" label="Name" type="string" width="150px" />
+        <vue-excel-column field="phone" label="Phone Number" type="string" width="130px" :validate="validPhoneNum" />
+        <vue-excel-column field="age" label="Age" type="number" width="70px" />
+        <vue-excel-column field="birth" label="Date Of Birth" type="date" width="80px" />
+    </vue-excel-editor>
+</template>
 ```
 
 ## License

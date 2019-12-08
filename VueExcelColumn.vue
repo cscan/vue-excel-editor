@@ -8,7 +8,7 @@ import moment from 'moment'
 export default {
   props: {
     field: {type: String, default: ''},
-    label: {type: String, default: ''},
+    label: {type: String, default: null},
     type: {type: String, default: 'string'},
     validate: {type: Function, default: null},
     initStyle: {
@@ -85,14 +85,14 @@ export default {
 
     this.$parent.registerColumn({
       name: this.field,
-      label: this.label,
+      label: this.label === null ? this.field : this.label,
       type: this.type,
       width: this.width,
       validate: this.validate,
       initStyle: style,
       visible: this.visible,
       readonly: this.readonly,
-      pos: this.pos,
+      pos: Number(this.pos),
       toValue: this.toValue,
       toText: this.toText
     })
