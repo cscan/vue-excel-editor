@@ -32,7 +32,7 @@ Register VueExcelEditor in your app entrypoint:
 import Vue from 'vue'
 import VueExcelEditor from 'vue-excel-editor'
 
-Vue.component('vue-excel-editor', VueExcelEditor)
+Vue.use(VueExcelEditor)
 ```
 
 In your template
