@@ -867,14 +867,20 @@ export default {
     saveSetting () {
       this.$bvModal.hide('panelGrid')
     },
-    exportTable (format) {
+    exportTable (format, selectedOnly) {
       this.$bvModal.hide('panelGrid')
       this.processing = true
       setTimeout(() => {
         const wb = XLSX.utils.book_new()
-        const ws1 = XLSX.utils.json_to_sheet(this.table, {
-          header: this.fields.map(field => field.name)
-        })
+        let ws1 = null
+        if (selectedOnly)
+          ws1 = XLSX.utils.json_to_sheet(this.table.filter((rec, i) => this.selected[i]), {
+            header: this.fields.map(field => field.name)
+          })
+        else
+          ws1 = XLSX.utils.json_to_sheet(this.table, {
+            header: this.fields.map(field => field.name)
+          })
         const labels = Array.from(this.labelTr.children).slice(1).map(t => t.children[0].innerText)
         XLSX.utils.sheet_add_aoa(ws1, [labels], {origin: 0})
         ws1['!cols'] = Array.from(this.labelTr.children).slice(1).map((t) => {
