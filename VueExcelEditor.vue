@@ -1070,7 +1070,7 @@ export default {
     },
     inputCellWrite (setText, col, row) {
       if (typeof col === 'undefined') col = this.currentColPos
-      if (typeof row === 'undefined') row = this.currentRowPos
+      if (typeof row === 'undefined') row = this.pageTop + this.currentRowPos
       if (typeof this.selected[row] !== 'undefined')
         this.updateSelectedRowsByCol(col, this.fields[col].name, setText)
       else
