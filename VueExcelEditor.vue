@@ -32,9 +32,13 @@
         </colgroup>
         <thead class="thead-light text-center">
           <tr>
-            <th class="text-center first-col" @click="settingClick">
+            <th class="text-center first-col" @mousedown="settingClick">
               <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" />
               <font-awesome-icon v-else icon="bars" size="sm" />
+              <div class="col-sep"
+                  @mousedown="colSepMouseDown"
+                  @mouseover="colSepMouseOver"
+                  @mouseout="colSepMouseOut" />
             </th>
             <th v-for="(item, p) in fields"
                 v-show="item.visible"
@@ -264,7 +268,14 @@
         </template>
       </span>
       <span style="float: right">
-        Selected: {{ Object.keys(selected).length }} | Filtered: {{ table.length }} | Loaded: {{ value.length }}
+        Selected:
+        <span :style="{color: Object.keys(selected).length>0? 'red': 'inherit'}">{{ Object.keys(selected).length }}</span>
+        &nbsp;|&nbsp;
+        Filtered:
+        <span :style="{color: table.length<value.length? 'red': 'inherit'}">{{ table.length }}</span>
+        &nbsp;|&nbsp;
+        Loaded:
+        <span>{{ value.length }}</span>
       </span>
     </div>
   </div>
