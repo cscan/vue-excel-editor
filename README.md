@@ -3,15 +3,16 @@
 Vue2 plugin for displaying and editing the array-of-object in Excel style. It supports the following features:
 
 - Excel-like UI
+- Real 2-way data binding
 - Column Filtering
 - Column Sorting
 - Pagination
 - Row selection
 - Update the cells in all selected rows
-- Key support: Up, down, left, right, PageUp, PageDown, tab, shift-tab
+- Key support: Up, down, left, right, PageUp, PageDown, tab, shift-tab, esc
+- Ctrl/meta Key support: Ctrl-A, Ctrl-C, Ctrl-V, Ctrl-Z
 - Column Valiation
 - Cell Error Tooltip
-- Custom Record Label
 - Custom Column Header
 - Readonly Column
 - Column Visibility
@@ -53,7 +54,7 @@ In your template
 
 #### Component: vue-excel-editor
 | Name           | Mandatory | Type              | Description |
-| :---           | :---      | :---:             | ---         |
+| :---           | :---      | :---              | ---         |
 | v-model        | Mandatory | Array Of Objects  | AOO Data to be edited | 
 | page           | Optional  | Number            | Specific page size, default is auto-calculating by screen height |
 | n-filter-count | Optional  | Number            | Number of items to be listed in filter dialog. Default is 200 |
@@ -64,7 +65,7 @@ In your template
 
 #### Component: vue-excel-column
 | Name         | Mandatory | Type     | Description |
-| :---         | :---      | :---:    | ---         |
+| :---         | :---      | :---     | :---        |
 | field        | Mandatory | String   | Row Object Key |
 | label        | Optional  | String   | Header Label, default is field |
 | type         | Optional  | String   | Column type: 'string' (default), 'number', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
@@ -83,7 +84,7 @@ In your template
 
 #### Component: vue-excel-editor
 | Name             | Argument          | Description |
-| :---             | :---:             | ---         |
+| :---             | :---              | :---        |
 | update           | Array Of Array    | Update Cell information |
 
 (TBD)
@@ -91,11 +92,11 @@ In your template
 ## Methods List
 
 #### Component: vue-excel-editor
-| Name             | Argument  | Description |
-| :---             | :---:     | ---         |
-| exportTable      | format    | export the filtered table as xlsx/csv |
-| clearAllSelected |           | Unselect all selected rows |
-| undoTransaction  |           | Undo the latest update |
+| Name             | Argument             | Description |
+| :---             | :---                 | :---        |
+| exportTable      | format, selectedOnly | export the filtered table as xlsx/csv |
+| clearAllSelected |                      | Unselect all selected rows |
+| undoTransaction  |                      | Undo the latest update |
 
 (TBD)
 
@@ -119,6 +120,22 @@ export default {
             if (!/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(content)) return 'Invalid Phone Number'
             return ''
         }
+    }
+}
+```
+
+## Work with redis for saving
+
+```html
+<vue-excel-editor v-model="jsondata" @update="save">
+...
+</vue-excel-editor>
+```
+```js
+methods: {
+    save (record) {
+      record = record.map(rec => ['hset', `user:${rec.key}`, rec.field, rec.newVal])
+      redis.multi(record).exec()
     }
 }
 ```

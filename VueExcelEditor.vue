@@ -242,7 +242,7 @@
       </div>
     </div>
     <div ref="footer" class="footer col col-12 text-center">
-      <span v-show="!noPaging" style="float: left">
+      <span v-show="!noPaging" style="position: absolute; left: 8px">
         Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
       </span>
       <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
@@ -267,7 +267,7 @@
           </b-link>
         </template>
       </span>
-      <span style="float: right">
+      <span style="position: absolute; right: 8px">
         Selected:
         <span :style="{color: Object.keys(selected).length>0? 'red': 'inherit'}">{{ Object.keys(selected).length }}</span>
         &nbsp;|&nbsp;
@@ -570,6 +570,14 @@ export default {
         if (this.currentRowPos < 0) return
         this.focused = true
         switch (true) {
+          case e.keyCode === 27:
+            if (this.inputBoxShow) {
+              e.preventDefault()
+              this.inputBox.value = this.currentCell.innerText
+              this.inputBoxShow = 0
+              this.inputBoxChanged = false
+            }
+            break
           case e.keyCode === 33:
             this.prevPage()
             e.preventDefault()
@@ -1184,7 +1192,7 @@ export default {
 }
 .systable {
   z-index: -1;
-  margin-bottom: 2px;
+  margin-bottom: 0;
   overflow: scroll;
 }
 .systable tr {
@@ -1314,13 +1322,16 @@ a.disabled {
   to {opacity: 1}
 }
 .rb-square {
-  width: 10px;
-  height: 10px;
-  border: 2px solid white;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid white;
+  border-left: 2px solid white;
+  border-bottom: 0;
+  border-right: 0;
   background-color:darkseagreen;
   position: absolute;
-  bottom: -6px;
-  right: -6px;
+  bottom: -3px;
+  right: -3px;
   cursor: crosshair;
 }
 </style>
