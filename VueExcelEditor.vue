@@ -663,7 +663,7 @@ export default {
       this.inputSquare.style.height = cellRect.height + 'px'
 
       const inputRect = this.inputSquare.getBoundingClientRect()
-      if (inputRect.right >= screen.availWidth)
+      if (inputRect.right >= document.body.scrollWidth)
         this.tableContent.scrollBy(inputRect.width, 0)
       if (inputRect.left <= this.tableContent.getBoundingClientRect().left)
         this.tableContent.scrollBy(-inputRect.width, 0)
@@ -1190,6 +1190,14 @@ export default {
   -ms-user-select: none;
   user-select: none;
 }
+.table-content::-webkit-scrollbar {
+  width: 0;
+  height: 10px;
+}
+.table-content::-webkit-scrollbar-thumb {
+  background: #a0a0a040;
+  border-radius: 3px;
+}
 .systable {
   z-index: -1;
   margin-bottom: 0;
@@ -1257,7 +1265,7 @@ export default {
 }
 .footer {
   flex: 0 1 30px;
-  padding: 8px;
+  padding: 4px;
   font-size: 0.9rem;
   color: dimgray;
   position: sticky;
