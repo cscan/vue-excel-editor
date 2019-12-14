@@ -701,10 +701,11 @@ export default {
       this.inputSquare.style.height = cellRect.height + 'px'
 
       const inputRect = this.inputSquare.getBoundingClientRect()
-      if (inputRect.right >= document.body.scrollWidth)
-        this.tableContent.scrollBy(inputRect.width, 0)
-      if (inputRect.left <= this.tableContent.getBoundingClientRect().left)
-        this.tableContent.scrollBy(-inputRect.width, 0)
+      const tabRect = this.tableContent.getBoundingClientRect()
+      if (inputRect.right >= tabRect.right)
+        this.tableContent.scrollBy(inputRect.right - tabRect.right, 0)
+      if (inputRect.left <= tabRect.left)
+        this.tableContent.scrollBy(inputRect.left - tabRect.left, 0)
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
