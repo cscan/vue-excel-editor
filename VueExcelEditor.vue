@@ -340,6 +340,7 @@ export default {
       }
     },
     noFinding: {type: Boolean, default: false},
+    noFindingNext: {type: Boolean, default: false},
     noPaging: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     newRecord: {type: Function, default: null},     // return the new record from caller if provided
@@ -596,7 +597,7 @@ export default {
             }
             break
           case 71: // g
-            if (!this.noFinding && this.inputFind !== '') {
+            if (!this.noFindingNext && this.inputFind !== '') {
               this.doFindNext()
               e.preventDefault()
             }
