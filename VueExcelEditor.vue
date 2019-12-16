@@ -660,7 +660,7 @@ export default {
             break
           default:
             if (!this.fields[this.currentColPos].readonly && !this.inputBoxShow) {
-              if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+              if ((e.key === 'Process' || e.key.length === 1) && !e.ctrlKey && !e.metaKey && !e.altKey) {
                 this.inputBox.value = ''
                 this.inputBoxShow = 1
                 this.inputBox.focus()
