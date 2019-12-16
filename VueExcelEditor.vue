@@ -58,7 +58,7 @@
           <tr v-for="(record, rowPos) in pagingTable"
               :key="rowPos"
               :pos="rowPos"
-              :class="{select: selected[pageTop + rowPos]}"
+              :class="{select: selected[pageTop + rowPos] >= 0}"
               :style="rowStyle(record)">
             <td class="text-center first-col"
                 scope="row"
@@ -1006,16 +1006,20 @@ export default {
       else this.selectRecord(rowPos)
     },
     selectRecord (rowPos) {
-      this.selected[rowPos] = this.table[rowPos].key
-      this.selectedCount++
-      if (this.recordBody.children[rowPos - this.pageTop])
-        this.recordBody.children[rowPos - this.pageTop].classList.add('select')
+      if (typeof this.selected[rowPos] === 'undefined') {
+        this.selectedCount++
+        this.selected[rowPos] = this.table[rowPos].key
+        if (this.recordBody.children[rowPos - this.pageTop])
+          this.recordBody.children[rowPos - this.pageTop].classList.add('select')
+      }
     },
     unSelectRecord (rowPos) {
-      delete this.selected[rowPos]
-      this.selectedCount--
-      if (this.recordBody.children[rowPos - this.pageTop])
-        this.recordBody.children[rowPos - this.pageTop].classList.remove('select')
+      if (typeof this.selected[rowPos] !== 'undefined') {
+        delete this.selected[rowPos]
+        this.selectedCount--
+        if (this.recordBody.children[rowPos - this.pageTop])
+          this.recordBody.children[rowPos - this.pageTop].classList.remove('select')
+      }
     },
     toggleSelectAllRecords (e) {
       if (e) e.preventDefault()
