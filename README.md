@@ -53,13 +53,15 @@ In your template
 ## Props List
 
 #### Component: vue-excel-editor
-| Name           | Mandatory | Type              | Description |
-| :---           | :---      | :---              | ---         |
-| v-model        | Mandatory | Array Of Objects  | AOO Data to be edited | 
-| page           | Optional  | Number            | Specific page size, default is auto-calculating by screen height |
-| n-filter-count | Optional  | Number            | Number of items to be listed in filter dialog. Default is 200 |
-| row-style      | Optional  | Function          | Conditional row formatting, default is null |
-| no-paging      | Optional  | Boolean           | Disable paging feature, default is false |
+| Name            | Mandatory | Type              | Description |
+| :---            | :---      | :---              | ---         |
+| v-model         | Mandatory | Array Of Objects  | AOO Data to be edited | 
+| page            | Optional  | Number            | Specific page size, default is auto-calculating by screen height |
+| n-filter-count  | Optional  | Number            | Number of items to be listed in filter dialog. Default is 200 |
+| row-style       | Optional  | Function          | Conditional row formatting, default is null |
+| no-paging       | Optional  | Boolean           | Disable paging feature, default is false |
+| no-finding      | Optional  | Boolean           | Disable find key (ctrl-f) and finding dialog, default is false |
+| no-finding-next | Optional  | Boolean           | Disable find-next key (ctrl-g), default is false |
 
 (TBD)
 
@@ -134,7 +136,7 @@ export default {
 ```js
 methods: {
     save (record) {
-      record = record.map(rec => ['hset', `user:${rec.key}`, rec.field, rec.newVal])
+      record = record.map(rec => ['hset', rec.key, rec.field, rec.newVal])
       redis.multi(record).exec()
     }
 }
