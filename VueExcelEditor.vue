@@ -681,10 +681,12 @@ export default {
   },
   methods: {
     tableScroll () {
-      const cellRect = this.currentCell.getBoundingClientRect()
-      const tableRect = this.$el.getBoundingClientRect()
-      this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
-      this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
+      if (this.inputBoxShow && this.currentCell) {
+        const cellRect = this.currentCell.getBoundingClientRect()
+        const tableRect = this.$el.getBoundingClientRect()
+        this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
+        this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
+      }
     },
     registerColumn (field) {
       let pos = this.fields.findIndex(item => item.pos > field.pos)
