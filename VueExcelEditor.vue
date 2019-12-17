@@ -1,304 +1,305 @@
 <template>
-  <div class="conponent-content">
-
-    <div ref="tableContent" class="table-content"
-         @mouseover="mouseOver"
-         @mouseout="mouseOut"
-         @mousemove="mouseMove"
-         @mouseup="mouseUp">
-      <!-- Main Table -->
-      <table ref="systable"
-             id="systable"
-             style="table-layout: fixed"
-             class="systable table table-bordered table-sm"
-             ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
-             ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
-        <colgroup>
-          <!--col class="first-col">
-          <col v-for="item in nFields" :key="`col-${item}`" style="width: 100px"-->
-        </colgroup>
-        <thead class="thead-light text-center">
-          <tr>
-            <th class="text-center first-col" @mousedown="settingClick">
-              <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" />
-              <font-awesome-icon v-else icon="bars" size="sm" />
-              <div class="col-sep"
-                  @mousedown="colSepMouseDown"
-                  @mouseover="colSepMouseOver"
-                  @mouseout="colSepMouseOut" />
-            </th>
-            <th v-for="(item, p) in fields"
-                v-show="item.visible"
-                :key="`th-${p}`"
-                :class="{'sort-asc-sign': sortPos==p && sortDir==1,
-                        'sort-des-sign': sortPos==p && sortDir==-1}"
-                class="table-col-header"
-                :style="{width: item.width}"
-                @mousedown="headerClick($event, p)">
-              <div :class="{'filter-sign': columnFilter[p]}">{{ item.label }}</div>
-              <div class="col-sep"
-                  @mousedown="colSepMouseDown"
-                  @mouseover="colSepMouseOver"
-                  @mouseout="colSepMouseOut" />
-            </th>
-          </tr>
-          <tr>
-            <td class="text-center first-col" @click="selectAllClick">
-              <font-awesome-icon v-if="selectedCount==table.length" icon="times-circle" size="sm" />
-              <font-awesome-icon v-else icon="check-circle" size="sm" />
-            </td>
-            <vue-excel-filter v-for="(item, p) in fields"
-                              v-show="item.visible"
-                              :key="`th2-${p}`"
-                              v-model="columnFilter[p]"
-                              class="column-filter" />
-          </tr>
-        </thead>
-        <tbody @mousedown.exact="mouseDown">
-          <tr v-for="(record, rowPos) in pagingTable"
-              :key="rowPos"
-              :pos="rowPos"
-              :class="{select: selected[pageTop + rowPos] >= 0}"
-              :style="rowStyle(record)">
-            <td class="text-center first-col"
-                scope="row"
-                @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
-            <template v-for="(item, p) in fields">
-              <td v-if="item.validate"
+  <div>
+    <div class="component-content">
+      <div ref="tableContent" class="table-content"
+          @scroll="tableScroll"
+          @mouseover="mouseOver"
+          @mouseout="mouseOut"
+          @mousemove="mouseMove"
+          @mouseup="mouseUp">
+        <!-- Main Table -->
+        <table ref="systable"
+              id="systable"
+              style="table-layout: fixed; width: 0"
+              class="systable"
+              ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
+              ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
+          <colgroup>
+            <!--col class="first-col">
+            <col v-for="item in nFields" :key="`col-${item}`" style="width: 100px"-->
+          </colgroup>
+          <thead class="thead-light text-center">
+            <tr>
+              <th class="text-center first-col tl-setting"
+                  @mousedown.left="settingClick">
+                <span style="width:100%">
+                  <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" />
+                  <font-awesome-icon v-else icon="bars" size="sm" />
+                </span>
+              </th>
+              <th v-for="(item, p) in fields"
                   v-show="item.visible"
-                  :id="`cell-${p+rowPos*fields.length}`"
-                  :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`]}"
-                  :style="item.initStyle"
-                  :key="`f${p}`">{{ item.toText(record[item.name]) }}
-                <b-tooltip v-if="errmsg[`${record.key}:${item.name}`]"
-                          variant="danger"
-                          :target="`cell-${p+rowPos*fields.length}`"
-                          placement="right"
-                          trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip>
-              <td v-else
-                  v-show="item.visible"
-                  :class="{readonly: item.readonly}"
-                  :style="item.initStyle"
-                  :key="`f${p}`">{{ item.toText(record[item.name]) }}
+                  :key="`th-${p}`"
+                  :class="{'sort-asc-sign': sortPos==p && sortDir==1,
+                          'sort-des-sign': sortPos==p && sortDir==-1}"
+                  class="table-col-header"
+                  :style="{width: item.width}"
+                  @mousedown="headerClick($event, p)">
+                <div :class="{'filter-sign': columnFilter[p]}">{{ item.label }}</div>
+                <div class="col-sep"
+                    @mousedown="colSepMouseDown"
+                    @mouseover="colSepMouseOver"
+                    @mouseout="colSepMouseOut" />
+              </th>
+            </tr>
+            <tr>
+              <td class="text-center first-col tl-filter" @click="selectAllClick">
+                <font-awesome-icon v-if="selectedCount==table.length" icon="times-circle" size="sm" />
+                <font-awesome-icon v-else icon="check-circle" size="sm" />
               </td>
-            </template>
-          </tr>
-        </tbody>
-        <slot></slot>
-      </table>
-      <!-- Editor Square-->
-      <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
-        <div style="position: relative; height: 100%; padding: 2px">
-          <textarea ref="inputBox"
-                    class="input-box"
-                    :style="{opacity: inputBoxShow}"
-                    @blur="inputBoxBlur"
-                    @keydown="inputBoxKeydown"
-                    trim
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocompitaize="off"
-                    spellcheck="false"></textarea>
-          <div class="rb-square" />
+              <vue-excel-filter v-for="(item, p) in fields"
+                                v-show="item.visible"
+                                :key="`th2-${p}`"
+                                v-model="columnFilter[p]"
+                                class="column-filter" />
+            </tr>
+          </thead>
+          <tbody @mousedown.exact="mouseDown" style="position: relative">
+            <tr v-for="(record, rowPos) in pagingTable"
+                :key="rowPos"
+                :pos="rowPos"
+                :class="{select: typeof selected[pageTop + rowPos] !== 'undefined'}"
+                :style="rowStyle(record)">
+              <td class="text-center first-col"
+                  scope="row"
+                  @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
+              <template v-for="(item, p) in fields">
+                <td v-if="item.validate"
+                    v-show="item.visible"
+                    :id="`cell-${p+rowPos*fields.length}`"
+                    :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`]}"
+                    :style="item.initStyle"
+                    :key="`f${p}`">{{ item.toText(record[item.name]) }}
+                  <b-tooltip v-if="errmsg[`${record.key}:${item.name}`]"
+                            variant="danger"
+                            :target="`cell-${p+rowPos*fields.length}`"
+                            placement="right"
+                            trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip>
+                <td v-else
+                    v-show="item.visible"
+                    :class="{readonly: item.readonly}"
+                    :style="item.initStyle"
+                    :key="`f${p}`">{{ item.toText(record[item.name]) }}
+                </td>
+              </template>
+            </tr>
+            <!-- Editor Square-->
+            <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
+              <div style="position: relative; height: 100%; padding: 2px">
+                <textarea ref="inputBox"
+                          class="input-box"
+                          :style="{opacity: inputBoxShow}"
+                          @blur="inputBoxBlur"
+                          @keydown="inputBoxKeydown"
+                          trim
+                          autocomplete="off"
+                          autocorrect="off"
+                          autocompitaize="off"
+                          spellcheck="false"></textarea>
+                <div class="rb-square" />
+              </div>
+            </div>
+          </tbody>
+          <slot></slot>
+        </table>
+        <!-- Waiting scene -->
+        <div v-show="processing" ref="frontdrop" class="front-drop">
+          <font-awesome-icon icon="spinner" spin size="3x" />
         </div>
       </div>
-      <!-- Waiting scene -->
-      <div v-show="processing" ref="frontdrop" class="front-drop">
-        <font-awesome-icon icon="spinner" spin size="3x" />
-      </div>
-    </div>
-    <!-- Footer -->
-    <div ref="footer" class="footer col col-12 text-center">
-      <span v-show="!noPaging" style="position: absolute; left: 8px">
-        Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
-      </span>
-      <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
-        <template v-if="processing">
-          <font-awesome-icon icon="spinner" spin size="sm" /> Processing
-        </template>
-        <template v-else>
-          <b-link :disabled="pageTop <= 0" @click="firstPage">
-            <font-awesome-icon icon="step-backward" size="sm" /> First
-          </b-link>
-          &nbsp;|&nbsp;
-          <b-link :disabled="pageTop <= 0" @click="prevPage">
-            <font-awesome-icon icon="backward" size="sm" /> Previous
-          </b-link>
-          &nbsp;|&nbsp;
-          <b-link :disabled="pageTop + pageSize >= table.length" @click="nextPage">
-            Next <font-awesome-icon icon="forward" size="sm" />
-          </b-link>
-          &nbsp;|&nbsp;
-          <b-link :disabled="pageTop + pageSize >= table.length" @click="lastPage">
-            Last <font-awesome-icon icon="step-forward" size="sm" />
-          </b-link>
-        </template>
-      </span>
-      <span style="position: absolute; right: 8px">
-        Selected:
-        <span :style="{color: Object.keys(selected).length>0? 'red': 'inherit'}">{{ Object.keys(selected).length }}</span>
-        &nbsp;|&nbsp;
-        Filtered:
-        <span :style="{color: table.length<value.length? 'red': 'inherit'}">{{ table.length }}</span>
-        &nbsp;|&nbsp;
-        Loaded:
-        <span>{{ value.length }}</span>
-      </span>
-    </div>
-    <!-- Filter Dialog -->
-    <b-modal id="panelFilter" ref="panelFilter" centered @shown="freezePanelSizeAfterShown($refs.panelList)">
-      <template v-slot:modal-title>
-        <font-awesome-icon icon="sort-amount-down" size="xs" />
-        &nbsp;&nbsp;Sorting and Filter
-      </template>
-      <b-form-group style="white-space: nowrap">
-        <b-button class="float-left" variant="info" style="width:48%" @click="sort(1)">
-          <font-awesome-icon icon="sort-alpha-down" />
-          &nbsp;&nbsp;Sort Ascending
-        </b-button>
-        <b-button class="float-right" variant="info" style="width:48%" @click="sort(-1)">
-          <font-awesome-icon icon="sort-alpha-up-alt" />
-          &nbsp;&nbsp;Sort Descending
-        </b-button>
-      </b-form-group>
-      <b-form-group>
-        <b-input-group>
-          <template v-slot:prepend>
-            <b-dropdown no-caret variant="success">
-              <template slot="button-content">
-                <font-awesome-icon v-if="inputFilterCondition==''" icon="percentage" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='='" icon="equals" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='>'" icon="greater-than" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='>='" icon="greater-than-equal" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='<'" icon="less-than" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='<='" icon="less-than-equal" size="sm" />
-                <font-awesome-icon v-if="inputFilterCondition=='~'" icon="plus" size="sm" />
-              </template>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition=''">
-                  <font-awesome-icon icon="percentage" size="sm" />
-                  &nbsp;&nbsp;Near
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='='">
-                  <font-awesome-icon icon="equals" size="sm" />
-                  &nbsp;&nbsp;Exact Match
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='>'">
-                  <font-awesome-icon icon="greater-than" size="sm" />
-                  &nbsp;&nbsp;Greater than
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='>='">
-                  <font-awesome-icon icon="greater-than-equal" size="sm" />
-                  &nbsp;&nbsp;Greater than or Equal to
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='<'">
-                  <font-awesome-icon icon="less-than" size="sm" />
-                  &nbsp;&nbsp;Less than
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='<='">
-                  <font-awesome-icon icon="less-than-equal" size="sm" />
-                  &nbsp;&nbsp;Less than or Equal to
-                </a>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="inputFilterCondition='~'">
-                  <font-awesome-icon icon="plus" size="sm" />
-                  &nbsp;&nbsp;Regular Expression
-                </a>
-              </b-dropdown-item>
-            </b-dropdown>
+      <!-- Footer -->
+      <div ref="footer" class="footer col col-12 text-center">
+        <span v-show="!noPaging" style="position: absolute; left: 8px">
+          Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
+        </span>
+        <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
+          <template v-if="processing">
+            <font-awesome-icon icon="spinner" spin size="sm" /> Processing
           </template>
-          <b-form-input ref="inputFilter"
-                        placeholder="Custom Filter"
-                        autofocus
-                        trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                        @keyup="doInputFilter"
-                        @keydown.exact.enter="doFilter" />
-        </b-input-group>
-      </b-form-group>
-      <div ref="panelList" class="list-group list-group-flush panel-list">
-        <a v-for="(item, k) in filteredSortedUniqueValueList.slice(0, nFilterCount)" :key="k"
-          href="#"
-          class="list-group-item list-group-item-action panel-list-item"
-          @click.prevent="filterPanelSelect(item)">
-          <b-checkbox size="sm">
-            {{ item }}
-          </b-checkbox>
-        </a>
+          <template v-else>
+            <b-link :disabled="pageTop <= 0" @click="firstPage">
+              <font-awesome-icon icon="step-backward" size="sm" /> First
+            </b-link>
+            &nbsp;|&nbsp;
+            <b-link :disabled="pageTop <= 0" @click="prevPage">
+              <font-awesome-icon icon="backward" size="sm" /> Previous
+            </b-link>
+            &nbsp;|&nbsp;
+            <b-link :disabled="pageTop + pageSize >= table.length" @click="nextPage">
+              Next <font-awesome-icon icon="forward" size="sm" />
+            </b-link>
+            &nbsp;|&nbsp;
+            <b-link :disabled="pageTop + pageSize >= table.length" @click="lastPage">
+              Last <font-awesome-icon icon="step-forward" size="sm" />
+            </b-link>
+          </template>
+        </span>
+        <span style="position: absolute; right: 8px">
+          Selected:
+          <span :style="{color: Object.keys(selected).length>0? 'red': 'inherit'}">{{ Object.keys(selected).length }}</span>
+          &nbsp;|&nbsp;
+          Filtered:
+          <span :style="{color: table.length<value.length? 'red': 'inherit'}">{{ table.length }}</span>
+          &nbsp;|&nbsp;
+          Loaded:
+          <span>{{ value.length }}</span>
+        </span>
       </div>
-      <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">List first {{ nFilterCount }} values only</div>
-      <template v-slot:modal-footer>
-        <b-button variant="primary input-button" @click="doFilter">
-          <span>
-            <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
-            <font-awesome-icon v-else icon="sign-in-alt" size="sm" fixed-width />
-          </span>
-          Apply
-        </b-button>
-      </template>
-    </b-modal>
-    <!-- Setting Dialog -->
-    <b-modal id="panelGrid" ref="panelGrid" centered>
-      <template v-slot:modal-title>
-        <font-awesome-icon icon="bars" size="xs" />
-        &nbsp;&nbsp;Table Setting
-      </template>
-      <b-form-group style="white-space: nowrap">
-        <b-button class="float-left" variant="info" style="width:48%" @click="exportTable('excel')">
-          <font-awesome-icon icon="file-excel" />
-          &nbsp;&nbsp;Export Excel
-        </b-button>
-        <b-button class="float-right" variant="info" style="width:48%" @click="exportTable('csv')">
-          <font-awesome-icon icon="file-csv" />
-          &nbsp;&nbsp;Export CSV
-        </b-button>
-      </b-form-group>
-      <div ref="fieldList" class="list-group list-group-flush panel-list">
-        <draggable v-model="fields" draggable=".panel-list-item">
-          <a v-for="(item, k) in fields" :key="k"
+      <!-- Filter Dialog -->
+      <b-modal id="panelFilter" ref="panelFilter" centered @shown="freezePanelSizeAfterShown($refs.panelList)">
+        <template v-slot:modal-title>
+          <font-awesome-icon icon="sort-amount-down" size="xs" />
+          &nbsp;&nbsp;Sorting and Filter
+        </template>
+        <b-form-group style="white-space: nowrap">
+          <b-button class="float-left" variant="info" style="width:48%" @click="sort(1)">
+            <font-awesome-icon icon="sort-alpha-down" />
+            &nbsp;&nbsp;Sort Ascending
+          </b-button>
+          <b-button class="float-right" variant="info" style="width:48%" @click="sort(-1)">
+            <font-awesome-icon icon="sort-alpha-up-alt" />
+            &nbsp;&nbsp;Sort Descending
+          </b-button>
+        </b-form-group>
+        <b-form-group>
+          <b-input-group>
+            <template v-slot:prepend>
+              <b-dropdown no-caret variant="success">
+                <template slot="button-content">
+                  <font-awesome-icon v-if="inputFilterCondition==''" icon="percentage" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='='" icon="equals" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='>'" icon="greater-than" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='>='" icon="greater-than-equal" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='<'" icon="less-than" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='<='" icon="less-than-equal" size="sm" />
+                  <font-awesome-icon v-if="inputFilterCondition=='~'" icon="plus" size="sm" />
+                </template>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition=''">
+                    <font-awesome-icon icon="percentage" size="sm" />
+                    &nbsp;&nbsp;Near
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='='">
+                    <font-awesome-icon icon="equals" size="sm" />
+                    &nbsp;&nbsp;Exact Match
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='>'">
+                    <font-awesome-icon icon="greater-than" size="sm" />
+                    &nbsp;&nbsp;Greater than
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='>='">
+                    <font-awesome-icon icon="greater-than-equal" size="sm" />
+                    &nbsp;&nbsp;Greater than or Equal to
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='<'">
+                    <font-awesome-icon icon="less-than" size="sm" />
+                    &nbsp;&nbsp;Less than
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='<='">
+                    <font-awesome-icon icon="less-than-equal" size="sm" />
+                    &nbsp;&nbsp;Less than or Equal to
+                  </a>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <a href="#" @click.prevent="inputFilterCondition='~'">
+                    <font-awesome-icon icon="plus" size="sm" />
+                    &nbsp;&nbsp;Regular Expression
+                  </a>
+                </b-dropdown-item>
+              </b-dropdown>
+            </template>
+            <b-form-input ref="inputFilter"
+                          placeholder="Custom Filter"
+                          autofocus
+                          trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                          @keyup="doInputFilter"
+                          @keydown.exact.enter="doFilter" />
+          </b-input-group>
+        </b-form-group>
+        <div ref="panelList" class="list-group list-group-flush panel-list">
+          <a v-for="(item, k) in filteredSortedUniqueValueList.slice(0, nFilterCount)" :key="k"
             href="#"
             class="list-group-item list-group-item-action panel-list-item"
-            @click.prevent="item.visible = !item.visible">
-            <b-checkbox size="sm" :checked="item.visible">
-              {{ item.label }}
+            @click.prevent="filterPanelSelect(item)">
+            <b-checkbox size="sm">
+              {{ item }}
             </b-checkbox>
           </a>
-        </draggable>
-      </div>
-      <template v-slot:modal-footer>
-        <b-button variant="primary input-button" @click="saveSetting">
-          <span>
-            <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
-            <font-awesome-icon v-else icon="save" size="sm" fixed-width />
-          </span>
-          Back
-        </b-button>
-      </template>
-    </b-modal>
-     <!-- Find Dialog -->
-    <b-modal id="panelFind" hide-header hide-footer scrollable centered>
-      <b-input-group class="">
-        <b-form-input id="inputFind" ref="inputFind" v-model="inputFind"
-                      autofocus
-                      trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                      @keydown.enter.prevent="doFind(inputFind)" />
-        <template v-slot:append>
-          <b-button variant="info" @click="doFind(inputFind)">
-            <font-awesome-icon icon="search" size="sm" />
+        </div>
+        <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">List first {{ nFilterCount }} values only</div>
+        <template v-slot:modal-footer>
+          <b-button variant="primary input-button" @click="doFilter">
+            <span>
+              <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
+              <font-awesome-icon v-else icon="sign-in-alt" size="sm" fixed-width />
+            </span>
+            Apply
           </b-button>
         </template>
-      </b-input-group>
-    </b-modal>
+      </b-modal>
+      <!-- Setting Dialog -->
+      <b-modal id="panelGrid" ref="panelGrid" centered>
+        <template v-slot:modal-title>
+          <font-awesome-icon icon="bars" size="xs" />
+          &nbsp;&nbsp;Table Setting
+        </template>
+        <b-form-group style="white-space: nowrap">
+          <b-button class="float-left" variant="info" style="width:48%" @click="exportTable('excel')">
+            <font-awesome-icon icon="file-excel" />
+            &nbsp;&nbsp;Export Excel
+          </b-button>
+          <b-button class="float-right" variant="info" style="width:48%" @click="exportTable('csv')">
+            <font-awesome-icon icon="file-csv" />
+            &nbsp;&nbsp;Export CSV
+          </b-button>
+        </b-form-group>
+        <div ref="fieldList" class="list-group list-group-flush panel-list">
+          <draggable v-model="fields" draggable=".panel-list-item">
+            <a v-for="(item, k) in fields" :key="k"
+              href="#"
+              class="list-group-item list-group-item-action panel-list-item"
+              @click.prevent="item.visible = !item.visible">
+              <b-checkbox size="sm" :checked="item.visible">
+                {{ item.label }}
+              </b-checkbox>
+            </a>
+          </draggable>
+        </div>
+        <template v-slot:modal-footer>
+          <b-button variant="primary input-button" @click="saveSetting">
+            <span>
+              <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
+              <font-awesome-icon v-else icon="save" size="sm" fixed-width />
+            </span>
+            Back
+          </b-button>
+        </template>
+      </b-modal>
+      <!-- Find Dialog -->
+      <b-modal id="panelFind" hide-header hide-footer scrollable centered>
+        <b-input-group class="">
+          <b-form-input id="inputFind" ref="inputFind" v-model="inputFind"
+                        autofocus
+                        trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                        @keydown.enter.prevent="doFind(inputFind)" />
+          <template v-slot:append>
+            <b-button variant="info" @click="doFind(inputFind)">
+              <font-awesome-icon icon="search" size="sm" />
+            </b-button>
+          </template>
+        </b-input-group>
+      </b-modal>
+    </div>
   </div>
 </template>
 
@@ -554,8 +555,7 @@ export default {
     if (this.height)
       this.systable.parentNode.style.height = this.height
     this.reset()
-    this.refreshPageSize()
-    // this.moveInputSquare(0, 0)
+    this.lazy(this.refreshPageSize, 200)
     window.onresize = () => {
       this.moveInputSquare(this.currentRowPos, this.currentColPos)
       this.lazy(this.refreshPageSize, 200)
@@ -675,8 +675,17 @@ export default {
         }
       }
     })
+    setTimeout(() => {
+      this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
+    }, 0)
   },
   methods: {
+    tableScroll () {
+      const cellRect = this.currentCell.getBoundingClientRect()
+      const tableRect = this.$el.getBoundingClientRect()
+      this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
+      this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
+    },
     registerColumn (field) {
       let pos = this.fields.findIndex(item => item.pos > field.pos)
       if (pos === -1) pos = this.fields.length
@@ -694,18 +703,18 @@ export default {
       const cell = row.children[colPos + 1]
       if (!cell) return
       const cellRect = cell.getBoundingClientRect()
-      const tableRect = this.systable.getBoundingClientRect()
-      this.inputSquare.style.left = (cellRect.left - tableRect.left) + 'px'
-      this.inputSquare.style.top =  (cellRect.top - tableRect.top) + 'px'
-      this.inputSquare.style.width = cellRect.width + 'px'
-      this.inputSquare.style.height = cellRect.height + 'px'
+      const tableRect = this.$el.getBoundingClientRect()
+      this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
+      this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
+      this.inputSquare.style.width = (cellRect.width + 1) + 'px'
+      this.inputSquare.style.height = (cellRect.height + 1) + 'px'
 
       const inputRect = this.inputSquare.getBoundingClientRect()
-      const tabRect = this.tableContent.getBoundingClientRect()
+      const tabRect = this.$el.getBoundingClientRect()
       if (inputRect.right >= tabRect.right)
         this.tableContent.scrollBy(inputRect.right - tabRect.right, 0)
-      if (inputRect.left <= tabRect.left)
-        this.tableContent.scrollBy(inputRect.left - tabRect.left, 0)
+      if (inputRect.left <= tabRect.left + 40)
+        this.tableContent.scrollBy(inputRect.left - tabRect.left - 40, 0)
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
@@ -897,8 +906,10 @@ export default {
         this.pageSize = 999999999
         return
       }
+      // eslint-disable-next-line
+      // console.log(window.innerHeight, this.recordBody.getBoundingClientRect().top, this.footer.getBoundingClientRect().height)
       this.pageSize = this.page || Math.floor((
-        window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.getBoundingClientRect().height - 42) / 24)
+        window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.getBoundingClientRect().height - 10) / 24)
     },
     firstPage () {
       this.processing = true
@@ -1205,10 +1216,10 @@ export default {
           document.body.appendChild(this.selSquare)
         }
 
-        const left = Math.min(st.left, ed.left)
-        const top = Math.min(st.top, ed.top)
-        const width = Math.max(ed.right - st.left, st.right - ed.left) + 1
-        const height = Math.max(ed.bottom - st.top, st.bottom - ed.top) + 1
+        const left = Math.min(st.left, ed.left) - 1
+        const top = Math.min(st.top, ed.top) - 1
+        const width = Math.max(ed.right - st.left, st.right - ed.left) + 2
+        const height = Math.max(ed.bottom - st.top, st.bottom - ed.top) + 2
 
         this.selSquare.setAttribute('style', `
           left: ${left}px;
@@ -1237,7 +1248,7 @@ input:focus, input:active:focus, input.active:focus {
 .input-square {
   position: absolute;
   padding: 0;
-  z-index: 100;
+  z-index: 2;
   border: 2px solid darkseagreen;
 }
 .input-box {
@@ -1260,15 +1271,17 @@ input:focus, input:active:focus, input.active:focus {
 .component-content {
   display: flex;
   flex-flow: column;
+  position: relative;
+  max-width:fit-content;
 }
 .table-content {
   flex: 1 1 auto;
   font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-size: 1rem;
+  border-top: 0.5px solid lightgray;
   line-height: 1.1;
   word-spacing: 0.02rem;
   overflow: scroll;
-  position: relative;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -1286,32 +1299,41 @@ input:focus, input:active:focus, input.active:focus {
 }
 .systable {
   z-index: -1;
+  width: fit-content;
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-bottom: 0;
-  overflow: scroll;
+  margin-left: 40px;
 }
 .systable tr {
-  background-color: white
+  background-color: white;
 }
 .systable tr.select {
-  filter: invert(100%)
-}
-.systable td.table-bordered {
-  border: 1px solid lightgray;
+  background-color: darkgrey !important;
 }
 .systable th, .systable td {
   vertical-align: bottom;
+  padding: 0.3rem;
   font-size: 0.88rem;
+  height: 24px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
 }
-.systable th {
+.systable thead th, .systable thead td {
   padding: 0.4rem 0.3rem;
+  background-color: #e9ecef;
   font-weight: 400;
+  height: 28px;
   cursor: s-resize !important;
   position: sticky;
   top: 0;
   z-index: 1;
 }
 .systable th.focus {
-  border-bottom: 2px solid darkseagreen !important;
+  border-bottom: 1px solid rgb(61, 85, 61) !important;
 }
 .systable td {
   cursor: cell;
@@ -1335,19 +1357,24 @@ input:focus, input:active:focus, input.active:focus {
 }
 .systable .first-col {
   background:#e9ecef;
-  min-width: 36px;
-  width: 36px;
-  max-width: 36px;
+  width: 40px;
+  position: absolute;
+  left: 0;
+  top: auto;
   cursor: e-resize !important;
+  text-overflow: inherit !important;
+  z-index: 5;
+}
+.systable thead .tl-setting {
+  display: flex;
+  flex-direction: column-reverse;
+  height: 100%;
 }
 .systable thead td.first-col, .systable thead th.first-col {
   cursor: pointer !important;
 }
 .systable td.first-col.focus {
-  border-right: 2px solid darkseagreen !important;
-}
-.systable thead td {
-  height: 1.8rem;
+  border-right: 1px solid rgb(61, 85, 61) !important;
 }
 .footer {
   flex: 0 1 30px;
@@ -1392,6 +1419,7 @@ a.disabled {
   width: 5px;
   cursor: col-resize;
   height: 100%;
+  z-index: 2;
 }
 .sort-asc-sign {
   background-image: url('./assets/sortasc.png');
@@ -1425,7 +1453,7 @@ a.disabled {
   background-color:darkseagreen;
   position: absolute;
   bottom: -3px;
-  right: -3px;
+  right: -2px;
   cursor: crosshair;
 }
 </style>
