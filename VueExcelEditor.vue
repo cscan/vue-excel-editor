@@ -681,7 +681,7 @@ export default {
   },
   methods: {
     tableScroll () {
-      if (this.inputBoxShow && this.currentCell) {
+      if (this.currentCell) {
         const cellRect = this.currentCell.getBoundingClientRect()
         const tableRect = this.$el.getBoundingClientRect()
         this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
