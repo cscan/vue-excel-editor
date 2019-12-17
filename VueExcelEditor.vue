@@ -1363,6 +1363,7 @@ input:focus, input:active:focus, input.active:focus {
   top: auto;
   cursor: e-resize !important;
   text-overflow: inherit !important;
+  overflow: hidden;
   z-index: 5;
 }
 .systable thead .tl-setting {
