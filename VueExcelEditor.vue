@@ -291,7 +291,7 @@
           <b-form-input id="inputFind" ref="inputFind" v-model="inputFind"
                         autofocus
                         trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                        @keydown.enter.prevent="doFind(inputFind)" />
+                        @keydown.enter.prevent="doFind(inputFind, $event)" />
           <template v-slot:append>
             <b-button variant="info" @click="doFind(inputFind)">
               <font-awesome-icon icon="search" size="sm" />
@@ -605,7 +605,8 @@ export default {
         }
       else {
         if (this.currentRowPos < 0) return
-        this.focused = true
+        if (!this.focused) return
+        // this.focused = true
         switch (true) {
           case e.keyCode === 27:
             if (this.inputBoxShow) {
@@ -684,8 +685,10 @@ export default {
       if (this.currentCell) {
         const cellRect = this.currentCell.getBoundingClientRect()
         const tableRect = this.$el.getBoundingClientRect()
+        this.inputSquare.classList.add('no-transition')
         this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
         this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
+        setTimeout(() => this.inputSquare.classList.remove('no-transition'))
       }
     },
     registerColumn (field) {
@@ -711,12 +714,15 @@ export default {
       this.inputSquare.style.width = (cellRect.width + 1) + 'px'
       this.inputSquare.style.height = (cellRect.height + 1) + 'px'
 
-      const inputRect = this.inputSquare.getBoundingClientRect()
-      const tabRect = this.$el.getBoundingClientRect()
-      if (inputRect.right >= tabRect.right)
-        this.tableContent.scrollBy(inputRect.right - tabRect.right, 0)
-      if (inputRect.left <= tabRect.left + 40)
-        this.tableContent.scrollBy(inputRect.left - tabRect.left - 40, 0)
+      setTimeout(() => {
+        const inputRect = this.inputSquare.getBoundingClientRect()
+        const tabRect = this.$el.getBoundingClientRect()
+        if (inputRect.right >= tabRect.right)
+          this.tableContent.scrollBy(inputRect.right - tabRect.right, 0)
+        if (inputRect.left <= tabRect.left + 40) {
+          this.tableContent.scrollBy(inputRect.left - tabRect.left - 40, 0)
+        }
+      }, 100)
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
@@ -796,7 +802,8 @@ export default {
     doFindNext () {
       return this.doFind()
     },
-    doFind (s) {
+    doFind (s, e) {
+      if (e) e.preventDefault()
       this.$bvModal.hide('panelFind')
       if (typeof s === 'undefined') s = this.inputFind
       else this.inputFind = s
@@ -807,7 +814,10 @@ export default {
           const field = this.fields[c].name
           if (typeof rec[field] !== 'undefined' && String(rec[field]).toUpperCase().indexOf(s) >= 0) {
             this.pageTop = this.findPageTop(r)
-            this.moveInputSquare(r - this.pageTop, c)
+            setTimeout(() => {
+              this.moveInputSquare(r - this.pageTop, c)
+              this.focused = true
+            })
             return true
           }
         }
@@ -819,6 +829,9 @@ export default {
           if (typeof rec[field] !== 'undefined' && String(rec[field]).toUpperCase().indexOf(s) >= 0) {
             this.pageTop = this.findPageTop(r)
             this.moveInputSquare(r - this.pageTop, c)
+            setTimeout(() => {
+              this.focused = true
+            })
             return true
           }
         }
@@ -1251,7 +1264,24 @@ input:focus, input:active:focus, input.active:focus {
   position: absolute;
   padding: 0;
   z-index: 2;
-  border: 2px solid darkseagreen;
+  border: 2px solid rgb(108, 143, 108);
+  transition: all 0.08s linear;
+}
+.no-transition {
+  transition: none !important;
+}
+.rb-square {
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid white;
+  border-left: 2px solid white;
+  border-bottom: 0;
+  border-right: 0;
+  background-color:rgb(108, 143, 108);
+  position: absolute;
+  bottom: -3px;
+  right: -2px;
+  cursor: crosshair;
 }
 .input-box {
   opacity: 0;
@@ -1445,18 +1475,5 @@ a.disabled {
 @keyframes fadein {
   from {opacity: 0}
   to {opacity: 1}
-}
-.rb-square {
-  width: 9px;
-  height: 9px;
-  border-top: 2px solid white;
-  border-left: 2px solid white;
-  border-bottom: 0;
-  border-right: 0;
-  background-color:darkseagreen;
-  position: absolute;
-  bottom: -3px;
-  right: -2px;
-  cursor: crosshair;
 }
 </style>
