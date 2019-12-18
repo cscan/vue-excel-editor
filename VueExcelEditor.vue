@@ -91,11 +91,18 @@
                           :style="{opacity: inputBoxShow}"
                           @blur="inputBoxBlur"
                           @keydown="inputBoxKeydown"
+                          @keyup="inputBoxKeyup"
                           trim
                           autocomplete="off"
                           autocorrect="off"
                           autocompitaize="off"
                           spellcheck="false"></textarea>
+                <ul v-if="autocompleteInputs.length" class="autocomplete-results">
+                  <li v-for="(item,i) in autocompleteInputs"
+                      :key="i"
+                      @mousedown.left.prevent="inputAutocompleteText"
+                      class="autocomplete-result">{{ item }}</li>
+                </ul>
                 <div class="rb-square" />
               </div>
             </div>
@@ -380,6 +387,7 @@ export default {
       inputBox: null,
       inputBoxShow: 0,
       inputSquare: null,
+      autocompleteInputs: [],
 
       errmsg: {},
 
@@ -602,6 +610,10 @@ export default {
               e.preventDefault()
             }
             break
+          case 76: // l
+            e.preventDefault()
+            this.calAutocompleteList(true)
+            break
         }
       else {
         if (this.currentRowPos < 0) return
@@ -733,6 +745,9 @@ export default {
       this.currentRowPos = rowPos
       this.currentColPos = colPos
       this.currentCell = cell
+      this.autocompleteInputs = []
+      if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
+
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
         this.lazy(() => {
           this.inputBox.focus()
@@ -1184,6 +1199,45 @@ export default {
       if (e.keyCode === 8 || e.keyCode === 46) this.inputBoxChanged = true
       if (e.key.length === 1) this.inputBoxChanged = true
     },
+    inputBoxKeyup () {
+      this.calAutocompleteList()
+    },
+    calAutocompleteList (force) {
+      if (force || (this.inputBoxChanged && this.inputBox.value.length > 0)) {
+        if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
+        this.recalAutoCompleteList = setTimeout(() => {
+          if (!force) {
+            if (!this.focused || !this.inputBoxShow || !this.inputBoxChanged || !this.inputBox.value.length) {
+              this.autocompleteInputs = []
+              return
+            }
+          }
+          const field = this.fields[this.currentColPos].name
+          const value = force ? '' : this.inputBox.value
+          const list = []
+          for(let i=0; i<this.table.length; i++) {
+            const rec = this.table[i]
+            if (rec[field].startsWith(value) && list.indexOf(rec[field]) === -1)
+              list.push(rec[field])
+            if (list.length >= 10) break
+          }
+          if (list.length === 1 && list[0] === this.inputBox.value) {
+            this.autocompleteInputs = []
+            return
+          }
+          list.sort()
+          this.autocompleteInputs = list
+        }, force ? 0 : 1000)
+      }
+    },
+    inputAutocompleteText (e) {
+      e.preventDefault()
+      this.inputBoxShow = 1
+      this.focused = true
+      this.inputBox.value = e.target.textContent
+      this.inputBoxChanged = true
+      this.inputBoxBlur()
+    },
     inputCellWrite (setText, col, row) {
       if (typeof col === 'undefined') col = this.currentColPos
       if (typeof row === 'undefined') row = this.pageTop + this.currentRowPos
@@ -1265,10 +1319,29 @@ input:focus, input:active:focus, input.active:focus {
   padding: 0;
   z-index: 2;
   border: 2px solid rgb(108, 143, 108);
-  transition: all 0.08s linear;
+  /* transition: all 0.04s linear; */
 }
 .no-transition {
   transition: none !important;
+}
+.autocomplete-results {
+  padding: 3px;
+  margin-left: -4px;
+  margin-right: -4px;
+  background-color: lightyellow;
+  border: 1px solid rgb(108, 143, 108);
+  height: fit-content;
+  font-size: 0.88rem;
+  overflow: auto;
+}
+.autocomplete-result {
+  list-style: none;
+  text-align: left;
+  padding: 4px 2px;
+  cursor: pointer
+}
+.autocomplete-result:hover {
+  background-color: lightsteelblue;
 }
 .rb-square {
   width: 9px;
@@ -1359,7 +1432,7 @@ input:focus, input:active:focus, input.active:focus {
   background-color: #e9ecef;
   font-weight: 400;
   height: 28px;
-  cursor: s-resize !important;
+  cursor: s-resize;
   position: sticky;
   top: 0;
   z-index: 1;
