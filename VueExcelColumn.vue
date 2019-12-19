@@ -11,17 +11,14 @@ export default {
     label: {type: String, default: null},
     type: {type: String, default: 'string'},
     validate: {type: Function, default: null},
-    initStyle: {
-      type: Object,
-      default () {
-        return {}
-      }
-    },
+    initStyle: {type: Object, default () {return {}}},
     width: {type: String, default: '100px'},
     visible: {type: Boolean, default: true},
     readonly: {type: Boolean, default: false},
     uppercase: {type: Boolean, default: false},
+    autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
+    options: {type: Array, default () {return []}},
     toValue: {
       type: Function,
       default (text) {
@@ -76,12 +73,14 @@ export default {
         style.textAlign = 'center'
         style.textTransform = 'uppercase'
         break
-      default:
-        style.textAlign = 'left'
+      case 'select':
+      case 'string':
         break
+      default:
+        throw new Error('VueExcelColumn: Not supported type:' + this.type)
     }
-    if (this.uppercsae)
-      style.textTransform='uppercase'
+
+    if (this.uppercsae) style.textTransform='uppercase'
 
     this.$parent.registerColumn({
       name: this.field,
@@ -89,10 +88,12 @@ export default {
       type: this.type,
       width: this.width,
       validate: this.validate,
+      autocomplete: this.autocomplete === null ? this.$parent.autocomplete : this.autocomplete,
       initStyle: style,
       visible: this.visible,
       readonly: this.readonly,
       pos: Number(this.pos),
+      options: this.options,
       toValue: this.toValue,
       toText: this.toText
     })

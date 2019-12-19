@@ -7,6 +7,7 @@
           @mouseout="mouseOut"
           @mousemove="mouseMove"
           @mouseup="mouseUp">
+
         <!-- Main Table -->
         <table ref="systable"
               id="systable"
@@ -64,56 +65,64 @@
                   scope="row"
                   @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
               <template v-for="(item, p) in fields">
-                <td v-if="item.validate"
+                <td v-if="item.options.length"
+                    v-show="item.visible"
+                    :id="`cell-${p+rowPos*fields.length}`"
+                    :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`], select: true}"
+                    :style="item.initStyle"
+                    :key="`f${p}`"
+                    @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
+                <td v-else
                     v-show="item.visible"
                     :id="`cell-${p+rowPos*fields.length}`"
                     :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`]}"
                     :style="item.initStyle"
-                    :key="`f${p}`">{{ item.toText(record[item.name]) }}
-                  <b-tooltip v-if="errmsg[`${record.key}:${item.name}`]"
-                            variant="danger"
-                            :target="`cell-${p+rowPos*fields.length}`"
-                            placement="right"
-                            trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip>
-                <td v-else
-                    v-show="item.visible"
-                    :class="{readonly: item.readonly}"
-                    :style="item.initStyle"
-                    :key="`f${p}`">{{ item.toText(record[item.name]) }}
-                </td>
+                    :key="`f${p}`">{{ item.toText(record[item.name]) }}</td>
+                <b-tooltip v-if="item.validate && errmsg[`${record.key}:${item.name}`]"
+                          variant="danger"
+                          :target="`cell-${p+rowPos*fields.length}`"
+                          :key="`tool${p}`"
+                          placement="right"
+                          trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip>
               </template>
             </tr>
-            <!-- Editor Square-->
-            <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
-              <div style="position: relative; height: 100%; padding: 2px">
-                <textarea ref="inputBox"
-                          class="input-box"
-                          :style="{opacity: inputBoxShow}"
-                          @blur="inputBoxBlur"
-                          @keydown="inputBoxKeydown"
-                          @keyup="inputBoxKeyup"
-                          trim
-                          autocomplete="off"
-                          autocorrect="off"
-                          autocompitaize="off"
-                          spellcheck="false"></textarea>
-                <ul v-if="autocompleteInputs.length" class="autocomplete-results">
-                  <li v-for="(item,i) in autocompleteInputs"
-                      :key="i"
-                      @mousedown.left.prevent="inputAutocompleteText"
-                      class="autocomplete-result">{{ item }}</li>
-                </ul>
-                <div class="rb-square" />
-              </div>
-            </div>
           </tbody>
           <slot></slot>
         </table>
+
+        <!-- Editor Square -->
+        <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
+          <div style="position: relative; height: 100%; padding: 2px">
+            <textarea ref="inputBox"
+                      class="input-box"
+                      :style="{opacity: inputBoxShow}"
+                      @blur="inputBoxBlur"
+                      @keydown="inputBoxKeydown"
+                      @keyup="inputBoxKeyup"
+                      @mousemove="inputBoxMouseMove"
+                      @mousedown="inputBoxMouseDown"
+                      trim
+                      autocomplete="off"
+                      autocorrect="off"
+                      autocompitaize="off"
+                      spellcheck="false"></textarea>
+            <ul v-if="autocompleteInputs.length" class="autocomplete-results">
+              <li v-for="(item,i) in autocompleteInputs"
+                  :key="i"
+                  :class="{select: autocompleteSelect === i}"
+                  @mousedown.left.prevent="inputAutocompleteText($event.target.textContent, $event)"
+                  class="autocomplete-result">{{ item }}</li>
+            </ul>
+            <div class="rb-square" />
+          </div>
+        </div>
+
         <!-- Waiting scene -->
         <div v-show="processing" ref="frontdrop" class="front-drop">
           <font-awesome-icon icon="spinner" spin size="3x" />
         </div>
       </div>
+
       <!-- Footer -->
       <div ref="footer" class="footer col col-12 text-center">
         <span v-show="!noPaging" style="position: absolute; left: 8px">
@@ -152,6 +161,7 @@
           <span>{{ value.length }}</span>
         </span>
       </div>
+
       <!-- Filter Dialog -->
       <b-modal id="panelFilter" ref="panelFilter" centered @shown="freezePanelSizeAfterShown($refs.panelList)">
         <template v-slot:modal-title>
@@ -254,6 +264,7 @@
           </b-button>
         </template>
       </b-modal>
+
       <!-- Setting Dialog -->
       <b-modal id="panelGrid" ref="panelGrid" centered>
         <template v-slot:modal-title>
@@ -292,6 +303,7 @@
           </b-button>
         </template>
       </b-modal>
+
       <!-- Find Dialog -->
       <b-modal id="panelFind" hide-header hide-footer scrollable centered>
         <b-input-group class="">
@@ -353,7 +365,8 @@ export default {
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     newRecord: {type: Function, default: null},     // return the new record from caller if provided
     nFilterCount: {type: Number, default: 200},     // show top n values in filter dialog
-    height: {type: Number, default: 0}
+    height: {type: Number, default: 0},
+    autocomplete: {type: Boolean, default: false}   // Default autocomplete of all columns
   },
   data () {
     return {
@@ -381,13 +394,15 @@ export default {
       rowIndex: {},                 // index of the record key to pos of [table] array
 
       currentRecord: null,          // focusing TR dom node
-      currentRowPos: 0,            // focusing array pos of [table] array
-      currentColPos: 0,            // focusing pos of column/field
+      currentRowPos: 0,             // focusing array pos of [table] array
+      currentColPos: 0,             // focusing pos of column/field
+      currentField: null,           // focusing field object
       currentCell: null,
       inputBox: null,
       inputBoxShow: 0,
       inputSquare: null,
       autocompleteInputs: [],
+      autocompleteSelect: -1,
 
       errmsg: {},
 
@@ -588,7 +603,7 @@ export default {
             e.preventDefault()
             break
           case 86: // v
-            if (this.fields[this.currentColPos].readonly) return
+            if (this.currentField.readonly) return
             this.inputBoxChanged = true
             this.inputBox.focus()
             this.inputBox.select()
@@ -621,6 +636,8 @@ export default {
         // this.focused = true
         switch (true) {
           case e.keyCode === 27:
+            this.autocompleteInputs = []
+            this.autocompleteSelect = -1
             if (this.inputBoxShow) {
               e.preventDefault()
               this.inputBox.value = this.currentCell.innerText
@@ -650,8 +667,11 @@ export default {
             }
             break
           case e.keyCode === 38:
-            this.moveNorth()
             e.preventDefault()
+            if (this.autocompleteInputs.length === 0)
+              this.moveNorth()
+            else
+              if (this.autocompleteSelect > 0) this.autocompleteSelect--
             break
           case e.keyCode === 9 && !e.shiftKey:
           case e.keyCode === 39:
@@ -667,21 +687,39 @@ export default {
             }
             break
           case e.keyCode === 13:
-          case e.keyCode === 40:
-            this.moveSouth(e)
             e.preventDefault()
+            if (this.autocompleteInputs.length === 0)
+              this.moveSouth(e)
+            else
+              if (this.autocompleteSelect !== -1)
+                this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
+            break
+          case e.keyCode === 40:
+            e.preventDefault()
+            if (this.autocompleteInputs.length === 0)
+              this.moveSouth(e)
+            else
+              if (this.autocompleteSelect < this.autocompleteInputs.length - 1) this.autocompleteSelect++
             break
           default:
-            if (!this.fields[this.currentColPos].readonly && !this.inputBoxShow) {
+            if (!this.currentField.readonly && !this.inputBoxShow) {
               if ((e.key === 'Process' || e.key.length === 1) && !e.ctrlKey && !e.metaKey && !e.altKey) {
-                this.inputBox.value = ''
-                this.inputBoxShow = 1
-                this.inputBox.focus()
-                this.inputBoxChanged = true
+                if (this.currentField.type === 'select')
+                  this.calAutocompleteList(true)
+                else {
+                  this.inputBox.value = ''
+                  this.inputBoxShow = 1
+                  this.inputBox.focus()
+                  this.inputBoxChanged = true
+                }
               }
-              if (e.keyCode === 8 || e.keyCode === 46) {  // Delete/BS
-                this.inputBox.value = ''
-                this.inputCellWrite('')
+              if (!this.autocompleteInputs.length && (e.keyCode === 8 || e.keyCode === 46)) {  // Delete/BS
+                if (this.currentField.type === 'select')
+                  this.calAutocompleteList(true)
+                else {
+                  this.inputBox.value = ''
+                  this.inputCellWrite('')
+                }
               }
             }
             break
@@ -738,12 +776,13 @@ export default {
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
-        this.inputCellWrite(this.fields[this.currentColPos].toValue(this.inputBox.value))
+        this.inputCellWrite(this.currentField.toValue(this.inputBox.value))
         this.inputBoxChanged = false
       }
 
       this.currentRowPos = rowPos
       this.currentColPos = colPos
+      this.currentField = this.fields[colPos]
       this.currentCell = cell
       this.autocompleteInputs = []
       if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
@@ -1160,14 +1199,19 @@ export default {
     },
     mouseDown (e) {
       if (e.target.parentNode.parentNode.tagName === 'TBODY' && !e.target.classList.contains('first-col')) {
+        e.preventDefault()
         this.inputBox.focus()
         this.focused = true
-        e.preventDefault()
         const row = e.target.parentNode
         const colPos = Array.from(row.children).indexOf(e.target) - 1
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
         this.moveInputSquare(rowPos, colPos)
+        if (e.target.classList.contains('select') && e.target.offsetWidth - e.offsetX < 15)
+          this.calAutocompleteList(true)
       }
+    },
+    cellMouseMove (e) {
+      e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : (this.inputBoxShow ? 'default' : 'cell')
     },
     mouseOver () {
       this.mousein = true
@@ -1176,33 +1220,37 @@ export default {
       this.mousein = false
     },
     inputSquareClick () {
-      if (!this.fields[this.currentColPos].readonly && !this.inputBoxShow) {
+      if (!this.currentField.readonly && !this.inputBoxShow && this.currentField.type !== 'select') {
         this.inputBox.value = this.currentCell.innerText
         this.inputBoxShow = 1
         this.inputBox.focus()
         this.inputBoxChanged = false
         this.focused = true
-        //this.inputBox.select()
       }
-      /*
-      // fix the browser cannot show the curser after selectAll
-      else {
-        const sel = document.getSelection()
-        if (e.target.textContent === sel.toString() || sel.focusOffset >= e.target.textContent.length)
-          sel.removeAllRanges()
-      }
-      */
     },
     inputBoxKeydown (e) {
-      if (this.fields[this.currentColPos].readonly) return
+      if (this.currentField.readonly) return
+      if (this.currentField.type === 'select') return
       if (e.ctrlKey || e.metaKey || e.altKey) return
       if (e.keyCode === 8 || e.keyCode === 46) this.inputBoxChanged = true
-      if (e.key.length === 1) this.inputBoxChanged = true
+      if (e.key === 'Process' || e.key.length === 1) this.inputBoxChanged = true
     },
-    inputBoxKeyup () {
-      this.calAutocompleteList()
+    inputBoxKeyup (e) {
+      if ((e.key === 'Process' || e.key.length === 1) && this.currentField.autocomplete)
+        this.calAutocompleteList()
+    },
+    inputBoxMouseMove (e) {
+      if (this.currentField.options.length)
+        e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : 'text'
+    },
+    inputBoxMouseDown (e) {
+      if (this.currentField.options.length && e.target.offsetWidth - e.offsetX < 15) {
+        e.preventDefault()
+        this.calAutocompleteList(true)
+      }
     },
     calAutocompleteList (force) {
+      if (!force && !this.currentField.autocomplete) return
       if (force || (this.inputBoxChanged && this.inputBox.value.length > 0)) {
         if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
         this.recalAutoCompleteList = setTimeout(() => {
@@ -1212,31 +1260,37 @@ export default {
               return
             }
           }
-          const field = this.fields[this.currentColPos].name
+          const field = this.currentField
+          const name = field.name
           const value = force ? '' : this.inputBox.value
-          const list = []
-          for(let i=0; i<this.table.length; i++) {
-            const rec = this.table[i]
-            if (rec[field].startsWith(value) && list.indexOf(rec[field]) === -1)
-              list.push(rec[field])
-            if (list.length >= 10) break
+          let list
+          if (field.options.length > 0) {
+            list = this.currentField.options
           }
-          if (list.length === 1 && list[0] === this.inputBox.value) {
-            this.autocompleteInputs = []
-            return
+          else {
+            list = []
+            for(let i=0; i<this.table.length; i++) {
+              const rec = this.table[i]
+              if (rec[name].startsWith(value) && list.indexOf(rec[name]) === -1)
+                list.push(rec[name])
+              if (list.length >= 10) break
+            }
+            list.sort()
           }
-          list.sort()
+          this.autocompleteSelect = -1
           this.autocompleteInputs = list
         }, force ? 0 : 1000)
       }
     },
-    inputAutocompleteText (e) {
-      e.preventDefault()
-      this.inputBoxShow = 1
-      this.focused = true
-      this.inputBox.value = e.target.textContent
-      this.inputBoxChanged = true
-      this.inputBoxBlur()
+    inputAutocompleteText (text, e) {
+      if (e) e.preventDefault()
+      setTimeout(() => {
+        this.inputCellWrite(text)
+        this.autocompleteInputs = []
+        this.autocompleteSelect = -1
+        this.inputBoxShow = 0
+        this.inputBoxChanged = false
+      })
     },
     inputCellWrite (setText, col, row) {
       if (typeof col === 'undefined') col = this.currentColPos
@@ -1326,6 +1380,7 @@ input:focus, input:active:focus, input.active:focus {
 }
 .autocomplete-results {
   padding: 3px;
+  margin-top: 0px;
   margin-left: -4px;
   margin-right: -4px;
   background-color: lightyellow;
@@ -1340,7 +1395,7 @@ input:focus, input:active:focus, input.active:focus {
   padding: 4px 2px;
   cursor: pointer
 }
-.autocomplete-result:hover {
+.autocomplete-result.select {
   background-color: lightsteelblue;
 }
 .rb-square {
@@ -1413,6 +1468,7 @@ input:focus, input:active:focus, input.active:focus {
 }
 .systable tr {
   background-color: white;
+  text-align: left;
 }
 .systable tr.select {
   background-color: darkgrey !important;
@@ -1437,27 +1493,36 @@ input:focus, input:active:focus, input.active:focus {
   top: 0;
   z-index: 1;
 }
+.systable thead td.column-filter {
+  text-align: left;
+  background-color: lightyellow;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
 .systable th.focus {
   border-bottom: 1px solid rgb(61, 85, 61) !important;
 }
-.systable td {
+.systable tbody td.select {
+  background-image: url('./assets/down.png');
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position: right 5px top 8px;
+}
+.systable tbody td {
   cursor: cell;
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
   animation: fadein 0.2s;
 }
-.systable td.column-filter {
-  text-align: left;
-  background-color: lightyellow;
-}
-.systable td.error {
+.systable tbody td.error {
   background-image: url('./assets/err.png');
   background-repeat: no-repeat;
   background-size: 8px 8px;
   background-position: right 0px top 0px;
 }
-.systable td.readonly {
+.systable tbody td.readonly {
   color: #2084EE
 }
 .systable .first-col {

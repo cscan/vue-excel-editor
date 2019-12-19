@@ -10,7 +10,7 @@ Vue2 plugin for displaying and editing the array-of-object in Excel style. It su
 - Row selection
 - Update the cells in all selected rows
 - Key support: Up, down, left, right, PageUp, PageDown, tab, shift-tab, esc
-- Ctrl/meta Key support: Ctrl-A, Ctrl-C, Ctrl-V, Ctrl-Z
+- Ctrl/meta Key support: Ctrl-A, Ctrl-C, Ctrl-V, Ctrl-Z, Ctrl-F, Ctrl-G, Ctrl-L
 - Column Valiation
 - Cell Error Tooltip
 - Custom Column Header
@@ -40,11 +40,12 @@ In your template
 ```html
 <template>
     <vue-excel-editor v-model="jsondata">
-        <vue-excel-column field="user"  label="User" />
-        <vue-excel-column field="name"  label="Name" />
-        <vue-excel-column field="phone" label="Phone" />
-        <vue-excel-column field="age"   label="Age" />
-        <vue-excel-column field="birth" label="Birth" />
+        <vue-excel-column field="user"   label="User" />
+        <vue-excel-column field="name"   label="Name" />
+        <vue-excel-column field="phone"  label="Contact" />
+        <vue-excel-column field="gender" label="Gender" />
+        <vue-excel-column field="age"    label="Age" />
+        <vue-excel-column field="birth"  label="Date Of Birth" />
     </vue-excel-editor>
 </template>
 
@@ -62,6 +63,7 @@ In your template
 | no-paging       | Optional  | Boolean           | Disable paging feature, default is false |
 | no-finding      | Optional  | Boolean           | Disable find key (ctrl-f) and finding dialog, default is false |
 | no-finding-next | Optional  | Boolean           | Disable find-next key (ctrl-g), default is false |
+| autocomplete    | Optional  | Boolean           | Enable autocomplete of all columns, default is false |
 
 (TBD)
 
@@ -70,17 +72,35 @@ In your template
 | :---         | :---      | :---     | :---        |
 | field        | Mandatory | String   | Row Object Key |
 | label        | Optional  | String   | Header Label, default is field |
-| type         | Optional  | String   | Column type: 'string' (default), 'number', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| type         | Optional  | String   | Column type: 'string' (default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
 | readonly     | Optional  | Boolean  | Read-only, default is false |
 | init-style   | Optional  | String   | Style in CSS |
 | width        | Optional  | String   | Specified Column Width, default is 100px |
 | validate     | Optional  | Function | Custom Function to validate and return the error message |
+| autocomplete | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
 | pos          | Optional  | Number   | Specified column sequence |
-| upper-case   | Optional  | Boolean  | Specify True if you want to force upper-case |
+| upper-case   | Optional  | Boolean  | True if you want to force upper-case when editing |
+| options      | Optional  | Array    | Define the selectable options only for type = 'select' |
 | to-text      | Optional  | Function | The custom conversion function from object value to edit-text |
 | to-value     | Optional  | Function | The custom conversion function from edit-text to object value |
 
 (TBD)
+
+## Hot Key List
+
+| Name             | Condition          | Description |
+| :---             | :---               | :---        |
+| Ctrl/Meta A      | Table Focus        | Select all rows |
+| Ctrl/Meta C      | Cell Focus         | Select the cell text to clipboard |
+| Ctrl/Meta V      | Cell Focus         | Place the clipboard text to cell |
+| Ctrl/Meta Z      | Table Focus        | Undo the last update |
+| Ctrl/Meta F      | Table Focus        | Popup the "Find" dialog |
+| Ctrl/Meta G      | After "Find"       | Continue to find the text |
+| Ctrl/Meta L      | Cell Focus         | Force to show autocomplete list, or the option list for "select" typed column |
+
+(TBD)
+
+
 
 ## Events List
 
@@ -109,11 +129,11 @@ export default {
     name: 'app',
     data: {
         jsondata: [
-            {key: 'U0001', user: 'kc', name: 'Kenneth Cheng', phone: '852-1234-5678', age: 25, birth: '1997-07-01'},
-            {key: 'U0002', user: 'sm', name: 'Simon Minolta', phone: '852-1234-5682', age: 20, birth: '1999-11-12'},
-            {key: 'U0003', user: 'ra', name: 'Raymond Atom', phone: '852-1234-5683', age: 18, birth: '2000-06-11'},
-            {key: 'U0004', user: 'ag', name: 'Anderson George', phone: '852-1234-5684', age: 22, birth: '2002-08-01'},
-            {key: 'U0005', user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', age: 29, birth: '1990-09-01'}
+            {key: 'U0001', user: 'kc', name: 'Kenneth Cheng', phone: '852-1234-5678', gender: 'M', age: 25, birth: '1997-07-01'},
+            {key: 'U0002', user: 'sm', name: 'Simon Minolta', phone: '852-1234-5682', gender: 'M', age: 20, birth: '1999-11-12'},
+            {key: 'U0003', user: 'ra', name: 'Raymond Atom', phone: '852-1234-5683', gender: 'M', age: 18, birth: '2000-06-11'},
+            {key: 'U0004', user: 'ag', name: 'Mary George', phone: '852-1234-5684', gender: 'F', age: 22, birth: '2002-08-01'},
+            {key: 'U0005', user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
         ]
     },
     method: {
@@ -150,11 +170,12 @@ In your HTML call it likes
 ```html
 <template>
     <vue-excel-editor v-model="jsondata">
-        <vue-excel-column field="user"  label="User ID"       type="string" width="80px" readonly />
-        <vue-excel-column field="name"  label="Name"          type="string" width="150px" />
-        <vue-excel-column field="phone" label="Phone Number"  type="string" width="130px" :validate="validPhoneNum" />
-        <vue-excel-column field="age"   label="Age"           type="number" width="70px" />
-        <vue-excel-column field="birth" label="Date Of Birth" type="date"   width="80px" />
+        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly />
+        <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
+        <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
+        <vue-excel-column field="gender" label="Gender"        type="select" width="50px" :options="['F','M','U']" />
+        <vue-excel-column field="age"    label="Age"           type="number" width="70px" />
+        <vue-excel-column field="birth"  label="Date Of Birth" type="date"   width="80px" />
     </vue-excel-editor>
 </template>
 ```
