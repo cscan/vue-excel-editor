@@ -1365,19 +1365,19 @@ input:focus, input:active:focus, input.active:focus {
 }
 .autocomplete-results {
   padding: 3px;
-  margin-top: 0px;
-  margin-left: -4px;
-  margin-right: -4px;
+  margin: 0px -3.5px;
   background-color: lightyellow;
   border: 1px solid rgb(108, 143, 108);
   height: fit-content;
   font-size: 0.88rem;
-  overflow: auto;
 }
 .autocomplete-result {
   list-style: none;
   text-align: left;
   padding: 4px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer
 }
 .autocomplete-result.select {
