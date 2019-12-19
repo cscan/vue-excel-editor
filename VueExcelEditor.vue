@@ -97,8 +97,6 @@
                       class="input-box"
                       :style="{opacity: inputBoxShow}"
                       @blur="inputBoxBlur"
-                      @keydown="inputBoxKeydown"
-                      @keyup="inputBoxKeyup"
                       @mousemove="inputBoxMouseMove"
                       @mousedown="inputBoxMouseDown"
                       trim
@@ -579,8 +577,11 @@ export default {
       this.systable.parentNode.style.height = this.height
     this.reset()
     this.lazy(this.refreshPageSize, 200)
+    setTimeout(() => {
+      this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
+    })
     window.onresize = () => {
-      this.moveInputSquare(this.currentRowPos, this.currentColPos)
+      // this.moveInputSquare(this.currentRowPos, this.currentColPos)
       this.lazy(this.refreshPageSize, 200)
     }
     window.addEventListener('keydown', (e) => {
@@ -634,27 +635,8 @@ export default {
         if (this.currentRowPos < 0) return
         if (!this.focused) return
         // this.focused = true
-        switch (true) {
-          case e.keyCode === 27:
-            this.autocompleteInputs = []
-            this.autocompleteSelect = -1
-            if (this.inputBoxShow) {
-              e.preventDefault()
-              this.inputBox.value = this.currentCell.innerText
-              this.inputBoxShow = 0
-              this.inputBoxChanged = false
-            }
-            break
-          case e.keyCode === 33:
-            this.prevPage()
-            e.preventDefault()
-            break
-          case e.keyCode === 34:
-            this.nextPage()
-            e.preventDefault()
-            break
-          case e.keyCode === 9 && e.shiftKey:
-          case e.keyCode === 37:
+        switch (e.keyCode) {
+          case 37:
             if (!this.inputBoxShow) {
               this.moveWest(e)
               e.preventDefault()
@@ -666,15 +648,15 @@ export default {
               }
             }
             break
-          case e.keyCode === 38:
+          case 38:
             e.preventDefault()
             if (this.autocompleteInputs.length === 0)
               this.moveNorth()
             else
               if (this.autocompleteSelect > 0) this.autocompleteSelect--
             break
-          case e.keyCode === 9 && !e.shiftKey:
-          case e.keyCode === 39:
+          case 9:
+          case 39:
             if (!this.inputBoxShow) {
               this.moveEast(e)
               e.preventDefault()
@@ -686,7 +668,7 @@ export default {
               }
             }
             break
-          case e.keyCode === 13:
+          case 13:
             e.preventDefault()
             if (this.autocompleteInputs.length === 0)
               this.moveSouth(e)
@@ -694,41 +676,68 @@ export default {
               if (this.autocompleteSelect !== -1)
                 this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
             break
-          case e.keyCode === 40:
+          case 40:
             e.preventDefault()
             if (this.autocompleteInputs.length === 0)
               this.moveSouth(e)
             else
               if (this.autocompleteSelect < this.autocompleteInputs.length - 1) this.autocompleteSelect++
             break
+          case 27:
+            this.autocompleteInputs = []
+            this.autocompleteSelect = -1
+            if (this.inputBoxShow) {
+              e.preventDefault()
+              this.inputBox.value = this.currentCell.innerText
+              this.inputBoxShow = 0
+              this.inputBoxChanged = false
+            }
+            break
+          case 33:
+            this.prevPage()
+            e.preventDefault()
+            break
+          case 34:
+            this.nextPage()
+            e.preventDefault()
+            break
+          case 8:
+          case 46:
+            if (this.inputBoxShow) return
+            if (this.currentField.readonly) return
+            if (this.autocompleteInputs.length) return
+            if (this.currentField.type === 'select') this.calAutocompleteList(true)
+            else {
+              this.inputbox.value = ''
+              this.inputCellWrite('')
+            }
+            break
           default:
-            if (!this.currentField.readonly && !this.inputBoxShow) {
-              if ((e.key === 'Process' || e.key.length === 1) && !e.ctrlKey && !e.metaKey && !e.altKey) {
-                if (this.currentField.type === 'select')
-                  this.calAutocompleteList(true)
-                else {
-                  this.inputBox.value = ''
-                  this.inputBoxShow = 1
-                  this.inputBox.focus()
-                  this.inputBoxChanged = true
-                }
-              }
-              if (!this.autocompleteInputs.length && (e.keyCode === 8 || e.keyCode === 46)) {  // Delete/BS
-                if (this.currentField.type === 'select')
-                  this.calAutocompleteList(true)
-                else {
-                  this.inputBox.value = ''
-                  this.inputCellWrite('')
-                }
+            if (this.inputBoxShow) return
+            if (this.currentField.readonly) return
+            if (e.altKey) return
+            if (e.key !== 'Process' && e.key.length > 1) return
+            if (this.currentField.type === 'select') this.calAutocompleteList(true)
+            else {
+              this.inputBox.value = ''
+              this.inputBoxShow = 1
+              this.inputBox.focus()
+              this.inputBoxChanged = true
+            }
+            /*
+            if (!this.autocompleteInputs.length && (e.keyCode === 8 || e.keyCode === 46)) {  // Delete/BS
+              if (this.currentField.type === 'select')
+                this.calAutocompleteList(true)
+              else {
+                this.inputBox.value = ''
+                this.inputCellWrite('')
               }
             }
+            */
             break
         }
       }
     })
-    setTimeout(() => {
-      this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
-    }, 0)
   },
   methods: {
     tableScroll () {
@@ -748,10 +757,9 @@ export default {
     },
     moveInputSquare (rowPos, colPos) {
       if (colPos < 0) return
-      if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
+      this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
+      if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length)
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
-        this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
-      }
 
       const row = this.recordBody.children[rowPos]
       if (!row) return
@@ -764,15 +772,12 @@ export default {
       this.inputSquare.style.width = (cellRect.width + 1) + 'px'
       this.inputSquare.style.height = (cellRect.height + 1) + 'px'
 
-      setTimeout(() => {
-        const inputRect = this.inputSquare.getBoundingClientRect()
-        const tabRect = this.$el.getBoundingClientRect()
-        if (inputRect.right >= tabRect.right)
-          this.tableContent.scrollBy(inputRect.right - tabRect.right, 0)
-        if (inputRect.left <= tabRect.left + 40) {
-          this.tableContent.scrollBy(inputRect.left - tabRect.left - 40, 0)
-        }
-      }, 100)
+      const inputRect = this.inputSquare.getBoundingClientRect()
+      const tabRect = this.$el.getBoundingClientRect()
+      if (inputRect.right >= tabRect.right)
+        this.tableContent.scrollBy(inputRect.right - tabRect.right, 0)
+      if (inputRect.left <= tabRect.left + 40)
+        this.tableContent.scrollBy(inputRect.left - tabRect.left - 40, 0)
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
@@ -785,15 +790,14 @@ export default {
       this.currentField = this.fields[colPos]
       this.currentCell = cell
       this.autocompleteInputs = []
+      this.autocompleteSelect = -1
       if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
 
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
-        this.lazy(() => {
-          this.inputBox.focus()
-          this.focused = true
-          this.recordBody.children[this.currentRowPos].children[0].classList.add('focus')
-          this.labelTr.children[this.currentColPos + 1].classList.add('focus')
-        }, 0)
+        this.inputBox.focus()
+        this.focused = true
+        row.children[0].classList.add('focus')
+        this.labelTr.children[this.currentColPos + 1].classList.add('focus')
       }
     },
     reset () {
@@ -1233,11 +1237,10 @@ export default {
       if (this.currentField.type === 'select') return
       if (e.ctrlKey || e.metaKey || e.altKey) return
       if (e.keyCode === 8 || e.keyCode === 46) this.inputBoxChanged = true
-      if (e.key === 'Process' || e.key.length === 1) this.inputBoxChanged = true
-    },
-    inputBoxKeyup (e) {
-      if ((e.key === 'Process' || e.key.length === 1) && this.currentField.autocomplete)
+      if (e.key === 'Process' || e.key.length === 1) {
+        this.inputBoxChanged = true
         this.calAutocompleteList()
+      }
     },
     inputBoxMouseMove (e) {
       if (this.currentField.options.length)
