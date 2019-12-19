@@ -634,7 +634,6 @@ export default {
       else {
         if (this.currentRowPos < 0) return
         if (!this.focused) return
-        // this.focused = true
         switch (e.keyCode) {
           case 37:
             if (!this.inputBoxShow) {
@@ -668,6 +667,13 @@ export default {
               }
             }
             break
+          case 40:
+            e.preventDefault()
+            if (this.autocompleteInputs.length === 0)
+              this.moveSouth(e)
+            else
+              if (this.autocompleteSelect < this.autocompleteInputs.length - 1) this.autocompleteSelect++
+            break
           case 13:
             e.preventDefault()
             if (this.autocompleteInputs.length === 0)
@@ -675,13 +681,6 @@ export default {
             else
               if (this.autocompleteSelect !== -1)
                 this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
-            break
-          case 40:
-            e.preventDefault()
-            if (this.autocompleteInputs.length === 0)
-              this.moveSouth(e)
-            else
-              if (this.autocompleteSelect < this.autocompleteInputs.length - 1) this.autocompleteSelect++
             break
           case 27:
             this.autocompleteInputs = []
@@ -708,32 +707,25 @@ export default {
             if (this.autocompleteInputs.length) return
             if (this.currentField.type === 'select') this.calAutocompleteList(true)
             else {
-              this.inputbox.value = ''
+              this.inputBox.value = ''
               this.inputCellWrite('')
             }
             break
           default:
-            if (this.inputBoxShow) return
             if (this.currentField.readonly) return
             if (e.altKey) return
             if (e.key !== 'Process' && e.key.length > 1) return
-            if (this.currentField.type === 'select') this.calAutocompleteList(true)
-            else {
+            if (!this.inputBoxShow) {
+              if (this.currentField.type === 'select') {
+                this.calAutocompleteList(true)
+                return
+              }
               this.inputBox.value = ''
               this.inputBoxShow = 1
               this.inputBox.focus()
               this.inputBoxChanged = true
             }
-            /*
-            if (!this.autocompleteInputs.length && (e.keyCode === 8 || e.keyCode === 46)) {  // Delete/BS
-              if (this.currentField.type === 'select')
-                this.calAutocompleteList(true)
-              else {
-                this.inputBox.value = ''
-                this.inputCellWrite('')
-              }
-            }
-            */
+            setTimeout(this.calAutocompleteList)
             break
         }
       }
@@ -797,7 +789,7 @@ export default {
         this.inputBox.focus()
         this.focused = true
         row.children[0].classList.add('focus')
-        this.labelTr.children[this.currentColPos + 1].classList.add('focus')
+        this.labelTr.children[colPos + 1].classList.add('focus')
       }
     },
     reset () {
@@ -1232,16 +1224,6 @@ export default {
         this.focused = true
       }
     },
-    inputBoxKeydown (e) {
-      if (this.currentField.readonly) return
-      if (this.currentField.type === 'select') return
-      if (e.ctrlKey || e.metaKey || e.altKey) return
-      if (e.keyCode === 8 || e.keyCode === 46) this.inputBoxChanged = true
-      if (e.key === 'Process' || e.key.length === 1) {
-        this.inputBoxChanged = true
-        this.calAutocompleteList()
-      }
-    },
     inputBoxMouseMove (e) {
       if (this.currentField.options.length)
         e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : 'text'
@@ -1282,7 +1264,7 @@ export default {
           }
           this.autocompleteSelect = -1
           this.autocompleteInputs = list
-        }, force ? 0 : 1000)
+        }, force ? 0 : 700)
       }
     },
     inputAutocompleteText (text, e) {
