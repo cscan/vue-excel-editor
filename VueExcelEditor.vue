@@ -763,13 +763,10 @@ export default {
       this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
       this.inputSquare.style.width = (cellRect.width + 1) + 'px'
       this.inputSquare.style.height = (cellRect.height + 1) + 'px'
-
-      const inputRect = this.inputSquare.getBoundingClientRect()
-      const tabRect = this.$el.getBoundingClientRect()
-      if (inputRect.right >= tabRect.right)
-        this.tableContent.scrollBy(inputRect.right - tabRect.right, 0)
-      if (inputRect.left <= tabRect.left + 40)
-        this.tableContent.scrollBy(inputRect.left - tabRect.left - 40, 0)
+      if (cellRect.right >= tableRect.right)
+        this.tableContent.scrollBy(cellRect.right - tableRect.right, 0)
+      if (cellRect.left <= tableRect.left + 40)
+        this.tableContent.scrollBy(cellRect.left - tableRect.left - 40, 0)
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
@@ -866,6 +863,7 @@ export default {
             this.pageTop = this.findPageTop(r)
             setTimeout(() => {
               this.moveInputSquare(r - this.pageTop, c)
+              setTimeout(() => this.inputBox.focus())
               this.focused = true
             })
             return true
@@ -1196,7 +1194,7 @@ export default {
     mouseDown (e) {
       if (e.target.parentNode.parentNode.tagName === 'TBODY' && !e.target.classList.contains('first-col')) {
         e.preventDefault()
-        this.inputBox.focus()
+        setTimeout(() => this.inputBox.focus())
         this.focused = true
         const row = e.target.parentNode
         const colPos = Array.from(row.children).indexOf(e.target) - 1
@@ -1365,7 +1363,7 @@ input:focus, input:active:focus, input.active:focus {
 }
 .autocomplete-results {
   padding: 3px;
-  margin: 0px -3.5px;
+  margin: 0px -4px;
   background-color: lightyellow;
   border: 1px solid rgb(108, 143, 108);
   height: fit-content;
