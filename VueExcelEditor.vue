@@ -723,8 +723,8 @@ export default {
               this.inputBox.value = ''
               this.inputBoxShow = 1
               this.inputBox.focus()
-              this.inputBoxChanged = true
             }
+            this.inputBoxChanged = true
             setTimeout(this.calAutocompleteList)
             break
         }
