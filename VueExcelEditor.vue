@@ -1129,36 +1129,42 @@ export default {
       return this.updateCell(row, this.fields.findIndex(f => f.name === name), name, content)
     },
     updateCell (row, colPos, name, content, restore) {
-      const transaction = {
-        key: this.table[row].key,
-        colPos: colPos,
-        field: name,
-        newVal: content,
-        oldVal: this.table[row][name],
-        err: ''
-      }
+      const tableRow = this.table[row]
+      const oldVal = tableRow[name]
+      tableRow[name] = content
 
-      if (this.fields[colPos].validate !== null) {
-        const err = this.fields[colPos].validate(content)
-        if (err) {
-          this.errmsg[`${transaction.key}:${name}`] = err
-          transaction.err = err
+      setTimeout(() => {
+        const field = this.fields[colPos]
+        const transaction = {
+          key: tableRow.key,
+          colPos: colPos,
+          field: name,
+          newVal: content,
+          oldVal: oldVal,
+          err: ''
         }
-        else delete this.errmsg[`${transaction.key}:${name}`]
-      }
-      this.table[row][name] = content
 
-      if (!this.saveLazyBuffer) this.saveLazyBuffer = []
-      this.saveLazyBuffer.push(transaction)
+        if (field.validate !== null) {
+          const err = field.validate(content)
+          if (err) {
+            this.errmsg[`${transaction.key}:${name}`] = err
+            transaction.err = err
+          }
+          else delete this.errmsg[`${transaction.key}:${name}`]
+        }
 
-      // Delay the propagation so that it can accumulate the result until no update
-      if (this.delayTimeout) clearTimeout(this.delayTimeout)
-      this.delayTimeout = setTimeout(() => {
-        this.$emit('update', this.saveLazyBuffer)
-        if (!restore)
-          this.redo.push(this.saveLazyBuffer)
-        this.saveLazyBuffer = []
-      }, 50)
+        if (!this.saveLazyBuffer) this.saveLazyBuffer = []
+        this.saveLazyBuffer.push(transaction)
+
+        // Delay the propagation so that it can accumulate the result until no update
+        if (this.delayTimeout) clearTimeout(this.delayTimeout)
+        this.delayTimeout = setTimeout(() => {
+          this.$emit('update', this.saveLazyBuffer)
+          if (!restore)
+            this.redo.push(this.saveLazyBuffer)
+          this.saveLazyBuffer = []
+        }, 50)
+      })
     },
     updateSelectedRowsByCol (colPos, field, content) {
       this.processing = true
