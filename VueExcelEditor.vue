@@ -1455,7 +1455,7 @@ input:focus, input:active:focus, input.active:focus {
   margin-bottom: 0;
   margin-left: 40px;
 }
-.systable tr {
+.systable tbody tr {
   background-color: white;
   text-align: left;
 }
