@@ -1260,7 +1260,7 @@ export default {
             list = []
             for(let i=0; i<this.table.length; i++) {
               const rec = this.table[i]
-              if (rec[name].startsWith(value) && list.indexOf(rec[name]) === -1)
+              if (typeof rec[name] !== 'undefined' && rec[name].startsWith(value) && list.indexOf(rec[name]) === -1)
                 list.push(rec[name])
               if (list.length >= 10) break
             }
