@@ -55,7 +55,9 @@
                                 class="column-filter" />
             </tr>
           </thead>
-          <tbody @mousedown.exact="mouseDown" style="position: relative">
+          <tbody
+            @mousedown.exact="mouseDown"
+            style="position: relative">
             <tr v-for="(record, rowPos) in pagingTable"
                 :key="rowPos"
                 :pos="rowPos"
@@ -580,11 +582,27 @@ export default {
     setTimeout(() => {
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
     })
-    window.onresize = () => {
+    window.onresize = this.winResize
+    window.addEventListener('paste', this.winPaste)
+    window.addEventListener('keydown', this.winKeydown)
+  },
+  methods: {
+    winResize () {
       // this.moveInputSquare(this.currentRowPos, this.currentColPos)
       this.lazy(this.refreshPageSize, 200)
-    }
-    window.addEventListener('keydown', (e) => {
+    },
+    winPaste (e) {
+      if (!this.mousein && !this.focused) return
+      if (this.currentField.readonly) return
+      if (this.inputBoxShow) {
+        this.inputBoxChanged = true
+        return
+      }
+      const text = (e.originalEvent || e).clipboardData.getData('text/plain')
+      this.inputCellWrite(text)
+      e.preventDefault()
+    },
+    winKeydown (e) {
       if (!this.mousein && !this.focused) return
       if (e.ctrlKey || e.metaKey)
         switch (e.keyCode) {
@@ -602,16 +620,6 @@ export default {
             this.inputBox.select()
             document.execCommand('copy')
             e.preventDefault()
-            break
-          case 86: // v
-            if (this.currentField.readonly) return
-            this.inputBoxChanged = true
-            this.inputBox.focus()
-            this.inputBox.select()
-            document.execCommand('paste')
-            this.inputCellWrite(this.inputBox.value)
-            if (!this.inputBoxShow)
-              e.preventDefault()
             break
           case 70: // f
             if (!this.noFinding) {
@@ -676,7 +684,7 @@ export default {
             break
           case 13:
             e.preventDefault()
-            if (this.autocompleteInputs.length === 0)
+            if (this.autocompleteInputs.length === 0 || this.autocompleteSelect === -1)
               this.moveSouth(e)
             else
               if (this.autocompleteSelect !== -1)
@@ -702,7 +710,10 @@ export default {
             break
           case 8:
           case 46:
-            if (this.inputBoxShow) return
+            if (this.inputBoxShow) {
+              this.inputBoxChanged = true
+              return
+            }
             if (this.currentField.readonly) return
             if (this.autocompleteInputs.length) return
             if (this.currentField.type === 'select') this.calAutocompleteList(true)
@@ -729,17 +740,15 @@ export default {
             break
         }
       }
-    })
-  },
-  methods: {
+    },
     tableScroll () {
       if (this.currentCell) {
         const cellRect = this.currentCell.getBoundingClientRect()
         const tableRect = this.$el.getBoundingClientRect()
-        this.inputSquare.classList.add('no-transition')
+        // this.inputSquare.classList.add('no-transition')
         this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
         this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
-        setTimeout(() => this.inputSquare.classList.remove('no-transition'))
+        // setTimeout(() => this.inputSquare.classList.remove('no-transition'))
       }
     },
     registerColumn (field) {
