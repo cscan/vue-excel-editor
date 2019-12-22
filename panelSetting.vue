@@ -72,6 +72,15 @@ export default {
     clickOutside (e) {
       if (e.target.id === 'panelModal') this.hidePanel()
     },
+    freezePanelSizeAfterShown () {
+      const target = this.$refs.panelList
+      const rect = target.getBoundingClientRect()
+      target.setAttribute('style', `width:${rect.width}px; height:${rect.height}px;`)
+    },
+    removePanelSizeAfterHide () {
+      const target = this.$refs.panelList
+      target.removeAttribute('style')
+    },
     exportTable (format) {
       this.hidePanel()
       this.$parent.exportTable(format)
@@ -79,9 +88,11 @@ export default {
     showPanel () {
       this.show = true
       setTimeout(() => (this.$refs.button.focus()))
+      setTimeout(() => this.freezePanelSizeAfterShown())
     },
     hidePanel () {
       this.show = false
+      this.removePanelSizeAfterHide()
     }
   }
 }
@@ -106,6 +117,7 @@ input:focus, button:focus {
   font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-weight: 400;
   font-size: 1rem;
+  text-shadow: none;
 }
 
 .panel-body {
@@ -125,7 +137,6 @@ input:focus, button:focus {
 }
 
 .panel-title {
-  height: 2rem;
   padding: 1rem;
   display: flex;
   color: black;
@@ -155,10 +166,10 @@ div.panel-title span, button.panel-button span {
   margin-bottom: 0.5rem;
   width: 100%;
   position: relative;
+  white-space: nowrap;
 }
 
 .panel-footer {
-  height: 2.5rem;
   display: flex;
   padding: 1rem;
   align-items: center;
@@ -211,4 +222,37 @@ div.panel-title span, button.panel-button span {
   border-bottom: 1px solid lightgray;
 }
 
+.fa-spin {
+  -webkit-animation: fa-spin 2s infinite linear;
+  animation: fa-spin 2s infinite linear;
+}
+.svg-inline--fa.fa-w-14 {
+  width: 0.875em;
+}
+.svg-inline--fa.fa-w-16 {
+  width: 1em;
+}
+.svg-inline--fa.fa-fw {
+  width: 1.25em;
+}
+.svg-inline--fa {
+  display: inline-block;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+.fa-xs {
+  font-size: 0.75em;
+}
+.fa-sm {
+  font-size: 0.875em;
+}
+.fa-3x {
+  font-size: 3em;
+}
 </style>

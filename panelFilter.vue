@@ -2,8 +2,7 @@
   <div id="panelModal" v-show="show" class="panel-modal" @click="clickOutside" @keydown.exact.esc="hidePanel">
     <div id="panelFilter"
          ref="panelFilter"
-         class="panel-body"
-         @shown="freezePanelSizeAfterShown">
+         class="panel-body">
       <div class="panel-title">
         <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort-amount-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-sort-amount-down fa-w-16 fa-xs"><path fill="currentColor" d="M304 416h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-128-64h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.37 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352zm256-192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-64 128H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM496 32H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z" class=""></path></svg>        
         <span>Sorting and Filter</span>
@@ -52,13 +51,15 @@
                 <span>Regular Expression</span>
               </div>
             </div>
-            <input type="text"
-                   ref="inputFilter"
-                   class="panel-input"
-                   placeholder="Custom Filter"
-                   trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                   @keyup="doInputFilter"
-                   @keydown.exact.enter="doFilter" />
+            <span class="panel-input-b">
+              <input type="text"
+                    ref="inputFilter"
+                    class="panel-input"
+                    placeholder="Custom Filter"
+                    trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                    @keyup="doInputFilter"
+                    @keydown.exact.enter="doFilter" />
+            </span>
           </div>
         </div>
         <div>
@@ -136,6 +137,10 @@ export default {
       const rect = target.getBoundingClientRect()
       target.setAttribute('style', `width:${rect.width}px; height:${rect.height}px;`)
     },
+    removePanelSizeAfterHide () {
+      const target = this.$refs.panelList
+      target.removeAttribute('style')
+    },
     doInputFilter () {
       if (window.delay) clearTimeout(window.delay)
       window.delay = setTimeout(() => {
@@ -172,9 +177,11 @@ export default {
       keys.sort()
       if (keys.length > 0 && keys[0] === '') keys[0] = ' '
       this.sortedUniqueValueList = keys
+      setTimeout(() => this.freezePanelSizeAfterShown())
     },
     hidePanel () {
       this.show = false
+      this.removePanelSizeAfterHide()
       setTimeout(() => {
         this.sortedUniqueValueList = []
       }, 0)
@@ -187,7 +194,7 @@ export default {
 
 input:focus, button:focus {
   outline: none !important;
-  box-shadow: inset 0 -1px 0 #ddd !important;
+  box-shadow: none !important;
 }
 
 .panel-modal {
@@ -202,6 +209,7 @@ input:focus, button:focus {
   font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-weight: 400;
   font-size: 1rem;
+  text-shadow: none;
 }
 
 .panel-body {
@@ -221,7 +229,6 @@ input:focus, button:focus {
 }
 
 .panel-title {
-  height: 2rem;
   padding: 1rem;
   display: flex;
   color: black;
@@ -251,30 +258,37 @@ div.panel-title span, button.panel-button span {
   margin-bottom: 0.5rem;
   width: 100%;
   position: relative;
+  white-space: nowrap;
 }
 
+.panel-input-b {
+  display: inline-block;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  width: calc(100% - 2.2rem);
+  border: 1px solid lightgray;
+  border-left: 0;
+  margin-left: -4px;
+  height: 2.3rem;
+}
+.panel-input {
+  border: 0;
+  box-shadow: none;
+  padding: 0.6rem;
+  width: calc(100% - 2.2rem);
+  font-size: 0.88rem;
+  background-color: transparent;
+}
 .panel-input-button {
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
   color: white;
   background-color: #28a745;
-  border: 0;
-  font-size: 1.4rem;
+  border: 1px solid #28a745;
+  font-size: 1.3rem;
   width: 2.2rem;
-  height: 2.3rem;
+  height: 2.35rem;
   vertical-align: -2px;
-  position: relative;
-}
-
-.panel-input {
-  padding: 0 0.5rem;
-  font-size: 0.88rem;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  width: calc(100% - 3.3rem);
-  border: 1px solid lightgray;
-  border-left: 0;
-  height: 2.2rem;
 }
 
 .panel-dropdown {
@@ -308,7 +322,6 @@ div.panel-title span, button.panel-button span {
 }
 
 .panel-footer {
-  height: 2.5rem;
   display: flex;
   padding: 1rem;
   align-items: center;
@@ -365,4 +378,37 @@ div.panel-title span, button.panel-button span {
   color: gray;
 }
 
+.fa-spin {
+  -webkit-animation: fa-spin 2s infinite linear;
+  animation: fa-spin 2s infinite linear;
+}
+.svg-inline--fa.fa-w-14 {
+  width: 0.875em;
+}
+.svg-inline--fa.fa-w-16 {
+  width: 1em;
+}
+.svg-inline--fa.fa-fw {
+  width: 1.25em;
+}
+.svg-inline--fa {
+  display: inline-block;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+.fa-xs {
+  font-size: 0.75em;
+}
+.fa-sm {
+  font-size: 0.875em;
+}
+.fa-3x {
+  font-size: 3em;
+}
 </style>

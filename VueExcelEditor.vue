@@ -67,30 +67,21 @@
                   scope="row"
                   @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
               <template v-for="(item, p) in fields">
-                <td v-if="item.options.length"
-                    v-show="item.visible"
-                    :id="`cell-${p+rowPos*fields.length}`"
-                    :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`], select: true}"
+                <td v-show="item.visible"
+                    :id="`${record.key}:${item.name}`"
+                    :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`], select: item.options.length}"
                     :style="item.initStyle"
                     :key="`f${p}`"
+                    @mouseover="cellMouseOver"
                     @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
-                <td v-else
-                    v-show="item.visible"
-                    :id="`cell-${p+rowPos*fields.length}`"
-                    :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`]}"
-                    :style="item.initStyle"
-                    :key="`f${p}`">{{ item.toText(record[item.name]) }}</td>
-                <!--b-tooltip v-if="item.validate && errmsg[`${record.key}:${item.name}`]"
-                          variant="danger"
-                          :target="`cell-${p+rowPos*fields.length}`"
-                          :key="`tool${p}`"
-                          placement="right"
-                          trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip-->
               </template>
             </tr>
           </tbody>
           <slot></slot>
         </table>
+
+        <!-- Tool Tip -->
+        <div v-show="tip" ref="tooltip" class="tool-tip">{{ tip }}</div>
 
         <!-- Editor Square -->
         <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
@@ -176,17 +167,17 @@
 
 <script>
 import VueExcelFilter from './VueExcelFilter'
-import panelFilter from './panelFilter'
-import panelSetting from './panelSetting'
-import panelFind from './panelFind'
+import PanelFilter from './panelFilter'
+import PanelSetting from './panelSetting'
+import PanelFind from './panelFind'
 import XLSX from 'xlsx'
 
 export default {
   components: {
     'vue-excel-filter': VueExcelFilter,
-    'panel-filter': panelFilter,
-    'panel-setting': panelSetting,
-    'panel-find': panelFind
+    'panel-filter': PanelFilter,
+    'panel-setting': PanelSetting,
+    'panel-find': PanelFind,
   },
   props: {
     value: {type: Array,                            // actual table content
@@ -252,6 +243,7 @@ export default {
       autocompleteSelect: -1,
 
       errmsg: {},
+      tip: '',
 
       fields: [],
       focused: false,
@@ -939,12 +931,14 @@ export default {
         }
 
         if (field.validate !== null) {
+          const id = `${transaction.key}:${name}`
           const err = field.validate(content)
           if (err) {
-            this.errmsg[`${transaction.key}:${name}`] = err
+            this.errmsg[id] = err
             transaction.err = err
+            document.getElementById(id).classList.add('error')
           }
-          else delete this.errmsg[`${transaction.key}:${name}`]
+          else delete this.errmsg[id]
         }
 
         if (!this.saveLazyBuffer) this.saveLazyBuffer = []
@@ -1005,7 +999,24 @@ export default {
       }
     },
     cellMouseMove (e) {
-      e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : (this.inputBoxShow ? 'default' : 'cell')
+      if (e.target.classList.contains('select'))
+        e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : (this.inputBoxShow ? 'default' : 'cell')
+    },
+    cellMouseOver (e) {
+      const cell = e.target
+      if (!cell.classList.contains('error')) return
+      if (this.tipTimeout) clearTimeout(this.tipTimeout)
+      if ((this.tip = this.errmsg[cell.getAttribute('id')]) === '') return
+      const rect = cell.getBoundingClientRect()
+      this.$refs.tooltip.style.top = (rect.top - 14) + 'px';
+      this.$refs.tooltip.style.left = (rect.right + 8) + 'px'
+      cell.addEventListener('mouseout', this.cellMouseOut)
+    },
+    cellMouseOut (e) {
+      this.tipTimeout = setTimeout(() => {
+        this.tip = ''
+      }, 1000)
+      e.target.removeEventListener(e.type, this.cellMouseOut)
     },
     mouseOver () {
       this.mousein = true
@@ -1429,5 +1440,28 @@ a:disabled {
 }
 .fa-3x {
   font-size: 3em;
+}
+.tool-tip {
+  display: inline-block;
+  position: fixed;
+  color: white;
+  background-color: red;
+  padding: 0.5rem;
+  min-height: 1rem;
+  max-width: 200px;
+  word-wrap: break-word;
+  border-radius: 4px;
+}
+.tool-tip:before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid red;
+  left: -8px;
+  top: 8px;
 }
 </style>
