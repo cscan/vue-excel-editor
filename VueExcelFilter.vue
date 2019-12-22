@@ -130,7 +130,8 @@ export default {
       if (e.button === 0 && this.cell.offsetWidth - e.offsetX < 15) {
         e.preventDefault()
         setTimeout(() => {
-          this.$parent.showFilterPanel(this)
+          // this.$parent.showFilterPanel(this)
+          this.$parent.$refs.panelFilter.showPanel(this)
         }, 0)
       }
     }

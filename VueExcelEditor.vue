@@ -24,8 +24,8 @@
               <th class="text-center first-col tl-setting"
                   @mousedown.left="settingClick">
                 <span style="width:100%">
-                  <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" />
-                  <font-awesome-icon v-else icon="bars" size="sm" />
+                  <svg v-if="processing" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-sm"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
+                  <svg v-else aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-bars fa-w-14 fa-sm"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg>
                 </span>
               </th>
               <th v-for="(item, p) in fields"
@@ -45,8 +45,8 @@
             </tr>
             <tr>
               <td class="text-center first-col tl-filter" @click="selectAllClick">
-                <font-awesome-icon v-if="selectedCount==table.length" icon="times-circle" size="sm" />
-                <font-awesome-icon v-else icon="check-circle" size="sm" />
+                <svg v-if="selectedCount==table.length" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-times-circle fa-w-16 fa-sm"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"></path></svg>
+                <svg v-else aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-check-circle fa-w-16 fa-sm"><path fill="currentColor" d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"></path></svg>
               </td>
               <vue-excel-filter v-for="(item, p) in fields"
                                 v-show="item.visible"
@@ -80,12 +80,12 @@
                     :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`]}"
                     :style="item.initStyle"
                     :key="`f${p}`">{{ item.toText(record[item.name]) }}</td>
-                <b-tooltip v-if="item.validate && errmsg[`${record.key}:${item.name}`]"
+                <!--b-tooltip v-if="item.validate && errmsg[`${record.key}:${item.name}`]"
                           variant="danger"
                           :target="`cell-${p+rowPos*fields.length}`"
                           :key="`tool${p}`"
                           placement="right"
-                          trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip>
+                          trigger="hover focus">{{ errmsg[`${record.key}:${item.name}`] }}</b-tooltip-->
               </template>
             </tr>
           </tbody>
@@ -119,7 +119,7 @@
 
         <!-- Waiting scene -->
         <div v-show="processing" ref="frontdrop" class="front-drop">
-          <font-awesome-icon icon="spinner" spin size="3x" />
+          <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-3x"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
         </div>
       </div>
 
@@ -130,24 +130,29 @@
         </span>
         <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
           <template v-if="processing">
-            <font-awesome-icon icon="spinner" spin size="sm" /> Processing
+            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-sm"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
+            Processing
           </template>
           <template v-else>
-            <b-link :disabled="pageTop <= 0" @click="firstPage">
-              <font-awesome-icon icon="step-backward" size="sm" /> First
-            </b-link>
+            <a :class="{disabled: pageTop <= 0}" @click="firstPage">
+              <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-backward fa-w-14 fa-sm"><path fill="currentColor" d="M64 468V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12v176.4l195.5-181C352.1 22.3 384 36.6 384 64v384c0 27.4-31.9 41.7-52.5 24.6L136 292.7V468c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12z"></path></svg>
+              First
+            </a>
             &nbsp;|&nbsp;
-            <b-link :disabled="pageTop <= 0" @click="prevPage">
-              <font-awesome-icon icon="backward" size="sm" /> Previous
-            </b-link>
+            <a :class="{disabled: pageTop <= 0}" @click="prevPage">
+              <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-backward fa-w-16 fa-sm"><path fill="currentColor" d="M11.5 280.6l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2zm256 0l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2z"></path></svg>
+              Previous
+            </a>
             &nbsp;|&nbsp;
-            <b-link :disabled="pageTop + pageSize >= table.length" @click="nextPage">
-              Next <font-awesome-icon icon="forward" size="sm" />
-            </b-link>
+            <a :class="{disabled: pageTop + pageSize >= table.length}" @click="nextPage">
+              Next
+              <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-forward fa-w-16 fa-sm"><path fill="currentColor" d="M500.5 231.4l-192-160C287.9 54.3 256 68.6 256 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2zm-256 0l-192-160C31.9 54.3 0 68.6 0 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2z"></path></svg>
+            </a>
             &nbsp;|&nbsp;
-            <b-link :disabled="pageTop + pageSize >= table.length" @click="lastPage">
-              Last <font-awesome-icon icon="step-forward" size="sm" />
-            </b-link>
+            <a :class="{disabled: pageTop + pageSize >= table.length}" @click="lastPage">
+              Last
+              <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-forward fa-w-14 fa-sm"><path fill="currentColor" d="M384 44v424c0 6.6-5.4 12-12 12h-48c-6.6 0-12-5.4-12-12V291.6l-195.5 181C95.9 489.7 64 475.4 64 448V64c0-27.4 31.9-41.7 52.5-24.6L312 219.3V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12z"></path></svg>
+            </a>
           </template>
         </span>
         <span style="position: absolute; right: 8px">
@@ -162,184 +167,26 @@
         </span>
       </div>
 
-      <!-- Filter Dialog -->
-      <b-modal id="panelFilter" ref="panelFilter" centered @shown="freezePanelSizeAfterShown($refs.panelList)">
-        <template v-slot:modal-title>
-          <font-awesome-icon icon="sort-amount-down" size="xs" />
-          &nbsp;&nbsp;Sorting and Filter
-        </template>
-        <b-form-group style="white-space: nowrap">
-          <b-button class="float-left" variant="info" style="width:48%" @click="sort(1)">
-            <font-awesome-icon icon="sort-alpha-down" />
-            &nbsp;&nbsp;Sort Ascending
-          </b-button>
-          <b-button class="float-right" variant="info" style="width:48%" @click="sort(-1)">
-            <font-awesome-icon icon="sort-alpha-up-alt" />
-            &nbsp;&nbsp;Sort Descending
-          </b-button>
-        </b-form-group>
-        <b-form-group>
-          <b-input-group>
-            <template v-slot:prepend>
-              <b-dropdown no-caret variant="success">
-                <template slot="button-content">
-                  <font-awesome-icon v-if="inputFilterCondition==''" icon="percentage" size="sm" />
-                  <font-awesome-icon v-if="inputFilterCondition=='='" icon="equals" size="sm" />
-                  <font-awesome-icon v-if="inputFilterCondition=='>'" icon="greater-than" size="sm" />
-                  <font-awesome-icon v-if="inputFilterCondition=='>='" icon="greater-than-equal" size="sm" />
-                  <font-awesome-icon v-if="inputFilterCondition=='<'" icon="less-than" size="sm" />
-                  <font-awesome-icon v-if="inputFilterCondition=='<='" icon="less-than-equal" size="sm" />
-                  <font-awesome-icon v-if="inputFilterCondition=='~'" icon="plus" size="sm" />
-                </template>
-                <b-dropdown-item>
-                  <a href="#" @click.prevent="inputFilterCondition=''">
-                    <font-awesome-icon icon="percentage" size="sm" />
-                    &nbsp;&nbsp;Near
-                  </a>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <a href="#" @click.prevent="inputFilterCondition='='">
-                    <font-awesome-icon icon="equals" size="sm" />
-                    &nbsp;&nbsp;Exact Match
-                  </a>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <a href="#" @click.prevent="inputFilterCondition='>'">
-                    <font-awesome-icon icon="greater-than" size="sm" />
-                    &nbsp;&nbsp;Greater than
-                  </a>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <a href="#" @click.prevent="inputFilterCondition='>='">
-                    <font-awesome-icon icon="greater-than-equal" size="sm" />
-                    &nbsp;&nbsp;Greater than or Equal to
-                  </a>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <a href="#" @click.prevent="inputFilterCondition='<'">
-                    <font-awesome-icon icon="less-than" size="sm" />
-                    &nbsp;&nbsp;Less than
-                  </a>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <a href="#" @click.prevent="inputFilterCondition='<='">
-                    <font-awesome-icon icon="less-than-equal" size="sm" />
-                    &nbsp;&nbsp;Less than or Equal to
-                  </a>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <a href="#" @click.prevent="inputFilterCondition='~'">
-                    <font-awesome-icon icon="plus" size="sm" />
-                    &nbsp;&nbsp;Regular Expression
-                  </a>
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-            <b-form-input ref="inputFilter"
-                          placeholder="Custom Filter"
-                          autofocus
-                          trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                          @keyup="doInputFilter"
-                          @keydown.exact.enter="doFilter" />
-          </b-input-group>
-        </b-form-group>
-        <div ref="panelList" class="list-group list-group-flush panel-list">
-          <a v-for="(item, k) in filteredSortedUniqueValueList.slice(0, nFilterCount)" :key="k"
-            href="#"
-            class="list-group-item list-group-item-action panel-list-item"
-            @click.prevent="filterPanelSelect(item)">
-            <b-checkbox size="sm">
-              {{ item }}
-            </b-checkbox>
-          </a>
-        </div>
-        <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">List first {{ nFilterCount }} values only</div>
-        <template v-slot:modal-footer>
-          <b-button variant="primary input-button" @click="doFilter">
-            <span>
-              <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
-              <font-awesome-icon v-else icon="sign-in-alt" size="sm" fixed-width />
-            </span>
-            Apply
-          </b-button>
-        </template>
-      </b-modal>
-
-      <!-- Setting Dialog -->
-      <b-modal id="panelGrid" ref="panelGrid" centered>
-        <template v-slot:modal-title>
-          <font-awesome-icon icon="bars" size="xs" />
-          &nbsp;&nbsp;Table Setting
-        </template>
-        <b-form-group style="white-space: nowrap">
-          <b-button class="float-left" variant="info" style="width:48%" @click="exportTable('excel')">
-            <font-awesome-icon icon="file-excel" />
-            &nbsp;&nbsp;Export Excel
-          </b-button>
-          <b-button class="float-right" variant="info" style="width:48%" @click="exportTable('csv')">
-            <font-awesome-icon icon="file-csv" />
-            &nbsp;&nbsp;Export CSV
-          </b-button>
-        </b-form-group>
-        <div ref="fieldList" class="list-group list-group-flush panel-list">
-          <draggable v-model="fields" draggable=".panel-list-item">
-            <a v-for="(item, k) in fields" :key="k"
-              href="#"
-              class="list-group-item list-group-item-action panel-list-item"
-              @click.prevent="item.visible = !item.visible">
-              <b-checkbox size="sm" :checked="item.visible">
-                {{ item.label }}
-              </b-checkbox>
-            </a>
-          </draggable>
-        </div>
-        <template v-slot:modal-footer>
-          <b-button variant="primary input-button" @click="saveSetting">
-            <span>
-              <font-awesome-icon v-if="processing" icon="spinner" spin size="sm" fixed-width />
-              <font-awesome-icon v-else icon="save" size="sm" fixed-width />
-            </span>
-            Back
-          </b-button>
-        </template>
-      </b-modal>
-
-      <!-- Find Dialog -->
-      <b-modal id="panelFind" hide-header hide-footer scrollable centered>
-        <b-input-group class="">
-          <b-form-input id="inputFind" ref="inputFind" v-model="inputFind"
-                        autofocus
-                        trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                        @keydown.enter.prevent="doFind(inputFind, $event)" />
-          <template v-slot:append>
-            <b-button variant="info" @click="doFind(inputFind)">
-              <font-awesome-icon icon="search" size="sm" />
-            </b-button>
-          </template>
-        </b-input-group>
-      </b-modal>
+      <panel-filter ref="panelFilter" :m-filter-count="nFilterCount" />
+      <panel-setting ref="panelSetting" v-model="fields" />
+      <panel-find ref="panelFind" />
     </div>
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import BootstrapVue from 'bootstrap-vue'
 import VueExcelFilter from './VueExcelFilter'
+import panelFilter from './panelFilter'
+import panelSetting from './panelSetting'
+import panelFind from './panelFind'
 import XLSX from 'xlsx'
-import draggable from 'vuedraggable'
-
-library.add(fas)
-Vue.use(BootstrapVue)
 
 export default {
   components: {
-    'font-awesome-icon': FontAwesomeIcon,
     'vue-excel-filter': VueExcelFilter,
-    'draggable': draggable
+    'panel-filter': panelFilter,
+    'panel-setting': panelSetting,
+    'panel-find': panelFind
   },
   props: {
     value: {type: Array,                            // actual table content
@@ -412,15 +259,10 @@ export default {
       inputBoxChanged: false,
 
       columnFilter: {},             // set filter storage in hash, key is the column pos
-      columnFilterRef: null,        // temporary remember the Vue reference of the filter for filter dialog
-      sortedUniqueValueList: [],    // unique value list of filter dialog
-      inputFilter: '',              // Custom filter storage for filter dialog
-      inputFilterCondition: '=',    // Custom filter condition for filter dialog
 
       inputFind: '',
 
       frontdrop: null,              // frontdrop dom node
-      sep: {},                      // temporary varialbe for sep to operate the column adjustment
 
       sortPos: 0,                   // Sort column position
       sortDir: 0,                   // Sort direction, 1=Ascending, -1=Descending
@@ -428,10 +270,6 @@ export default {
     }
   },
   computed: {
-    filteredSortedUniqueValueList () {
-      const filter = this.inputFilter.toUpperCase()
-      return this.sortedUniqueValueList.filter(item => item.toUpperCase().startsWith(filter))
-    },
     columnFilterString () {
       return JSON.stringify(this.columnFilter)
     },
@@ -588,7 +426,6 @@ export default {
   },
   methods: {
     winResize () {
-      // this.moveInputSquare(this.currentRowPos, this.currentColPos)
       this.lazy(this.refreshPageSize, 200)
     },
     winPaste (e) {
@@ -623,8 +460,7 @@ export default {
             break
           case 70: // f
             if (!this.noFinding) {
-              this.inputFind = ''
-              this.$bvModal.show('panelFind')
+              this.$refs.panelFind.showPanel()
               e.preventDefault()
             }
             break
@@ -838,29 +674,17 @@ export default {
     mouseMove (e) {
       if (!this.sep || !this.sep.curCol) return
       const diffX = e.pageX - this.sep.pageX
-      // if (this.systable.getBoundingClientRect().right === window.innerWidth)
-      //   if (this.sep.nxtCol)
-      //     this.sep.nxtCol.style.width = (this.sep.nxtColWidth - diffX) + 'px'
       this.sep.curCol.style.width = (this.sep.curColWidth + diffX) + 'px'
     },
     mouseUp (e) {
-      // this.focused = true
       e.preventDefault()
       e.stopPropagation()
       delete this.sep
     },
-    doInputFilter () {
-      if (window.delay) clearTimeout(window.delay)
-      window.delay = setTimeout(() => {
-        this.inputFilter = this.$refs.inputFilter.$el.value
-      }, 200)
-    },
     doFindNext () {
       return this.doFind()
     },
-    doFind (s, e) {
-      if (e) e.preventDefault()
-      this.$bvModal.hide('panelFind')
+    doFind (s) {
       if (typeof s === 'undefined') s = this.inputFind
       else this.inputFind = s
       s = s.toUpperCase()
@@ -917,7 +741,6 @@ export default {
       const fieldName = this.fields[colPos].name
       const type = this.fields[colPos].type
       setTimeout(() => {
-        this.$bvModal.hide('panelFilter')
         if (type === 'number')
           this.value.sort((a, b) => {
             if (Number(a[fieldName]) > Number(b[fieldName])) return n
@@ -933,40 +756,6 @@ export default {
         this.sortPos = colPos
         this.sortDir = n
         this.processing = false
-      }, 0)
-    },
-    doFilter () {
-      const opt = this.inputFilterCondition + this.$refs.inputFilter.$el.value
-      this.columnFilterRef.$el.textContent = opt
-      this.columnFilterRef.$emit('input', opt)
-      this.hideFilterPanel()
-    },
-    filterPanelSelect (opt) {
-      // this.columnFilter[this.columnFilterRef.colPos] = el  // Cannot use this, dunno why
-      this.columnFilterRef.$el.textContent = '=' + opt
-      this.columnFilterRef.$emit('input', '=' + opt)
-      this.hideFilterPanel()
-    },
-    showFilterPanel (ref) {
-      this.columnFilterRef = ref
-      this.inputFilter = ''
-      this.inputFilterCondition = ''
-      this.sortedUniqueValueList = []
-      this.$bvModal.show('panelFilter')
-      this.columnFilterRef.$el.textContent = ''
-      this.columnFilterRef.$emit('input', '')
-      const hash = {}
-      const fieldName = this.fields[ref.colPos].name
-      this.table.forEach(record => (hash[record[fieldName]] = true))
-      const keys = Object.keys(hash)
-      keys.sort()
-      if (keys.length > 0 && keys[0] === '') keys[0] = ' '
-      this.sortedUniqueValueList = keys
-    },
-    hideFilterPanel () {
-      this.$bvModal.hide('panelFilter')
-      setTimeout(() => {
-        this.sortedUniqueValueList = []
       }, 0)
     },
     freezePanelSizeAfterShown (target) {
@@ -1031,13 +820,9 @@ export default {
       this.prevSelect = rowPos
     },
     settingClick () {
-      this.$bvModal.show('panelGrid')
-    },
-    saveSetting () {
-      this.$bvModal.hide('panelGrid')
+      this.$refs.panelSetting.showPanel()
     },
     exportTable (format, selectedOnly) {
-      this.$bvModal.hide('panelGrid')
       this.processing = true
       setTimeout(() => {
         const wb = XLSX.utils.book_new()
@@ -1366,6 +1151,9 @@ input:focus, input:active:focus, input.active:focus {
   outline: none;
   box-shadow: inset 0 -1px 0 #ddd;
 }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 .input-square {
   position: absolute;
   padding: 0;
@@ -1431,14 +1219,15 @@ input:focus, input:active:focus, input.active:focus {
   flex-flow: column;
   position: relative;
   max-width:fit-content;
+  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+  word-spacing: 0.02rem;
+  line-height: 1.1;
 }
 .table-content {
   flex: 1 1 auto;
-  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-size: 1rem;
   border-top: 0.5px solid lightgray;
-  line-height: 1.1;
-  word-spacing: 0.02rem;
+  text-shadow: 0.3px 0.3px 1px #ccc;
   overflow: scroll;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -1531,6 +1320,7 @@ input:focus, input:active:focus, input.active:focus {
   top: auto;
   cursor: e-resize !important;
   text-overflow: inherit !important;
+  text-align: center;
   overflow: hidden;
   z-index: 5;
 }
@@ -1555,18 +1345,12 @@ input:focus, input:active:focus, input.active:focus {
   left: 0;
   background-color: white;
 }
-.panel-list-item {
-  padding: 10px 5px;
+.footer a {
+  cursor: pointer;
+  color: #007bff;
 }
-.panel-list {
-  overflow-y: scroll;
-  max-height: 20rem;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  padding: 10px;
-}
-.panel-list a:first-child {
-  border-top: 0
+.footer a.disabled {
+  color: gray;
 }
 .front-drop {
   position: fixed;
@@ -1578,7 +1362,7 @@ input:focus, input:active:focus, input.active:focus {
   color: white;
   z-index: 1000;
 }
-a.disabled {
+a:disabled {
   color: gray;
 }
 .col-sep {
@@ -1611,5 +1395,39 @@ a.disabled {
 @keyframes fadein {
   from {opacity: 0}
   to {opacity: 1}
+}
+
+.fa-spin {
+  -webkit-animation: fa-spin 2s infinite linear;
+  animation: fa-spin 2s infinite linear;
+}
+.svg-inline--fa.fa-w-14 {
+  width: 0.875em;
+}
+.svg-inline--fa.fa-w-16 {
+  width: 1em;
+}
+.svg-inline--fa.fa-fw {
+  width: 1.25em;
+}
+.svg-inline--fa {
+  display: inline-block;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+.fa-xs {
+  font-size: 0.75em;
+}
+.fa-sm {
+  font-size: 0.875em;
+}
+.fa-3x {
+  font-size: 3em;
 }
 </style>
