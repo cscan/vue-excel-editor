@@ -330,7 +330,7 @@ export default {
         const content = {}
         filterColumnList.forEach((k) => {
           const val = record[this.fields[k].name]
-          content[k] = typeof val === 'undefined' ? '' : val.toUpperCase()
+          content[k] = typeof val === 'undefined' ? '' : String(val).toUpperCase()
         })
         for (let i = 0; i < filterColumnList.length; i++) {
           const k = filterColumnList[i]
@@ -1337,7 +1337,7 @@ input:focus, input:active:focus, input.active:focus {
 .table-content {
   flex: 1 1 auto;
   font-size: 1rem;
-  border-top: 0.5px solid lightgray;
+  border-top: 0.8px solid lightgray;
   text-shadow: 0.3px 0.3px 1px #ccc;
   overflow: scroll;
   -webkit-touch-callout: none;
@@ -1372,6 +1372,9 @@ input:focus, input:active:focus, input.active:focus {
   text-align: left;
 }
 .systable tr.select {
+  background-color: darkgrey !important;
+}
+.systable tr.select td.first-col {
   background-color: darkgrey !important;
 }
 .systable th, .systable td {

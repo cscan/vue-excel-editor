@@ -51,6 +51,9 @@ In your template
 
 ```
 
+## Outlook
+![Simple Outlook](/vue-excel-editor/master/assets/simple.png?raw=true "VueExcelEditor")
+
 ## Props List
 
 #### Component: vue-excel-editor
@@ -174,7 +177,7 @@ In your HTML call it likes
 
 ```html
 <template>
-    <vue-excel-editor v-model="jsondata">
+    <vue-excel-editor no-footer no-paging autocomplete filter-row v-model="jsondata">
         <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly />
         <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
         <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
@@ -184,6 +187,18 @@ In your HTML call it likes
     </vue-excel-editor>
 </template>
 ```
+
+![Filter + Footer Rows](/vue-excel-editor/master/assets/filterfooter.png?raw=true "Filter + Footer Rows")
+
+![Filtering](/vue-excel-editor/master/assets/filtering.png?raw=true "Filtering")
+
+![Sorting](/vue-excel-editor/master/assets/filtering.png?raw=true "Sorting")
+
+![Options](/vue-excel-editor/master/assets/options.png?raw=true "Options")
+
+![Select](/vue-excel-editor/master/assets/select.png?raw=true "Select")
+
+![Validation](/vue-excel-editor/master/assets/validate.png?raw=true "Validation")
 
 ## License
 MIT
