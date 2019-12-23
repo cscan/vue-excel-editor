@@ -52,7 +52,7 @@ In your template
 ```
 
 ## Outlook
-![Simple Outlook](/vue-excel-editor/master/assets/simple.png?raw=true "VueExcelEditor")
+![Simple Outlook](/assets/simple.png?raw=true "VueExcelEditor")
 
 ## Props List
 
@@ -188,17 +188,17 @@ In your HTML call it likes
 </template>
 ```
 
-![Filter + Footer Rows](/vue-excel-editor/master/assets/filterfooter.png?raw=true "Filter + Footer Rows")
+![Filter + Footer Rows](/assets/filterfooter.png?raw=true "Filter + Footer Rows")
 
-![Filtering](/vue-excel-editor/master/assets/filtering.png?raw=true "Filtering")
+![Filtering](/assets/filtering.png?raw=true "Filtering")
 
-![Sorting](/vue-excel-editor/master/assets/filtering.png?raw=true "Sorting")
+![Sorting](/assets/filtering.png?raw=true "Sorting")
 
-![Options](/vue-excel-editor/master/assets/options.png?raw=true "Options")
+![Options](/ssets/options.png?raw=true "Options")
 
-![Select](/vue-excel-editor/master/assets/select.png?raw=true "Select")
+![Select](/assets/select.png?raw=true "Select")
 
-![Validation](/vue-excel-editor/master/assets/validate.png?raw=true "Validation")
+![Validation](/assets/validate.png?raw=true "Validation")
 
 ## License
 MIT
