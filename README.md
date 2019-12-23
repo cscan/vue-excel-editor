@@ -187,17 +187,22 @@ In your HTML call it likes
     </vue-excel-editor>
 </template>
 ```
+#### Filter + Footer Rows
+![Filter + Footer Rows](/assets/footerfilter.png?raw=true "Filter + Footer Rows")
 
-![Filter + Footer Rows](/assets/filterfooter.png?raw=true "Filter + Footer Rows")
-
+#### Filtering
 ![Filtering](/assets/filtering.png?raw=true "Filtering")
 
-![Sorting](/assets/filtering.png?raw=true "Sorting")
+#### Sorting
+![Sorting](/assets/sorting.png?raw=true "Sorting")
 
-![Options](/ssets/options.png?raw=true "Options")
+#### Options
+![Options](/assets/options.png?raw=true "Options")
 
+#### Select
 ![Select](/assets/select.png?raw=true "Select")
 
+#### Validation
 ![Validation](/assets/validate.png?raw=true "Validation")
 
 ## License
