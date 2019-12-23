@@ -1,7 +1,6 @@
 <template>
   <div id="panelModal" v-show="show" class="panel-modal" @click="clickOutside" @keydown.exact.esc="hidePanel">
-    <div id="panelFilter"
-         ref="panelFilter"
+    <div ref="panelFilter"
          class="panel-body">
       <div class="panel-title">
         <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort-amount-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-sort-amount-down fa-w-16 fa-xs"><path fill="currentColor" d="M304 416h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-128-64h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.37 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352zm256-192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-64 128H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM496 32H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z" class=""></path></svg>        
@@ -53,12 +52,12 @@
             </div>
             <span class="panel-input-b">
               <input type="text"
-                    ref="inputFilter"
-                    class="panel-input"
-                    placeholder="Custom Filter"
-                    trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                    @keyup="doInputFilter"
-                    @keydown.exact.enter="doFilter" />
+                     ref="inputFilter"
+                     class="panel-input"
+                     placeholder="Custom Filter"
+                     trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                     @keyup="doInputFilter"
+                     @keydown.exact.enter="doFilter" />
             </span>
           </div>
         </div>
@@ -289,6 +288,7 @@ div.panel-title span, button.panel-button span {
   width: 2.2rem;
   height: 2.35rem;
   vertical-align: -2px;
+  cursor: pointer;
 }
 
 .panel-dropdown {
@@ -337,6 +337,7 @@ div.panel-title span, button.panel-button span {
   background-color: #007bff;
   color: white;
   padding: 0.6rem;
+  cursor: pointer;
 }
 
 .float-left {

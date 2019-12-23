@@ -158,6 +158,12 @@
         </span>
       </div>
 
+      <input type="file"
+             ref="importFile"
+             accept=".xlsx, .xls, xlsm, .csv"
+             style="width:0; height: 0; opacity:0; z-index:-1"
+             @change="doImport" />
+
       <panel-filter ref="panelFilter" :m-filter-count="nFilterCount" />
       <panel-setting ref="panelSetting" v-model="fields" />
       <panel-find ref="panelFind" />
@@ -417,6 +423,92 @@ export default {
     window.addEventListener('keydown', this.winKeydown)
   },
   methods: {
+    importTable (cb) {
+      this.$refs.importFile.click()
+      this.importCallback = cb
+    },
+    doImport (e) {
+      this.processing = true
+      this.clearAllSelected()
+      setTimeout(() => {
+        const files = e.target.files
+        if (!files || files.length === 0) return
+        const file = files[0]
+
+        const fileReader = new FileReader()
+        fileReader.onload = (e) => {
+          try {
+            const data = e.target.result
+            const wb = XLSX.read(data, {type: 'binary', cellDates: true, cellStyle: false})
+            const sheet = wb.SheetNames[0]
+            const importData = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheet])
+            const keyStart = new Date().getTime()
+            if (importData.length === 0) throw new Error('VueExcelEditor: No record is read')
+
+            let pass = 0
+            let inserted = 0
+            let updated = 0
+            while (pass < 2) {
+              importData.forEach((line, i) => {
+                const rec = {
+                  key: typeof line.key === 'undefined' ? keyStart + i : line.key
+                }
+                let rowPos = this.value.findIndex(v => v.key === rec.key)
+                let real = rowPos >= 0
+                this.fields.forEach((field) => {
+                  if (field.name === 'key') return
+                  let val = line[field.name]
+                  if (typeof val === 'undefined') val = line[field.label]
+                  if (typeof val === 'undefined') val = ''
+                  else {
+                    if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] Readonly column detected.`)
+                    if (field.validate) {
+                      let err
+                      if ((err = field.validate(val)))
+                        throw new Error(`VueExcelEditor: [row=${i+1}] Column ${field.name} has validation error: ${err}`)
+                    }
+                    real = true
+                  }
+                  if (!real) throw new Error(`VueExcelEditor: [row=${i+1}] No matched column name`)
+                  rec[field.name] = val
+                })
+                if (pass === 1) {
+                  if (rowPos >= 0) {
+                    this.value[rowPos] = rec
+                    updated++
+                  }
+                  else {
+                    rowPos = this.value.push(rec) - 1
+                    inserted++
+                  }
+                  this.selectRecord(rowPos)
+                }
+              })
+              pass++
+            }
+            if (pass === 2 && this.importCallback)
+              this.importCallback({
+                inserted: inserted,
+                updated: updated,
+                recordAffected: inserted + updated
+              })
+          }
+          catch (e) {
+            throw new Error('VueExcelEditor: ' + e.stack)
+          }
+          finally {
+            this.processing = false
+            e.target.value = ''
+          }
+        }
+        fileReader.onerror = (e) => {
+          this.processing = false
+          this.$refs.importFile.reset()
+          throw new Error('VueExcelEditor: ' + e.stack)
+        }
+        fileReader.readAsBinaryString(file)
+      }, 500)      
+    },
     winResize () {
       this.lazy(this.refreshPageSize, 200)
     },
