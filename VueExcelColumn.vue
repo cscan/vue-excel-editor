@@ -14,7 +14,7 @@ export default {
     initStyle: {type: Object, default () {return {}}},
     width: {type: String, default: '100px'},
     visible: {type: Boolean, default: true},
-    readonly: {type: Boolean, default: false},
+    readonly: {type: Boolean, default: null},
     uppercase: {type: Boolean, default: false},
     autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
@@ -81,6 +81,7 @@ export default {
     }
 
     if (this.uppercsae) style.textTransform='uppercase'
+    if (this.readonly && this.$parent.readonlyColor) style.color = this.$parent.readonlyColor
 
     this.$parent.registerColumn({
       name: this.field,
@@ -91,7 +92,7 @@ export default {
       autocomplete: this.autocomplete === null ? this.$parent.autocomplete : this.autocomplete,
       initStyle: style,
       visible: this.visible,
-      readonly: this.readonly,
+      readonly: this.readonly === null ? this.$parent.readonly : this.readonly,
       pos: Number(this.pos),
       options: this.options,
       toValue: this.toValue,

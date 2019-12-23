@@ -61,9 +61,14 @@ In your template
 | n-filter-count  | Optional  | Number            | Number of items to be listed in filter dialog. Default is 200 |
 | row-style       | Optional  | Function          | Conditional row formatting, default is null |
 | no-paging       | Optional  | Boolean           | Disable paging feature, default is false |
+| no-num-col      | Optional  | Boolean           | No number column, default is false |
+| filter-row      | Optional  | Boolean           | Show fixed filter row, default is false |
+| no-footer       | Optional  | Boolean           | No footer row, default is false |
 | no-finding      | Optional  | Boolean           | Disable find key (ctrl-f) and finding dialog, default is false |
 | no-finding-next | Optional  | Boolean           | Disable find-next key (ctrl-g), default is false |
 | autocomplete    | Optional  | Boolean           | Enable autocomplete of all columns, default is false |
+| readonly        | Optional  | Boolean           | Set all columns read only, default is false |
+| readonly-color  | Optional  | Boolean           | The text color of read-only cell |
 
 (TBD)
 
@@ -72,15 +77,15 @@ In your template
 | :---         | :---      | :---     | :---        |
 | field        | Mandatory | String   | Row Object Key |
 | label        | Optional  | String   | Header Label, default is field |
-| type         | Optional  | String   | Column type: 'string' (default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
-| readonly     | Optional  | Boolean  | Read-only, default is false |
-| init-style   | Optional  | String   | Style in CSS |
+| type         | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| readonly     | Optional  | Boolean  | Read-only, default is parent prop: readonly |
+| init-style   | Optional  | String   | Cell inital style in css |
 | width        | Optional  | String   | Specified Column Width, default is 100px |
 | validate     | Optional  | Function | Custom Function to validate and return the error message |
 | autocomplete | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
 | pos          | Optional  | Number   | Specified column sequence |
 | upper-case   | Optional  | Boolean  | True if you want to force upper-case when editing |
-| options      | Optional  | Array    | Define the selectable options only for type = 'select' |
+| options      | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
 | to-text      | Optional  | Function | The custom conversion function from object value to edit-text |
 | to-value     | Optional  | Function | The custom conversion function from edit-text to object value |
 

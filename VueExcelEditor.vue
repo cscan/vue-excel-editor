@@ -13,6 +13,7 @@
               id="systable"
               style="table-layout: fixed; width: 0"
               class="systable"
+              :class="{'no-number': noNumCol}"
               ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
           <colgroup>
@@ -22,6 +23,7 @@
           <thead class="thead-light text-center">
             <tr>
               <th class="text-center first-col tl-setting"
+                  :class="{hide: noNumCol}"
                   @mousedown.left="settingClick">
                 <span style="width:100%">
                   <svg v-if="processing" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-sm"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
@@ -43,8 +45,8 @@
                     @mouseout="colSepMouseOut" />
               </th>
             </tr>
-            <tr>
-              <td class="text-center first-col tl-filter" @click="selectAllClick">
+            <tr :class="{hide: !filterRow}">
+              <td class="text-center first-col tl-filter" :class="{hide: noNumCol}" @click="selectAllClick">
                 <svg v-if="selectedCount==table.length" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-times-circle fa-w-16 fa-sm"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"></path></svg>
                 <svg v-else aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-check-circle fa-w-16 fa-sm"><path fill="currentColor" d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"></path></svg>
               </td>
@@ -64,6 +66,7 @@
                 :class="{select: typeof selected[pageTop + rowPos] !== 'undefined'}"
                 :style="rowStyle(record)">
               <td class="text-center first-col"
+                  :class="{hide: noNumCol}"
                   scope="row"
                   @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
               <template v-for="(item, p) in fields">
@@ -115,7 +118,7 @@
       </div>
 
       <!-- Footer -->
-      <div ref="footer" class="footer col col-12 text-center">
+      <div ref="footer" class="footer col col-12 text-center" :class="{hide: noFooter}">
         <span v-show="!noPaging" style="position: absolute; left: 8px">
           Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
         </span>
@@ -205,12 +208,17 @@ export default {
     },
     noFinding: {type: Boolean, default: false},
     noFindingNext: {type: Boolean, default: false},
+    filterRow: {type: Boolean, default: false},
+    noFooter: {type: Boolean, default: false},
     noPaging: {type: Boolean, default: false},
+    noNumCol: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     newRecord: {type: Function, default: null},     // return the new record from caller if provided
     nFilterCount: {type: Number, default: 200},     // show top n values in filter dialog
     height: {type: Number, default: 0},
-    autocomplete: {type: Boolean, default: false}   // Default autocomplete of all columns
+    autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
+    readonly: {type: Boolean, default: false},
+    readonlyColor: {type: String, default: ''}
   },
   data () {
     return {
@@ -1356,6 +1364,9 @@ input:focus, input:active:focus, input.active:focus {
   margin-bottom: 0;
   margin-left: 40px;
 }
+.systable.no-number {
+  margin-left: 0 !important;
+}
 .systable tbody tr {
   background-color: white;
   text-align: left;
@@ -1411,9 +1422,6 @@ input:focus, input:active:focus, input.active:focus {
   background-repeat: no-repeat;
   background-size: 8px 8px;
   background-position: right 0px top 0px;
-}
-.systable tbody td.readonly {
-  color: #2084EE
 }
 .systable .first-col {
   background:#e9ecef;
@@ -1494,6 +1502,9 @@ a:disabled {
   background-repeat: no-repeat;
   background-size: 9px 9px;
   background-position: right 0px bottom 0px;
+}
+.hide {
+  display: none !important;
 }
 @keyframes fadein {
   from {opacity: 0}
