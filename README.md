@@ -19,7 +19,7 @@ Vue2 plugin for displaying and editing the array-of-object in Excel style. It su
 - Column Sequence
 - Column Width Adjustment
 - Undo
-- Copy & Paste (Under Testing)
+- Copy & Paste
 
 ## Getting started
 
@@ -177,7 +177,7 @@ In your HTML call it likes
 
 ```html
 <template>
-    <vue-excel-editor no-footer no-paging autocomplete filter-row v-model="jsondata">
+    <vue-excel-editor v-model="jsondata" no-footer no-paging autocomplete filter-row>
         <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly />
         <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
         <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
@@ -198,6 +198,9 @@ In your HTML call it likes
 
 #### Options
 ![Options](/assets/options.png?raw=true "Options")
+
+#### Autocomplete
+![Autocomplete](/assets/autocomplete.png?raw=true "Autocomplete")
 
 #### Select
 ![Select](/assets/select.png?raw=true "Select")
