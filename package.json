@@ -6,7 +6,7 @@
   },
   "name": "vue-excel-editor",
   "description": "Vue2 plugin for displaying and editing the array-of-object in Excel style",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
