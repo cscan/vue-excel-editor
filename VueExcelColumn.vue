@@ -31,7 +31,14 @@ export default {
     toValue: {
       type: Function,
       default (text) {
-        if (this.uppercase) text = text.toUpperCase()
+        switch (this.textTransform) {
+          case 'uppercase':
+            text = text.toUpperCase()
+            break
+          case 'lowercase':
+            text = text.toLowerCase()
+            break
+        }
         switch (this.type) {
           case 'datetick':
             return moment(text, 'YY-MM-DD').valueOf()
@@ -93,13 +100,13 @@ export default {
         }
         break
       case 'datetick':
-        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
         break
       case 'datetimetick':
-        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
         break
       case 'datetimesectick':
-        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
         break
       case 'check10':
         style.textAlign = 'center'
