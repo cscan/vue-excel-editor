@@ -645,6 +645,8 @@ export default {
             if (this.currentField.readonly) return
             if (e.altKey) return
             if (e.key !== 'Process' && e.key.length > 1) return
+            if (this.currentField.allowKeys && this.currentField.allowKeys.indexOf(e.key.toUpperCase()) === -1) return e.preventDefault()
+            if (this.currentField.lengthLimit && this.inputBox.value.length > this.currentField.lengthLimit) return e.preventDefault()
             if (!this.inputBoxShow) {
               if (this.currentField.type === 'select') {
                 this.calAutocompleteList(true)

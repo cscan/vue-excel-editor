@@ -15,16 +15,15 @@ export default {
     width: {type: String, default: '100px'},
     visible: {type: Boolean, default: true},
     readonly: {type: Boolean, default: null},
-
     textTransform: {type: String, default: null}, // replace uppercase prop
-    textAlign: {type: String, default: 'left'},
+    textAlign: {type: String, default: null},
 
     keyField: {type: Number, default: 0},
     allowEditWhenNew: {type: Boolean, default: true},
-    allowKeys: {type: Array, default () {return []}},
+
+    allowKeys: {type: Array, default () {return null}},
     mandatory: {type: Boolean, default: false},
     lengthLimit: {type: Number, default: 0},
-
     autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
     options: {type: Array, default () {return []}},
@@ -79,6 +78,7 @@ export default {
 
     switch (this.type) {
       case 'number':
+        style.textAlign = 'right'
         allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-']
         break
       case 'date':
