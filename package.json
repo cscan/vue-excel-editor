@@ -5,6 +5,7 @@
     "xlsx": "^0.15.3"
   },
   "name": "vue-excel-editor",
+  "email": "apple.6502@gmail.com",
   "description": "Vue2 plugin for displaying and editing the array-of-object in Excel style",
   "version": "1.2.7",
   "main": "index.js",
@@ -16,6 +17,13 @@
     "type": "git",
     "url": "git+https://github.com/cscan/vue-excel-editor.git"
   },
+  "keywords": [
+    "vue", "vue2", "vuejs", "excel", "data", "grid", "table", "v-model",
+    "editor", "editable", "javascript", "DHTML", "no-jquery", "grid-editor",
+    "online-editor", "data-grid", "data-table", "spreadsheet", "tabular-data",
+    "edit-cell", "editable-table", "data-spreadsheet", "bootstrap", "responsive",
+    "navigatable", "contenteditable"
+  ],
   "author": "Kenneth Cheng",
   "license": "MIT",
   "bugs": {

@@ -15,7 +15,16 @@ export default {
     width: {type: String, default: '100px'},
     visible: {type: Boolean, default: true},
     readonly: {type: Boolean, default: null},
-    uppercase: {type: Boolean, default: false},
+
+    textTransform: {type: String, default: null}, // replace uppercase prop
+    textAlign: {type: String, default: 'left'},
+
+    keyField: {type: Number, default: 0},
+    allowEditWhenNew: {type: Boolean, default: true},
+    allowKeys: {type: Array, default () {return []}},
+    mandatory: {type: Boolean, default: false},
+    lengthLimit: {type: Number, default: 0},
+
     autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
     options: {type: Array, default () {return []}},
@@ -57,21 +66,58 @@ export default {
   },
   created () {
     let style = this.initStyle
+    let validate = this.validate
+    let allowKeys = this.allowKeys
+    let lengthLimit = this.lengthLimit
+
     switch (this.type) {
       case 'number':
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-']
+        break
       case 'date':
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-']
+        if (!validate) validate = (val) => {
+          return moment(val, 'YY-MM-DD', true).isValid()
+        }
+        break
       case 'datetime':
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
+        if (!validate) validate = (val) => {
+          return moment(val, 'YY-MM-DD hh:mm', true).isValid()
+        }
+        break
       case 'datetimesec':
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
+        if (!validate) validate = (val) => {
+          return moment(val, 'YY-MM-DD hh:mm:ss', true).isValid()
+        }
+        break
       case 'datetick':
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        break
       case 'datetimetick':
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        break
       case 'datetimesectick':
-        style.textAlign = 'right'
+        allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         break
       case 'check10':
+        style.textAlign = 'center'
+        style.textTransform = 'uppercase'
+        allowKeys = allowKeys || ['0', '1']
+        lengthLimit = lengthLimit || 1
+        break
       case 'checkYN':
+        style.textAlign = 'center'
+        style.textTransform = 'uppercase'
+        allowKeys = allowKeys || ['Y', 'N']
+        lengthLimit = lengthLimit || 1
+        break
       case 'checkTF':
         style.textAlign = 'center'
         style.textTransform = 'uppercase'
+        allowKeys = allowKeys || ['T', 'F']
+        lengthLimit = lengthLimit || 1
         break
       case 'select':
       case 'string':
@@ -80,15 +126,23 @@ export default {
         throw new Error('VueExcelColumn: Not supported type:' + this.type)
     }
 
-    if (this.uppercsae) style.textTransform='uppercase'
-    if (this.readonly && this.$parent.readonlyColor) style.color = this.$parent.readonlyColor
+    if (this.textTransform) style.textTransform = this.textTransform
+    if (this.textAlign) style.textAlign = this.textAlign
+    if (this.readonly && this.$parent.readonlyStyle) style = Object.assign(style, this.$parent.readonlyStyle)
 
     this.$parent.registerColumn({
       name: this.field,
       label: this.label === null ? this.field : this.label,
       type: this.type,
       width: this.width,
-      validate: this.validate,
+      validate: validate,
+
+      keyField: Number(this.keyField),
+      allowEditWhenNew: this.allowEditWhenNew,
+      allowKeys: allowKeys,
+      mandatory: this.mandatory,
+      lengthLimit: Number(lengthLimit),
+
       autocomplete: this.autocomplete === null ? this.$parent.autocomplete : this.autocomplete,
       initStyle: style,
       visible: this.visible,

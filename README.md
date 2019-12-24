@@ -20,6 +20,7 @@ Vue2 plugin for displaying and editing the array-of-object in Excel style. It su
 - Column Width Adjustment
 - Undo
 - Copy & Paste
+- Mass Import Excel Data
 
 ## Getting started
 
@@ -71,28 +72,35 @@ In your template
 | no-finding-next | Optional  | Boolean           | Disable find-next key (ctrl-g), default is false |
 | autocomplete    | Optional  | Boolean           | Enable autocomplete of all columns, default is false |
 | readonly        | Optional  | Boolean           | Set all columns read only, default is false |
-| readonly-color  | Optional  | Boolean           | The text color of read-only cell |
+| readonly-style  | Optional  | Object            | The style of the read-only cell |
 
 (TBD)
 
 #### Component: vue-excel-column
-| Name         | Mandatory | Type     | Description |
-| :---         | :---      | :---     | :---        |
-| field        | Mandatory | String   | Row Object Key |
-| label        | Optional  | String   | Header Label, default is field |
-| type         | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
-| readonly     | Optional  | Boolean  | Read-only, default is parent prop: readonly |
-| init-style   | Optional  | String   | Cell inital style in css |
-| width        | Optional  | String   | Specified Column Width, default is 100px |
-| validate     | Optional  | Function | Custom Function to validate and return the error message |
-| autocomplete | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
-| pos          | Optional  | Number   | Specified column sequence |
-| upper-case   | Optional  | Boolean  | True if you want to force upper-case when editing |
-| options      | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
-| to-text      | Optional  | Function | The custom conversion function from object value to edit-text |
-| to-value     | Optional  | Function | The custom conversion function from edit-text to object value |
+| Name                 | Mandatory | Type     | Description |
+| :---                 | :---      | :---     | :---        |
+| field                | Mandatory | String   | Row Object Key |
+| label                | Optional  | String   | Header Label, default is field |
+| type                 | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| readonly             | Optional  | Boolean  | Read-only, default is parent prop: readonly |
+| init-style           | Optional  | Object   | Cell inital style in css |
+| width                | Optional  | String   | Specified Column Width, default is 100px |
+| validate             | Optional  | Function | Custom Function to validate and return the error message |
+| key-field*           | Optional  | Number   | Sequence number to create record key, default is 0 = Not key field |
+| allow-edit-when-new* | Optional  | Boolean  | Allow edit (For readonly column) when it is new record |
+| allow-keys*          | Optional  | Array    | Array of char which allow to input |
+| mandatory*           | Optional  | String   | If the content is blank, show this warning, default is '' |
+| lengthLimit*         | Optional  | Number   | Not allow to input when the content length reaches the limit |
+| autocomplete         | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
+| pos                  | Optional  | Number   | Specified column sequence |
+| text-transform       | Optional  | String   | Force the input to upppercase or lowercase when editing |
+| text-align*          | Optional  | String   | Text alignment, default is 'left' |
+| options              | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
+| to-text              | Optional  | Function | The custom conversion function from object value to edit-text |
+| to-value             | Optional  | Function | The custom conversion function from edit-text to object value |
 
 (TBD)
+* - Still Under Testing
 
 ## Hot Key List
 
@@ -213,6 +221,3 @@ MIT
 
 ## Status
 This project is in an early stage of development. Any contribution is welcome :D
-
-## Keywords
-vue vue2 vuejs excel data grid table v-model editor editable javascript DHTML no-jquery grid-editor online-editor data-grid data-table spreadsheet tabular-data edit-cell editable-table data-spreadsheet bootstrap responsive navigatable contenteditable

@@ -189,17 +189,8 @@ export default {
     'panel-find': PanelFind,
   },
   props: {
-    value: {type: Array,                            // actual table content
-      default () {
-        return []
-      }
-    },
-    rowStyle: {                                    // return the row style
-      type: Function,
-      default () {
-        return {}
-      }
-    },
+    value: {type: Array, default () {return []}},
+    rowStyle: {type: Function, default () {return {}}},
     recordLabel: {                                  // return the row header
       type: Function,
       default (record, recordPosition) {
@@ -218,7 +209,7 @@ export default {
     height: {type: Number, default: 0},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     readonly: {type: Boolean, default: false},
-    readonlyColor: {type: String, default: ''}
+    readonlyStyle: {type: Object, default: null}
   },
   data () {
     return {
