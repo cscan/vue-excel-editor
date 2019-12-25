@@ -1,12 +1,14 @@
 <template>
   <div>
     <div class="component-content">
-      <div ref="tableContent" class="table-content"
-          @scroll="tableScroll"
-          @mouseover="mouseOver"
-          @mouseout="mouseOut"
-          @mousemove="mouseMove"
-          @mouseup="mouseUp">
+      <div ref="tableContent"
+           class="table-content"
+           :class="{'no-footer': noFooter}"
+           @scroll="tableScroll"
+           @mouseover="mouseOver"
+           @mouseout="mouseOut"
+           @mousemove="mouseMove"
+           @mouseup="mouseUp">
 
         <!-- Main Table -->
         <table ref="systable"
@@ -57,9 +59,7 @@
                                 class="column-filter" />
             </tr>
           </thead>
-          <tbody
-            @mousedown.exact="mouseDown"
-            style="position: relative">
+          <tbody @mousedown.exact="mouseDown">
             <tr v-for="(record, rowPos) in pagingTable"
                 :key="rowPos"
                 :pos="rowPos"
@@ -119,10 +119,11 @@
 
       <!-- Footer -->
       <div ref="footer" class="footer col col-12 text-center" :class="{hide: noFooter}">
-        <span v-show="!noPaging" style="position: absolute; left: 8px">
+        <span class="left-block"></span>
+        <span v-show="!noPaging" style="position: absolute; left: 44px">
           Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
         </span>
-        <span v-show="!noPaging" style="position: absolute; left: 0; right: 0">
+        <span v-show="!noPaging">
           <template v-if="processing">
             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-sm"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
             Processing
@@ -149,7 +150,7 @@
             </a>
           </template>
         </span>
-        <span style="position: absolute; right: 8px">
+        <span style="position: absolute; right: 6px">
           Selected:
           <span :style="{color: Object.keys(selected).length>0? 'red': 'inherit'}">{{ Object.keys(selected).length }}</span>
           &nbsp;|&nbsp;
@@ -212,6 +213,7 @@ export default {
     readonlyStyle: {type: Object, default: null}
   },
   data () {
+    const pageSize = this.noPaging ? 999999 : 20
     return {
       // selTarget: null,
       // selSquare: null,
@@ -226,7 +228,7 @@ export default {
       recordBody: null,             // TBODY dom node
       footer: null,                 // TFOOTER dom node
 
-      pageSize: 20,                 // Default page size
+      pageSize: pageSize,
       pageTop: 0,                   // Current page top pos of [table] array
 
       selected: {},                 // selected storage in hash, key is the pos of [table] array
@@ -411,7 +413,7 @@ export default {
     this.frontdrop = this.$refs.frontdrop
 
     if (this.height)
-      this.systable.parentNode.style.height = this.height
+      this.systable.parentNode.style.height = this.height + 'px'
     this.reset()
     this.lazy(this.refreshPageSize, 200)
     setTimeout(() => {
@@ -848,14 +850,11 @@ export default {
       target.setAttribute('style', `width:${rect.width}px; height:${rect.height}px;`)
     },
     refreshPageSize () {
-      if (this.noPaging) {
-        this.pageSize = 999999999
-        return
-      }
+      if (this.noPaging) return
       // eslint-disable-next-line
       // console.log(window.innerHeight, this.recordBody.getBoundingClientRect().top, this.footer.getBoundingClientRect().height)
       this.pageSize = this.page || Math.floor((
-        window.innerHeight - this.recordBody.getBoundingClientRect().top - this.footer.getBoundingClientRect().height - 10) / 24)
+        window.innerHeight - this.recordBody.getBoundingClientRect().top - 35) / 24)
     },
     firstPage () {
       this.processing = true
@@ -1199,10 +1198,20 @@ export default {
         this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
       }
     },
+    hashCode (s) {
+      s.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0)
+        return a & a
+      }, 0)
+    },
     lazy (p, delay) {
       if (!delay) delay = 20
-      if (window._$_lazy) clearTimeout(window._$_lazy)
-      window._$_lazy = setTimeout(p, delay)
+      const hash = this.hashCode(p.toString())
+      if (this[hash]) clearTimeout(this[hash])
+      this[hash] = setTimeout(() => {
+        p()
+        delete this[hash]
+      }, delay)
     }
     /*
     selStart (target) {
@@ -1261,7 +1270,7 @@ input:focus, input:active:focus, input.active:focus {
 .input-square {
   position: absolute;
   padding: 0;
-  z-index: 2;
+  z-index: 0;
   border: 2px solid rgb(108, 143, 108);
   /* transition: all 0.04s linear; */
 }
@@ -1326,11 +1335,13 @@ input:focus, input:active:focus, input.active:focus {
   font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   word-spacing: 0.02rem;
   line-height: 1.1;
+  overflow: hidden;
+  border-bottom: 1px solid lightgray;
 }
 .table-content {
   flex: 1 1 auto;
   font-size: 1rem;
-  border-top: 0.8px solid lightgray;
+  border: 1px solid lightgray;
   text-shadow: 0.3px 0.3px 1px #ccc;
   overflow: scroll;
   -webkit-touch-callout: none;
@@ -1341,12 +1352,21 @@ input:focus, input:active:focus, input.active:focus {
   user-select: none;
 }
 .table-content::-webkit-scrollbar {
+  background: white;
   width: 0;
-  height: 10px;
+  height: 24px;
+}
+.table-content.no-footer {
+  border-bottom: 0;
+}
+.table-content.no-footer::-webkit-scrollbar {
+  height: 0;
 }
 .table-content::-webkit-scrollbar-thumb {
-  background: #a0a0a040;
-  border-radius: 3px;
+  background: #eeee;
+}
+.table-content::-webkit-scrollbar-thumb:hover {
+  background: #9999;
 }
 .systable {
   z-index: -1;
@@ -1355,7 +1375,7 @@ input:focus, input:active:focus, input.active:focus {
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 0;
-  margin-left: 40px;
+  margin-left: 39px;
 }
 .systable.no-number {
   margin-left: 0 !important;
@@ -1377,9 +1397,14 @@ input:focus, input:active:focus, input.active:focus {
   height: 24px;
   border-top: 0;
   border-left: 0;
-  border-right: 1px solid lightgray;
   border-bottom: 1px solid lightgray;
 }
+.systable th:not(:last-child), .systable td:not(:last-child) {
+  border-right: 1px solid lightgray;
+}
+.systable tbody tr:last-child td {
+  border-bottom: 0;
+} 
 .systable thead th, .systable thead td {
   padding: 0.4rem 0.3rem;
   background-color: #e9ecef;
@@ -1430,6 +1455,7 @@ input:focus, input:active:focus, input.active:focus {
   text-align: center;
   overflow: hidden;
   z-index: 5;
+  border-left: 1px solid lightgray;
 }
 .systable thead .tl-setting {
   display: flex;
@@ -1443,14 +1469,26 @@ input:focus, input:active:focus, input.active:focus {
   border-right: 1px solid rgb(61, 85, 61) !important;
 }
 .footer {
-  flex: 0 1 30px;
-  padding: 4px;
-  font-size: 0.9rem;
+  z-index: 10;
+  padding: 0;
+  font-size: 14px;
   color: dimgray;
-  position: sticky;
-  bottom: 0;
+  position: absolute;
+  bottom: 25px;
   left: 0;
-  background-color: white;
+  width: 100%;
+  height: 0;
+  line-height: 1.7;
+  border-top: 1px solid lightgray;
+}
+.footer .left-block {
+  position: absolute;
+  left: 0;
+  height: 25px;
+  width: 40px;
+  background-color: #e9ecef;
+  border: 1px solid lightgray;
+  border-top: 0;
 }
 .footer a {
   cursor: pointer;

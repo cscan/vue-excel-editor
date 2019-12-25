@@ -6,6 +6,7 @@
     ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
     ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
     class="cell column-filter"
+    :style="filterRowTop"
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
     v-on="listeners"
     @focus="onFocus"
@@ -44,7 +45,11 @@ export default {
       if (this.validate)
         return this.validate(this.value)
       return ''
-    }
+    },
+    filterRowTop () {
+      if (this.cell) return {top: (this.cell.offsetTop - 1) + 'px'}
+      else return {}
+    },
   },
   watch: {
     value (newVal) {
