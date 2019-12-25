@@ -26,6 +26,7 @@
             <tr>
               <th class="text-center first-col tl-setting"
                   :class="{hide: noNumCol}"
+                  :style="{left: calCellLeft + 'px', top: calCellTop + 'px'}"
                   @mousedown.left="settingClick">
                 <span style="width:100%">
                   <svg v-if="processing" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-sm"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
@@ -48,7 +49,10 @@
               </th>
             </tr>
             <tr :class="{hide: !filterRow}">
-              <td class="text-center first-col tl-filter" :class="{hide: noNumCol}" @click="selectAllClick">
+              <td class="text-center first-col tl-filter"
+                  :class="{hide: noNumCol}"
+                  :style="{left: calCellLeft + 'px', top: calCellTop2 + 'px'}"
+                  @click="selectAllClick">
                 <svg v-if="selectedCount==table.length" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-times-circle fa-w-16 fa-sm"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"></path></svg>
                 <svg v-else aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-check-circle fa-w-16 fa-sm"><path fill="currentColor" d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"></path></svg>
               </td>
@@ -67,6 +71,7 @@
                 :style="rowStyle(record)">
               <td class="text-center first-col"
                   :class="{hide: noNumCol}"
+                  :style="{left: calCellLeft + 'px'}"
                   scope="row"
                   @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
               <template v-for="(item, p) in fields">
@@ -120,7 +125,7 @@
       <!-- Footer -->
       <div ref="footer" class="footer col col-12 text-center" :class="{hide: noFooter}">
         <span class="left-block"></span>
-        <span v-show="!noPaging" style="position: absolute; left: 44px">
+        <span v-show="!noPaging" style="position: absolute; left: 46px">
           Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
         </span>
         <span v-show="!noPaging">
@@ -260,6 +265,9 @@ export default {
       columnFilter: {},             // set filter storage in hash, key is the column pos
 
       inputFind: '',
+      calCellLeft: 0,
+      calCellTop: 0,
+      calCellTop2: 29,
 
       frontdrop: null,              // frontdrop dom node
 
@@ -414,10 +422,12 @@ export default {
 
     if (this.height)
       this.systable.parentNode.style.height = this.height + 'px'
+
     this.reset()
     this.lazy(this.refreshPageSize, 200)
     setTimeout(() => {
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
+      this.calCellTop2 = this.labelTr.offsetHeight
     })
     window.onresize = this.winResize
     window.addEventListener('paste', this.winPaste)
@@ -665,14 +675,19 @@ export default {
       }
     },
     tableScroll () {
+      this.calCellLeft = this.tableContent.scrollLeft
+      this.calCellTop = this.tableContent.scrollTop
+      this.calCellTop2 = this.tableContent.scrollTop + this.labelTr.offsetHeight
+      /*
       if (this.currentCell) {
         const cellRect = this.currentCell.getBoundingClientRect()
-        const tableRect = this.$el.getBoundingClientRect()
+        const tableRect = this.systable.getBoundingClientRect()
         // this.inputSquare.classList.add('no-transition')
-        this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
+        this.inputSquare.style.left = (cellRect.left - tableRect.left + 38) + 'px'
         this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
         // setTimeout(() => this.inputSquare.classList.remove('no-transition'))
       }
+      */
     },
     registerColumn (field) {
       let pos = this.fields.findIndex(item => item.pos > field.pos)
@@ -690,15 +705,16 @@ export default {
       const cell = row.children[colPos + 1]
       if (!cell) return
       const cellRect = cell.getBoundingClientRect()
-      const tableRect = this.$el.getBoundingClientRect()
-      this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
+      const tableRect = this.systable.getBoundingClientRect()
+      const boundRect = this.$el.getBoundingClientRect()
+      this.inputSquare.style.left = (cellRect.left - tableRect.left + 38) + 'px'
       this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
       this.inputSquare.style.width = (cellRect.width + 1) + 'px'
       this.inputSquare.style.height = (cellRect.height + 1) + 'px'
-      if (cellRect.right >= tableRect.right)
-        this.tableContent.scrollBy(cellRect.right - tableRect.right, 0)
-      if (cellRect.left <= tableRect.left + 40)
-        this.tableContent.scrollBy(cellRect.left - tableRect.left - 40, 0)
+      if (cellRect.right >= boundRect.right)
+        this.tableContent.scrollBy(cellRect.right - boundRect.right, 0)
+      if (cellRect.left <= boundRect.left + 40)
+        this.tableContent.scrollBy(cellRect.left - boundRect.left - 40, 0)
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
@@ -1350,6 +1366,7 @@ input:focus, input:active:focus, input.active:focus {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  position: relative;
 }
 .table-content::-webkit-scrollbar {
   background: white;
@@ -1397,9 +1414,14 @@ input:focus, input:active:focus, input.active:focus {
   height: 24px;
   border-top: 0;
   border-left: 0;
+}
+.systable th:not(:last-child) {
+  border-right: 1px solid lightgray;
+}
+.systable td {
   border-bottom: 1px solid lightgray;
 }
-.systable th:not(:last-child), .systable td:not(:last-child) {
+.systable td:not(:last-child) {
   border-right: 1px solid lightgray;
 }
 .systable tbody tr:last-child td {
@@ -1409,7 +1431,7 @@ input:focus, input:active:focus, input.active:focus {
   padding: 0.4rem 0.3rem;
   background-color: #e9ecef;
   font-weight: 400;
-  height: 28px;
+  height: 29px;
   cursor: s-resize;
   position: sticky;
   top: 0;
@@ -1421,6 +1443,8 @@ input:focus, input:active:focus, input.active:focus {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
 }
 .systable th.focus {
   border-bottom: 1px solid rgb(61, 85, 61) !important;
@@ -1436,7 +1460,7 @@ input:focus, input:active:focus, input.active:focus {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
-  animation: fadein 0.2s;
+  /* animation: fadein 0.2s; */
 }
 .systable tbody td.error {
   background-image: url('./assets/err.png');
@@ -1455,7 +1479,6 @@ input:focus, input:active:focus, input.active:focus {
   text-align: center;
   overflow: hidden;
   z-index: 5;
-  border-left: 1px solid lightgray;
 }
 .systable thead .tl-setting {
   display: flex;
@@ -1464,6 +1487,10 @@ input:focus, input:active:focus, input.active:focus {
 }
 .systable thead td.first-col, .systable thead th.first-col {
   cursor: pointer !important;
+  z-index: 10;
+}
+.systable thead td.first-col {
+  border-top: 1px solid lightgray;
 }
 .systable td.first-col.focus {
   border-right: 1px solid rgb(61, 85, 61) !important;
