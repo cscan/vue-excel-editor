@@ -88,19 +88,19 @@ In your template
 | validate             | Optional  | Function | Custom Function to validate and return the error message |
 | key-field*           | Optional  | Number   | Sequence number to create record key, default is 0 = Not key field |
 | allow-edit-when-new* | Optional  | Boolean  | Allow edit (For readonly column) when it is new record |
-| allow-keys*          | Optional  | Array    | Array of char which allow to input |
-| mandatory*           | Optional  | String   | If the content is blank, show this warning, default is '' |
-| lengthLimit*         | Optional  | Number   | Not allow to input when the content length reaches the limit |
+| allow-keys           | Optional  | Array    | Array of char which allow to input |
+| mandatory            | Optional  | String   | If specified, it will be shown if the cell is blank, default is '' |
+| lengthLimit          | Optional  | Number   | Not allow to input when the content length reaches the limit |
 | autocomplete         | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
 | pos                  | Optional  | Number   | Specified column sequence |
 | text-transform       | Optional  | String   | Force the input to upppercase or lowercase when editing |
-| text-align*          | Optional  | String   | Text alignment, default is 'left' |
+| text-align           | Optional  | String   | Text alignment, default is 'left' |
 | options              | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
 | to-text              | Optional  | Function | The custom conversion function from object value to edit-text |
 | to-value             | Optional  | Function | The custom conversion function from edit-text to object value |
 
 (TBD)
-* - Still Under Testing
+(*) Still Under Testing
 
 ## Hot Key List
 

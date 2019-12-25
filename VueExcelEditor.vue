@@ -1023,16 +1023,16 @@ export default {
           err: ''
         }
 
-        if (field.validate !== null) {
-          const id = `${transaction.key}:${name}`
-          const err = field.validate(content)
-          if (err) {
-            this.errmsg[id] = err
-            transaction.err = err
-            document.getElementById(id).classList.add('error')
-          }
-          else delete this.errmsg[id]
+        const id = `${transaction.key}:${name}`
+        if (field.validate !== null) transaction.err = field.validate(content)
+        if (field.mandatory && content === '')
+          transaction.err += (transaction.err ? '\n' : '') + field.mandatory
+
+        if (transaction.err !== '') {
+          this.errmsg[id] = transaction.err
+          document.getElementById(id).classList.add('error')
         }
+        else delete this.errmsg[id]
 
         if (!this.saveLazyBuffer) this.saveLazyBuffer = []
         this.saveLazyBuffer.push(transaction)
