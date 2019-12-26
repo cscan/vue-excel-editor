@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="display: inline-block; max-width: 100%">
     <div class="component-content">
       <div ref="tableContent"
            class="table-content"
@@ -22,9 +22,9 @@
             <!--col class="first-col">
             <col v-for="item in nFields" :key="`col-${item}`" style="width: 100px"-->
           </colgroup>
-          <thead class="thead-light text-center">
+          <thead class="center-text">
             <tr>
-              <th class="text-center first-col tl-setting"
+              <th class="center-text first-col tl-setting"
                   :class="{hide: noNumCol}"
                   :style="{left: calCellLeft + 'px', top: calCellTop + 'px'}"
                   @mousedown.left="settingClick">
@@ -49,7 +49,7 @@
               </th>
             </tr>
             <tr :class="{hide: !filterRow}">
-              <td class="text-center first-col tl-filter"
+              <td class="center-text first-col tl-filter"
                   :class="{hide: noNumCol}"
                   :style="{left: calCellLeft + 'px', top: calCellTop2 + 'px'}"
                   @click="selectAllClick">
@@ -69,7 +69,7 @@
                 :pos="rowPos"
                 :class="{select: typeof selected[pageTop + rowPos] !== 'undefined'}"
                 :style="rowStyle(record)">
-              <td class="text-center first-col"
+              <td class="center-text first-col"
                   :class="{hide: noNumCol}"
                   :style="{left: calCellLeft + 'px'}"
                   scope="row"
@@ -123,7 +123,7 @@
       </div>
 
       <!-- Footer -->
-      <div ref="footer" class="footer col col-12 text-center" :class="{hide: noFooter}">
+      <div ref="footer" class="footer center-text" :class="{hide: noFooter}">
         <span class="left-block"></span>
         <span v-show="!noPaging" style="position: absolute; left: 46px">
           Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
@@ -643,6 +643,7 @@ export default {
           case 46:
             if (this.inputBoxShow) {
               this.inputBoxChanged = true
+              setTimeout(this.calAutocompleteList)
               return
             }
             if (this.currentField.readonly) return
@@ -1288,7 +1289,7 @@ input:focus, input:active:focus, input.active:focus {
   padding: 0;
   z-index: 0;
   border: 2px solid rgb(108, 143, 108);
-  /* transition: all 0.04s linear; */
+  transition: all 0.08s linear;
 }
 .no-transition {
   transition: none !important;
@@ -1340,9 +1341,6 @@ input:focus, input:active:focus, input.active:focus {
   background: white;
   font-size: 0.88rem;
 }
-.table-content :focus {
-  outline: none;
-}
 .component-content {
   display: flex;
   flex-flow: column;
@@ -1354,10 +1352,14 @@ input:focus, input:active:focus, input.active:focus {
   overflow: hidden;
   border-bottom: 1px solid lightgray;
 }
+.center-text {
+  text-align: center;
+}
 .table-content {
   flex: 1 1 auto;
   font-size: 1rem;
   border: 1px solid lightgray;
+  border-bottom: 0;
   text-shadow: 0.3px 0.3px 1px #ccc;
   overflow: scroll;
   -webkit-touch-callout: none;
@@ -1367,6 +1369,9 @@ input:focus, input:active:focus, input.active:focus {
   -ms-user-select: none;
   user-select: none;
   position: relative;
+}
+.table-content :focus {
+  outline: none;
 }
 .table-content::-webkit-scrollbar {
   background: white;
@@ -1418,43 +1423,6 @@ input:focus, input:active:focus, input.active:focus {
 .systable th:not(:last-child) {
   border-right: 1px solid lightgray;
 }
-.systable td {
-  border-bottom: 1px solid lightgray;
-}
-.systable td:not(:last-child) {
-  border-right: 1px solid lightgray;
-}
-.systable tbody tr:last-child td {
-  border-bottom: 0;
-} 
-.systable thead th, .systable thead td {
-  padding: 0.4rem 0.3rem;
-  background-color: #e9ecef;
-  font-weight: 400;
-  height: 29px;
-  cursor: s-resize;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-.systable thead td.column-filter {
-  text-align: left;
-  background-color: lightyellow;
-  white-space: nowrap;
-  overflow-x: hidden;
-  text-overflow: ellipsis;
-  border-top: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
-}
-.systable th.focus {
-  border-bottom: 1px solid rgb(61, 85, 61) !important;
-}
-.systable tbody td.select {
-  background-image: url('./assets/down.png');
-  background-repeat: no-repeat;
-  background-size: 8px 8px;
-  background-position: right 5px top 8px;
-}
 .systable tbody td {
   cursor: cell;
   white-space: nowrap;
@@ -1467,6 +1435,42 @@ input:focus, input:active:focus, input.active:focus {
   background-repeat: no-repeat;
   background-size: 8px 8px;
   background-position: right 0px top 0px;
+}
+.systable tbody tr:not(:last-child) td {
+  border-bottom: 1px solid lightgray;
+}
+.systable td:not(:last-child) {
+  border-right: 1px solid lightgray;
+}
+.systable thead th, .systable thead td {
+  padding: 0.4rem 0.3rem;
+  background-color: #e9ecef;
+  font-weight: 400;
+  height: 29px;
+  cursor: s-resize;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid lightgray;
+}
+.systable thead td.column-filter {
+  text-align: left;
+  background-color: lightyellow;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+.systable th.focus {
+  border-bottom: 1px solid rgb(61, 85, 61) !important;
+}
+.systable td.first-col.focus {
+  border-right: 1px solid rgb(61, 85, 61) !important;
+}
+.systable tbody td.select {
+  background-image: url('./assets/down.png');
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position: right 5px top 8px;
 }
 .systable .first-col {
   background:#e9ecef;
@@ -1489,12 +1493,6 @@ input:focus, input:active:focus, input.active:focus {
   cursor: pointer !important;
   z-index: 10;
 }
-.systable thead td.first-col {
-  border-top: 1px solid lightgray;
-}
-.systable td.first-col.focus {
-  border-right: 1px solid rgb(61, 85, 61) !important;
-}
 .footer {
   z-index: 10;
   padding: 0;
@@ -1512,10 +1510,10 @@ input:focus, input:active:focus, input.active:focus {
   position: absolute;
   left: 0;
   height: 25px;
-  width: 40px;
+  width: 41px;
   background-color: #e9ecef;
-  border: 1px solid lightgray;
-  border-top: 0;
+  border-left: 1px solid lightgray;
+  border-right: 1px solid lightgray;
 }
 .footer a {
   cursor: pointer;

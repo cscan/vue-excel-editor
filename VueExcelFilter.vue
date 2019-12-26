@@ -47,7 +47,7 @@ export default {
       return ''
     },
     filterRowTop () {
-      if (this.cell) return {top: (this.cell.offsetTop - 1) + 'px'}
+      if (this.cell) return {top: this.cell.offsetTop + 'px'}
       else return {}
     },
   },
