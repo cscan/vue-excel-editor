@@ -68,13 +68,12 @@
           <tbody @mousedown.exact="mouseDown">
             <tr v-for="(record, rowPos) in pagingTable"
                 :key="rowPos"
-                :pos="rowPos"
                 :class="{select: typeof selected[pageTop + rowPos] !== 'undefined'}"
                 :style="rowStyle(record)">
               <td class="center-text first-col"
                   :class="{hide: noNumCol}"
                   :style="{left: calCellLeft + 'px'}"
-                  scope="row"
+                  :pos="rowPos"
                   @click="rowLabelClick">
                 <span v-html="recordLabel(pageTop + rowPos + 1, record)"></span>
               </td>
@@ -163,15 +162,6 @@
         </span>
         <span style="position: absolute; right: 6px">
           <span v-html="footerRightLabel(Object.keys(selected).length, table.length, value.length)"></span>
-          <!--
-          Selected:
-          <span :style="{color: Object.keys(selected).length>0? 'red': 'inherit'}">{{ Object.keys(selected).length }}</span>
-          &nbsp;|&nbsp;
-          Filtered:
-          <span :style="{color: table.length<value.length? 'red': 'inherit'}">{{ table.length }}</span>
-          &nbsp;|&nbsp;
-          Loaded:
-          <span>{{ value.length }}</span-->
         </span>
       </div>
 
@@ -939,7 +929,9 @@ export default {
       }, 0)
     },
     rowLabelClick (e) {
-      const rowPos = Number(e.target.parentNode.getAttribute('pos')) + this.pageTop
+      let target = e.target
+      while (target.tagName !== 'TD') target = target.parentNode
+      const rowPos = Number(target.getAttribute('pos')) + this.pageTop
       if (e.shiftKey) {
         document.getSelection().removeAllRanges()
         if (this.prevSelect !== -1 && this.prevSelect !== rowPos) {
