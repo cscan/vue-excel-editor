@@ -73,6 +73,7 @@ In your template
 | autocomplete    | Optional  | Boolean           | Enable autocomplete of all columns, default is false |
 | readonly        | Optional  | Boolean           | Set all columns read only, default is false |
 | readonly-style  | Optional  | Object            | The style of the read-only cell |
+| height          | Optional  | Number            | Define the exact height of the component in px |
 
 (TBD)
 
@@ -121,22 +122,49 @@ In your template
 ## Events List
 
 #### Component: vue-excel-editor
-| Name             | Argument          | Description |
-| :---             | :---              | :---        |
-| update           | Array Of Array    | Update Cell information |
+| Name    | Argument                  | Description |
+| :---    | :---                      | :---        |
+| update  | Array Of Array            | Update Cell information |
+| select  | Array of rows, select/not | Emit this when rows are selected/unselected |
 
 (TBD)
 
 ## Methods List
 
 #### Component: vue-excel-editor
-| Name             | Argument             | Description |
-| :---             | :---                 | :---        |
-| exportTable      | format, selectedOnly | export the filtered table as xlsx/csv |
-| clearAllSelected |                      | Unselect all selected rows |
-| undoTransaction  |                      | Undo the latest update |
+| Name               | Argument             | Description |
+| :---               | :---                 | :---        |
+| exportTable        | format, selectedOnly | export the filtered table as xlsx/csv |
+| importTable        | callback             | import the specified formatted xlsx |
+| clearAllSelected   |                      | Unselect all selected rows |
+| undoTransaction    |                      | Undo the latest update |
+| firstPage          |                      | Move to the first page |
+| lastPage           |                      | Move to the last page |
+| prevPage           |                      | Move to the previous page |
+| nextPage           |                      | Move to the next page |
+| getSelectedRecords |                      | Get an array of the selected rows |
+| doFind             | FindText             | Find the specified text in whole table and locate the cursor cell |
+| doFindNext         |                      | Contnue the last find |
+| selectRecord       | row                  | Select the row |
+| unSelectRecord     | row                  | UnSelect the row |
+| moveNorth          |                      | Move the cursor cell to upper cell |
+| moveSouth          |                      | Move the cursor cell to lower cell |
+| moveWest           |                      | Move the cursor cell to previous cell |
+| moveEast           |                      | Move the cursor cell to next cell |
+| sort               | n, pos               | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
 
-(TBD)
+## Variable List
+
+#### Component: vue-excel-editor
+| Name               | Type            | Description |
+| :---               | :---            | :---        |
+| fields             | Array of Object | It contains the column speicification, the spec will create during mounted, developer can still change still the spec via this after mounted |
+| filterColumn       | Object          | Contains the current filters |
+| selected           | Object          | Contains all the selected rows |
+| selectedCount      | Number          | Number of rows are selected |
+| errmsg             | Object          | Contains all the validation error messages |
+| redo               | Array of Object | The undo buffer |
+| pageTop            | Number          | The top row of the current page |
 
 ## Example
 
@@ -185,7 +213,7 @@ In your HTML call it likes
 
 ```html
 <template>
-    <vue-excel-editor v-model="jsondata" no-footer no-paging autocomplete filter-row>
+    <vue-excel-editor v-model="jsondata" no-paging autocomplete filter-row>
         <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly />
         <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
         <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />

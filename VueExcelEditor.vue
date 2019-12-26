@@ -275,7 +275,10 @@ export default {
 
       sortPos: 0,                   // Sort column position
       sortDir: 0,                   // Sort direction, 1=Ascending, -1=Descending
-      redo: []                      // redo log
+      redo: [],                     // redo log
+
+      lazyTimeout: {},
+      lazyBuffer: {}
     }
   },
   computed: {
@@ -983,6 +986,9 @@ export default {
         this.selected[rowPos] = this.table[rowPos].key
         if (this.recordBody.children[rowPos - this.pageTop])
           this.recordBody.children[rowPos - this.pageTop].classList.add('select')
+        this.lazy(rowPos, (buf) => {
+          this.$emit('select', buf, true)
+        })
       }
     },
     unSelectRecord (rowPos) {
@@ -991,6 +997,9 @@ export default {
         this.selectedCount--
         if (this.recordBody.children[rowPos - this.pageTop])
           this.recordBody.children[rowPos - this.pageTop].classList.remove('select')
+        this.lazy(rowPos, (buf) => {
+          this.$emit('select', buf, false)
+        })
       }
     },
     toggleSelectAllRecords (e) {
@@ -1053,6 +1062,12 @@ export default {
         }
         else delete this.errmsg[id]
 
+        this.lazy(transaction, (buf) => {
+          this.$emit('update', buf)
+          if (!restore) this.redo.push(buf)
+        }, 50)
+
+        /*
         if (!this.saveLazyBuffer) this.saveLazyBuffer = []
         this.saveLazyBuffer.push(transaction)
 
@@ -1064,6 +1079,7 @@ export default {
             this.redo.push(this.saveLazyBuffer)
           this.saveLazyBuffer = []
         }, 50)
+        */
       })
     },
     updateSelectedRowsByCol (colPos, field, content) {
@@ -1225,18 +1241,34 @@ export default {
       }
     },
     hashCode (s) {
-      s.split('').reduce((a, b) => {
+      return - s.split('').reduce((a, b) => {
         a = ((a << 5) - a) + b.charCodeAt(0)
         return a & a
       }, 0)
     },
-    lazy (p, delay) {
+    lazy (p, delay, p1) {
+      if (typeof p !== 'function') return this.lazyBuf(p, delay, p1)
       if (!delay) delay = 20
       const hash = this.hashCode(p.toString())
-      if (this[hash]) clearTimeout(this[hash])
-      this[hash] = setTimeout(() => {
+      if (this.lazyTimeout[hash]) clearTimeout(this.lazyTimeout[hash])
+      this.lazyTimeout[hash] = setTimeout(() => {
         p()
-        delete this[hash]
+        delete this.lazyTimeout[hash]
+      }, delay)
+    },
+    lazyBuf (item, p, delay) {
+      if (!delay) delay = 20
+      const hash = this.hashCode(p.toString())
+      if (this.lazyBuffer[hash])
+        this.lazyBuffer[hash].push(item)
+      else
+        this.lazyBuffer[hash] = [item]
+
+      if (this.lazyTimeout[hash]) clearTimeout(this.lazyTimeout[hash])
+      this.lazyTimeout[hash] = setTimeout(() => {
+        p(this.lazyBuffer[hash])
+        delete this.lazyTimeout[hash]
+        delete this.lazyBuffer[hash]
       }, delay)
     }
     /*
