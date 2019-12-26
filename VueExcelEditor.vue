@@ -175,9 +175,9 @@
              style="width:0; height: 0; opacity:0; z-index:-1"
              @change="doImport" />
 
-      <panel-filter ref="panelFilter" :m-filter-count="nFilterCount" :localizedLabel="localizedLabel" />
-      <panel-setting ref="panelSetting" v-model="fields" :localizedLabel="localizedLabel" />
-      <panel-find ref="panelFind" :localizedLabel="localizedLabel" />
+      <panel-filter ref="panelFilter" :m-filter-count="nFilterCount" :localized-label="localizedLabel" />
+      <panel-setting ref="panelSetting" v-model="fields" :localized-label="localizedLabel" />
+      <panel-find ref="panelFind" :localized-label="localizedLabel" />
     </div>
   </div>
 </template>
