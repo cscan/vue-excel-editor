@@ -20,6 +20,15 @@
 
 <script>
 export default {
+  props: {
+    localizedLabel: {
+      type: Object,
+      default () {
+        return {
+        }
+      }
+    }
+  },
   data () {
     return {
       show: false,

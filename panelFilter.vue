@@ -4,17 +4,17 @@
          class="panel-body">
       <div class="panel-title">
         <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort-amount-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-sort-amount-down fa-w-16 fa-xs"><path fill="currentColor" d="M304 416h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-128-64h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.37 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352zm256-192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-64 128H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM496 32H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z" class=""></path></svg>        
-        <span>Sorting and Filter</span>
+        <span v-html="localizedLabel.sortingAndFiltering" />
       </div>
       <div class="panel-content">
         <div class="panel-action">
           <button class="panel-button float-left" @click="sort(1)">
             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort-alpha-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-sort-alpha-down fa-w-14"><path fill="currentColor" d="M176 352h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.36 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352zm240-64H288a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h56l-61.26 70.45A32 32 0 0 0 272 446.37V464a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16h-56l61.26-70.45A32 32 0 0 0 432 321.63V304a16 16 0 0 0-16-16zm31.06-85.38l-59.27-160A16 16 0 0 0 372.72 32h-41.44a16 16 0 0 0-15.07 10.62l-59.27 160A16 16 0 0 0 272 224h24.83a16 16 0 0 0 15.23-11.08l4.42-12.92h71l4.41 12.92A16 16 0 0 0 407.16 224H432a16 16 0 0 0 15.06-21.38zM335.61 144L352 96l16.39 48z" class=""></path></svg>
-            <span>Sort Ascending</span>
+            <span v-html="localizedLabel.sortAscending" />
           </button>
           <button class="panel-button float-right" @click="sort(-1)">
             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort-alpha-up-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-sort-alpha-up-alt fa-w-14"><path fill="currentColor" d="M16 160h48v304a16 16 0 0 0 16 16h32a16 16 0 0 0 16-16V160h48c14.21 0 21.38-17.24 11.31-27.31l-80-96a16 16 0 0 0-22.62 0l-80 96C-5.35 142.74 1.78 160 16 160zm272 64h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16h-56l61.26-70.45A32 32 0 0 0 432 65.63V48a16 16 0 0 0-16-16H288a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h56l-61.26 70.45A32 32 0 0 0 272 190.37V208a16 16 0 0 0 16 16zm159.06 234.62l-59.27-160A16 16 0 0 0 372.72 288h-41.44a16 16 0 0 0-15.07 10.62l-59.27 160A16 16 0 0 0 272 480h24.83a16 16 0 0 0 15.23-11.08l4.42-12.92h71l4.41 12.92A16 16 0 0 0 407.16 480H432a16 16 0 0 0 15.06-21.38zM335.61 400L352 352l16.39 48z" class=""></path></svg>
-            <span>Sort Descending</span>
+            <span v-html="localizedLabel.sortDescending" />
           </button>
         </div>
         <div class="panel-action">
@@ -22,39 +22,32 @@
             <button class="panel-input-button" @click="showDropdown = !showDropdown">{{ symbol }}</button>
             <div :class="{show: showDropdown}" class="panel-dropdown">
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('')">
-                <span> ≒ </span>
-                <span>Near</span>
+                <span v-html="localizedLabel.near" />
               </div>
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('=')">
-                <span> = </span>
-                <span>Exact Match</span>
+                <span v-html="localizedLabel.exactMatch" />
               </div>
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('>')">
-                <span> &gt; </span>
-                <span>Greater than</span>
+                <span v-html="localizedLabel.greaterThan" />
               </div>
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('>=')">
-                <span> ≥ </span>
-                <span>Greater than or Equal to</span>
+                <span v-html="localizedLabel.greaterThanOrEqualTo" />
               </div>
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('<')">
-                <span> &lt; </span>
-                <span>Less than</span>
+                <span v-html="localizedLabel.lessThan" />
               </div>
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('<=')">
-                <span> ≤ </span>
-                <span>Less than or Equal to</span>
+                <span v-html="localizedLabel.lessThanOrEqualTo" />
               </div>
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('~')">
-                <span> ~ </span>
-                <span>Regular Expression</span>
+                <span v-html="localizedLabel.regularExpression" />
               </div>
             </div>
             <span class="panel-input-b">
               <input type="text"
                      ref="inputFilter"
                      class="panel-input"
-                     placeholder="Custom Filter"
+                     :placeholder="localizedLabel.customFilter"
                      trim autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                      @keyup="doInputFilter"
                      @keydown.exact.enter="doFilter" />
@@ -70,14 +63,16 @@
               <span>{{ item }}</span>
             </div>
           </div>
-          <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">List first {{ nFilterCount }} values only</div>
+          <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">
+            <span v-html="localizedLabel.lastFirstNValuesOnly(nFilterCount)" />
+          </div>
         </div>
       </div>
 
       <div class="panel-footer">
         <button class="panel-button" @click="doFilter">
           <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sign-in-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-sign-in-alt fa-w-16 fa-fw fa-sm"><path fill="currentColor" d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12V76c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L201 79c-15-15-41-4.5-41 17v96H24c-13.3 0-24 10.7-24 24v96c0 13.3 10.7 24 24 24h136v96c0 21.5 26 32 41 17l168-168c9.3-9.4 9.3-24.6 0-34z" class=""></path></svg>
-          <span>Apply</span>
+          <span v-html="localizedLabel.apply" />
         </button>
       </div>
     </div>
@@ -88,6 +83,26 @@
 export default {
   props: {
     nFilterCount: {type: Number, default: 200},     // show top n values in filter dialog
+    localizedLabel: {
+      type: Object,
+      default () {
+        return {
+          sortingAndFiltering: 'Sorting And Filtering',
+          sortAscending: 'Sort Ascending',
+          sortDescending: 'Sort Descending',
+          near: '≒ Near',
+          exactMatch: '= Exact Match',
+          greaterThan: '&gt; Greater Than',
+          greaterThanOrEqualTo: '≥ Greater Than or Equal To',
+          lessThan: '&lt; Less Than',
+          lessThanOrEqualTo: '≤ Less Than Or Equal To',
+          regularExpression: '~ Regular Expression',
+          customFilter: 'Custom Filter',
+          listFirstNValuesOnly: (n) => `List first ${n} values only`,
+          apply: 'Apply'
+        }
+      }
+    }
   },
   data () {
     return {

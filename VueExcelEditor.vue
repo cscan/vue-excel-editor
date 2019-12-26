@@ -131,37 +131,41 @@
       <div ref="footer" class="footer center-text" :class="{hide: noFooter}">
         <span class="left-block"></span>
         <span v-show="!noPaging" style="position: absolute; left: 46px">
-          <span v-html="footerLeftLabel(pageTop + 1, pageBottom, table.length)"></span>
+          <span v-html="localizedLabel.footerLeft(pageTop + 1, pageBottom, table.length)"></span>
         </span>
         <span v-show="!noPaging">
           <template v-if="processing">
             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-sm"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
-            Processing
+            <span v-html="localizedLabel.processing" />
           </template>
           <template v-else>
             <a :class="{disabled: pageTop <= 0}" @click="firstPage">
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-backward fa-w-14 fa-sm"><path fill="currentColor" d="M64 468V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12v176.4l195.5-181C352.1 22.3 384 36.6 384 64v384c0 27.4-31.9 41.7-52.5 24.6L136 292.7V468c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12z"></path></svg>
-              {{ footerMiddleLabel.first }}
+              &nbsp;
+              <span v-html="localizedLabel.first" />
             </a>
             &nbsp;|&nbsp;
             <a :class="{disabled: pageTop <= 0}" @click="prevPage">
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-backward fa-w-16 fa-sm"><path fill="currentColor" d="M11.5 280.6l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2zm256 0l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2z"></path></svg>
-              {{ footerMiddleLabel.previous }}
+              &nbsp;
+              <span v-html="localizedLabel.previous" />
             </a>
             &nbsp;|&nbsp;
             <a :class="{disabled: pageTop + pageSize >= table.length}" @click="nextPage">
-              {{ footerMiddleLabel.next }}
+              <span v-html="localizedLabel.next" />
+              &nbsp;
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-forward fa-w-16 fa-sm"><path fill="currentColor" d="M500.5 231.4l-192-160C287.9 54.3 256 68.6 256 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2zm-256 0l-192-160C31.9 54.3 0 68.6 0 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2z"></path></svg>
             </a>
             &nbsp;|&nbsp;
             <a :class="{disabled: pageTop + pageSize >= table.length}" @click="lastPage">
-              {{ footerMiddleLabel.last }}
+              <span v-html="localizedLabel.last" />
+              &nbsp;
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-forward fa-w-14 fa-sm"><path fill="currentColor" d="M384 44v424c0 6.6-5.4 12-12 12h-48c-6.6 0-12-5.4-12-12V291.6l-195.5 181C95.9 489.7 64 475.4 64 448V64c0-27.4 31.9-41.7 52.5-24.6L312 219.3V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12z"></path></svg>
             </a>
           </template>
         </span>
         <span style="position: absolute; right: 6px">
-          <span v-html="footerRightLabel(Object.keys(selected).length, table.length, value.length)"></span>
+          <span v-html="localizedLabel.footerRight(Object.keys(selected).length, table.length, value.length)" />
         </span>
       </div>
 
@@ -171,9 +175,9 @@
              style="width:0; height: 0; opacity:0; z-index:-1"
              @change="doImport" />
 
-      <panel-filter ref="panelFilter" :m-filter-count="nFilterCount" />
-      <panel-setting ref="panelSetting" v-model="fields" />
-      <panel-find ref="panelFind" />
+      <panel-filter ref="panelFilter" :m-filter-count="nFilterCount" :localizedLabel="localizedLabel" />
+      <panel-setting ref="panelSetting" v-model="fields" :localizedLabel="localizedLabel" />
+      <panel-find ref="panelFind" :localizedLabel="localizedLabel" />
     </div>
   </div>
 </template>
@@ -220,22 +224,39 @@ export default {
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     readonly: {type: Boolean, default: false},
     readonlyStyle: {type: Object, default: null},
-    footerLeftLabel: {
-      type: Function,
-      default (top, bottom, total) {
-          return `Record ${top} to ${bottom} of ${total}`
-      },
-    },
-    footerMiddleLabel: {
+    localizedLabel: {
       type: Object,
       default () {
-        return {first: 'First', previous: 'Previous', next: 'Next', last: 'Last'}
-      }
-    },
-    footerRightLabel: {
-      type: Function,
-      default (selected, filtered, loaded) {
-        return `Selected: ${selected} | Filtered: ${filtered} | Loaded: ${loaded}`
+        return {
+          footerLeft: (top, bottom, total) => `Record ${top} to ${bottom} of ${total}`,
+          first: 'First',
+          previous: 'Previous',
+          next: 'Next',
+          last: 'Last',
+          footerRight: (selected, filtered, loaded) => `Selected: ${selected} | Filtered: ${filtered} | Loaded: ${loaded}`,
+          processing: 'Processing',
+          tableSetting: 'Table Setting',
+          exportExcel: 'Export Excel',
+          importExcel: 'Import Excel',
+          back: 'Back',
+          sortingAndFiltering: 'Sorting And Filtering',
+          sortAscending: 'Sort Ascending',
+          sortDescending: 'Sort Descending',
+          near: '≒ Near',
+          exactMatch: '= Exact Match',
+          greaterThan: '&gt; Greater Than',
+          greaterThanOrEqualTo: '≥ Greater Than or Equal To',
+          lessThan: '&lt; Less Than',
+          lessThanOrEqualTo: '≤ Less Than Or Equal To',
+          regularExpression: '~ Regular Expression',
+          customFilter: 'Custom Filter',
+          listFirstNValuesOnly: (n) => `List first ${n} values only`,
+          apply: 'Apply',
+          noRecordIsRead: 'No record is read',
+          readonlyColumnDetected: 'Readonly column detected',
+          columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
+          noMatchedColumnName: 'No matched column name'
+        }
       }
     }
   },
@@ -479,7 +500,7 @@ export default {
             const sheet = wb.SheetNames[0]
             const importData = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheet])
             const keyStart = new Date().getTime()
-            if (importData.length === 0) throw new Error('VueExcelEditor: No record is read')
+            if (importData.length === 0) throw new Error('VueExcelEditor: ' + this.localizedLabel.noRecordIsRead)
 
             let pass = 0
             let inserted = 0
@@ -497,15 +518,15 @@ export default {
                   if (typeof val === 'undefined') val = line[field.label]
                   if (typeof val === 'undefined') val = ''
                   else {
-                    if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] Readonly column detected.`)
+                    if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected)
                     if (field.validate) {
                       let err
                       if ((err = field.validate(val)))
-                        throw new Error(`VueExcelEditor: [row=${i+1}] Column ${field.name} has validation error: ${err}`)
+                        throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.columnHasValidationError(field.name, err))
                     }
                     real = true
                   }
-                  if (!real) throw new Error(`VueExcelEditor: [row=${i+1}] No matched column name`)
+                  if (!real) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.noMatchedColumnName)
                   rec[field.name] = val
                 })
                 if (pass === 1) {
