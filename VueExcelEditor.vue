@@ -41,7 +41,9 @@
                   class="table-col-header"
                   :style="{width: item.width}"
                   @mousedown="headerClick($event, p)">
-                <div :class="{'filter-sign': columnFilter[p]}">{{ item.label }}</div>
+                <div :class="{'filter-sign': columnFilter[p]}">
+                  <span v-html="headerLabel(item.label, item)"></span>
+                </div>
                 <div class="col-sep"
                     @mousedown="colSepMouseDown"
                     @mouseover="colSepMouseOver"
@@ -73,7 +75,9 @@
                   :class="{hide: noNumCol}"
                   :style="{left: calCellLeft + 'px'}"
                   scope="row"
-                  @click="rowLabelClick">{{ recordLabel(record, rowPos) }}</td>
+                  @click="rowLabelClick">
+                <span v-html="recordLabel(pageTop + rowPos + 1, record)"></span>
+              </td>
               <template v-for="(item, p) in fields">
                 <td v-show="item.visible"
                     :id="`${record.key}:${item.name}`"
@@ -128,7 +132,7 @@
       <div ref="footer" class="footer center-text" :class="{hide: noFooter}">
         <span class="left-block"></span>
         <span v-show="!noPaging" style="position: absolute; left: 46px">
-          Record {{ pageTop + 1 }} to {{ pageBottom }} of {{ table.length }}
+          <span v-html="footerLeftLabel(pageTop + 1, pageBottom, table.length)"></span>
         </span>
         <span v-show="!noPaging">
           <template v-if="processing">
@@ -138,26 +142,28 @@
           <template v-else>
             <a :class="{disabled: pageTop <= 0}" @click="firstPage">
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-backward fa-w-14 fa-sm"><path fill="currentColor" d="M64 468V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12v176.4l195.5-181C352.1 22.3 384 36.6 384 64v384c0 27.4-31.9 41.7-52.5 24.6L136 292.7V468c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12z"></path></svg>
-              First
+              {{ footerMiddleLabel.first }}
             </a>
             &nbsp;|&nbsp;
             <a :class="{disabled: pageTop <= 0}" @click="prevPage">
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-backward fa-w-16 fa-sm"><path fill="currentColor" d="M11.5 280.6l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2zm256 0l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2z"></path></svg>
-              Previous
+              {{ footerMiddleLabel.previous }}
             </a>
             &nbsp;|&nbsp;
             <a :class="{disabled: pageTop + pageSize >= table.length}" @click="nextPage">
-              Next
+              {{ footerMiddleLabel.next }}
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-forward fa-w-16 fa-sm"><path fill="currentColor" d="M500.5 231.4l-192-160C287.9 54.3 256 68.6 256 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2zm-256 0l-192-160C31.9 54.3 0 68.6 0 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2z"></path></svg>
             </a>
             &nbsp;|&nbsp;
             <a :class="{disabled: pageTop + pageSize >= table.length}" @click="lastPage">
-              Last
+              {{ footerMiddleLabel.last }}
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-forward fa-w-14 fa-sm"><path fill="currentColor" d="M384 44v424c0 6.6-5.4 12-12 12h-48c-6.6 0-12-5.4-12-12V291.6l-195.5 181C95.9 489.7 64 475.4 64 448V64c0-27.4 31.9-41.7 52.5-24.6L312 219.3V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12z"></path></svg>
             </a>
           </template>
         </span>
         <span style="position: absolute; right: 6px">
+          <span v-html="footerRightLabel(Object.keys(selected).length, table.length, value.length)"></span>
+          <!--
           Selected:
           <span :style="{color: Object.keys(selected).length>0? 'red': 'inherit'}">{{ Object.keys(selected).length }}</span>
           &nbsp;|&nbsp;
@@ -165,7 +171,7 @@
           <span :style="{color: table.length<value.length? 'red': 'inherit'}">{{ table.length }}</span>
           &nbsp;|&nbsp;
           Loaded:
-          <span>{{ value.length }}</span>
+          <span>{{ value.length }}</span-->
         </span>
       </div>
 
@@ -199,10 +205,16 @@ export default {
   props: {
     value: {type: Array, default () {return []}},
     rowStyle: {type: Function, default () {return {}}},
+    headerLabel: {
+      type: Function,
+      default (label) {
+        return label
+      }
+    },
     recordLabel: {                                  // return the row header
       type: Function,
-      default (record, recordPosition) {
-        return this.pageTop + recordPosition + 1
+      default (pos) {
+        return pos
       }
     },
     noFinding: {type: Boolean, default: false},
@@ -217,7 +229,25 @@ export default {
     height: {type: Number, default: 0},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     readonly: {type: Boolean, default: false},
-    readonlyStyle: {type: Object, default: null}
+    readonlyStyle: {type: Object, default: null},
+    footerLeftLabel: {
+      type: Function,
+      default (top, bottom, total) {
+          return `Record ${top} to ${bottom} of ${total}`
+      },
+    },
+    footerMiddleLabel: {
+      type: Object,
+      default () {
+        return {first: 'First', previous: 'Previous', next: 'Next', last: 'Last'}
+      }
+    },
+    footerRightLabel: {
+      type: Function,
+      default (selected, filtered, loaded) {
+        return `Selected: ${selected} | Filtered: ${filtered} | Loaded: ${loaded}`
+      }
+    }
   },
   data () {
     const pageSize = this.noPaging ? 999999 : 20
@@ -1419,7 +1449,7 @@ input:focus, input:active:focus, input.active:focus {
 .table-content::-webkit-scrollbar {
   background: white;
   width: 0;
-  height: 24px;
+  height: 25px;
 }
 .table-content.no-footer {
   border-bottom: 0;
@@ -1546,7 +1576,7 @@ input:focus, input:active:focus, input.active:focus {
   left: 0;
   width: 100%;
   height: 0;
-  line-height: 1.7;
+  line-height: 2;
   border-top: 1px solid lightgray;
 }
 .footer .left-block {

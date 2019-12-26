@@ -9,7 +9,7 @@ Vue2 plugin for displaying and editing the array-of-object in Excel style. It su
 - Pagination
 - Row selection
 - Update the cells in all selected rows
-- Key support: Up, down, left, right, PageUp, PageDown, tab, shift-tab, esc
+- Key support: up, down, left, right, page-up, page-down, tab, esc
 - Ctrl/meta Key support: Ctrl-A, Ctrl-C, Ctrl-V, Ctrl-Z, Ctrl-F, Ctrl-G, Ctrl-L
 - Column Valiation
 - Cell Error Tooltip
@@ -58,35 +58,38 @@ In your template
 ## Props List
 
 #### Component: vue-excel-editor
-| Name            | Mandatory | Type              | Description |
-| :---            | :---      | :---              | ---         |
-| v-model         | Mandatory | Array Of Objects  | AOO Data to be edited | 
-| page            | Optional  | Number            | Specific page size, default is auto-calculating by screen height |
-| n-filter-count  | Optional  | Number            | Number of items to be listed in filter dialog. Default is 200 |
-| row-style       | Optional  | Function          | Conditional row formatting, default is null |
-| no-paging       | Optional  | Boolean           | Disable paging feature, default is false |
-| no-num-col      | Optional  | Boolean           | No number column, default is false |
-| filter-row      | Optional  | Boolean           | Show fixed filter row, default is false |
-| no-footer       | Optional  | Boolean           | No footer row, default is false |
-| no-finding      | Optional  | Boolean           | Disable find key (ctrl-f) and finding dialog, default is false |
-| no-finding-next | Optional  | Boolean           | Disable find-next key (ctrl-g), default is false |
-| autocomplete    | Optional  | Boolean           | Enable autocomplete of all columns, default is false |
-| readonly        | Optional  | Boolean           | Set all columns read only, default is false |
-| readonly-style  | Optional  | Object            | The style of the read-only cell |
-| height          | Optional  | Number            | Define the exact height of the component in px |
-
-(TBD)
+| Name                | Mandatory | Type     | Description |
+| :---                | :---      | :---     | :---        |
+| v-model             | Mandatory | Array    | Edited data in Array Of Object | 
+| page                | Optional  | Number   | Specific page size, default is auto-calculating by screen height |
+| n-filter-count      | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
+| row-style           | Optional  | Function | Conditional row formatting, default is null |
+| no-paging           | Optional  | Boolean  | Disable paging feature, default is false |
+| no-num-col          | Optional  | Boolean  | No number column, default is false |
+| filter-row          | Optional  | Boolean  | Show fixed filter row, default is false |
+| no-footer           | Optional  | Boolean  | No footer row, default is false |
+| no-finding          | Optional  | Boolean  | Disable find key (ctrl-f) and finding dialog, default is false |
+| no-finding-next     | Optional  | Boolean  | Disable find-next key (ctrl-g), default is false |
+| autocomplete        | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
+| readonly            | Optional  | Boolean  | Set all columns read only, default is false |
+| readonly-style      | Optional  | Object   | The style of the read-only cell |
+| height              | Optional  | Number   | Define the exact height of the component in px |
+| header-label        | Optional  | Function | Func to return the label, parameter are the field label, field object |
+| record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
+| footer-left-label   | Optional  | Function | Func to return the left label of footer, parameters are top#, bottom#, total# |
+| footer-middle-label | Optional  | Object   | Object to specify the first, previous, next and last labels of footer |
+| footer-right-label  | Optional  | Function | Func to return the right label of footer, parameters are select#, filter# & total# |
 
 #### Component: vue-excel-column
 | Name                 | Mandatory | Type     | Description |
 | :---                 | :---      | :---     | :---        |
-| field                | Mandatory | String   | Row Object Key |
-| label                | Optional  | String   | Header Label, default is field |
+| field                | Mandatory | String   | Field name, row object key |
+| label                | Optional  | String   | Header label, default is field name |
 | type                 | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
 | readonly             | Optional  | Boolean  | Read-only, default is parent prop: readonly |
 | init-style           | Optional  | Object   | Cell inital style in css |
-| width                | Optional  | String   | Specified Column Width, default is 100px |
-| validate             | Optional  | Function | Custom Function to validate and return the error message |
+| width                | Optional  | String   | Specified column width, default is 100px |
+| validate             | Optional  | Function | Custom function to validate and return the error message |
 | key-field*           | Optional  | Number   | Sequence number to create record key, default is 0 = Not key field |
 | allow-edit-when-new* | Optional  | Boolean  | Allow edit (For readonly column) when it is new record |
 | allow-keys           | Optional  | Array    | Array of char which allow to input |
@@ -100,24 +103,19 @@ In your template
 | to-text              | Optional  | Function | The custom conversion function from object value to edit-text |
 | to-value             | Optional  | Function | The custom conversion function from edit-text to object value |
 
-(TBD)
 (*) Still Under Testing
 
 ## Hot Key List
 
-| Name             | Condition          | Description |
-| :---             | :---               | :---        |
-| Ctrl/Meta A      | Table Focus        | Select all rows |
-| Ctrl/Meta C      | Cell Focus         | Select the cell text to clipboard |
-| Ctrl/Meta V      | Cell Focus         | Place the clipboard text to cell |
-| Ctrl/Meta Z      | Table Focus        | Undo the last update |
-| Ctrl/Meta F      | Table Focus        | Popup the "Find" dialog |
-| Ctrl/Meta G      | After "Find"       | Continue to find the text |
-| Ctrl/Meta L      | Cell Focus         | Force to show autocomplete list, or the option list for "select" typed column |
-
-(TBD)
-
-
+| Name        | Condition    | Description |
+| :---        | :---         | :---        |
+| Ctrl/Meta A | Table Focus  | Select all rows |
+| Ctrl/Meta C | Cell Focus   | Select the cell text to clipboard |
+| Ctrl/Meta V | Cell Focus   | Place the clipboard text to cell |
+| Ctrl/Meta Z | Table Focus  | Undo the last update |
+| Ctrl/Meta F | Table Focus  | Popup the "Find" dialog |
+| Ctrl/Meta G | After "Find" | Continue to find the text |
+| Ctrl/Meta L | Cell Focus   | Force to show autocomplete list, or the option list for "select" typed column |
 
 ## Events List
 
@@ -132,7 +130,7 @@ In your template
 ## Methods List
 
 #### Component: vue-excel-editor
-| Name               | Argument             | Description |
+| Name               | Arguments            | Description |
 | :---               | :---                 | :---        |
 | exportTable        | format, selectedOnly | export the filtered table as xlsx/csv |
 | importTable        | callback             | import the specified formatted xlsx |
@@ -158,13 +156,13 @@ In your template
 #### Component: vue-excel-editor
 | Name               | Type            | Description |
 | :---               | :---            | :---        |
-| fields             | Array of Object | It contains the column speicification, the spec will create during mounted, developer can still change still the spec via this after mounted |
-| filterColumn       | Object          | Contains the current filters |
-| selected           | Object          | Contains all the selected rows |
+| fields             | Array of Object | It contains the column spec, each will create during mount, developer can still change the col spec via this after mounted |
+| filterColumn       | Object          | Contains the current filters, developer can access the filter string via this |
+| selected           | Object          | Contains all the selected rows, the key is row number and the value is record key |
 | selectedCount      | Number          | Number of rows are selected |
-| errmsg             | Object          | Contains all the validation error messages |
-| redo               | Array of Object | The undo buffer |
-| pageTop            | Number          | The top row of the current page |
+| errmsg             | Object          | Contains all the validation error messages, the key is record key and field name |
+| redo               | Array of array  | The buffer of undo, it will be removed after undo |
+| pageTop            | Number          | The top row number of the current page |
 
 ## Example
 
@@ -190,6 +188,9 @@ export default {
 }
 ```
 
+#### Important
+The Array-Of-Object (AOO) data (e.g. U0001, U0002 ... in above example) is required an unique "key" field to operate
+
 ## Work with redis for saving
 
 ```html
@@ -205,9 +206,6 @@ methods: {
     }
 }
 ```
-
-#### Important
-The Array-Of-Object (AOO) data is required an unique "key" field to operate
 
 In your HTML call it likes
 
