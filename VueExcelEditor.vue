@@ -105,13 +105,6 @@
                       autocorrect="off"
                       autocompitaize="off"
                       spellcheck="false"></textarea>
-            <ul v-if="autocompleteInputs.length" class="autocomplete-results">
-              <li v-for="(item,i) in autocompleteInputs"
-                  :key="i"
-                  :class="{select: autocompleteSelect === i}"
-                  @mousedown.left.prevent="inputAutocompleteText($event.target.textContent, $event)"
-                  class="autocomplete-result">{{ item }}</li>
-            </ul>
             <div class="rb-square" />
           </div>
         </div>
@@ -121,6 +114,15 @@
           <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-3x"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
         </div>
       </div>
+
+      <!-- Autocomplete List -->
+      <ul ref="autocomplete" v-if="focused && autocompleteInputs.length" class="autocomplete-results">
+        <li v-for="(item,i) in autocompleteInputs"
+            :key="i"
+            :class="{select: autocompleteSelect === i}"
+            @mousedown.left.prevent="inputAutocompleteText($event.target.textContent, $event)"
+            class="autocomplete-result">{{ item }}</li>
+      </ul>
 
       <!-- Footer -->
       <div ref="footer" class="footer center-text" :class="{hide: noFooter}">
@@ -679,6 +681,7 @@ export default {
       this.calCellLeft = this.tableContent.scrollLeft
       this.calCellTop = this.tableContent.scrollTop
       this.calCellTop2 = this.tableContent.scrollTop + this.labelTr.offsetHeight
+      this.autocompleteInputs = []
       /*
       if (this.currentCell) {
         const cellRect = this.currentCell.getBoundingClientRect()
@@ -708,14 +711,14 @@ export default {
       const cellRect = cell.getBoundingClientRect()
       const tableRect = this.systable.getBoundingClientRect()
       const boundRect = this.$el.getBoundingClientRect()
-      this.inputSquare.style.left = (cellRect.left - tableRect.left + 38) + 'px'
+      this.inputSquare.style.left = (cellRect.left - tableRect.left + 39) + 'px'
       this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
       this.inputSquare.style.width = (cellRect.width + 1) + 'px'
       this.inputSquare.style.height = (cellRect.height + 1) + 'px'
       if (cellRect.right >= boundRect.right)
         this.tableContent.scrollBy(cellRect.right - boundRect.right, 0)
-      if (cellRect.left <= boundRect.left + 40)
-        this.tableContent.scrollBy(cellRect.left - boundRect.left - 40, 0)
+      if (cellRect.left <= boundRect.left + 39)
+        this.tableContent.scrollBy(cellRect.left - boundRect.left - 39, 0)
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
@@ -1182,6 +1185,12 @@ export default {
           }
           this.autocompleteSelect = -1
           this.autocompleteInputs = list
+          this.lazy(() => {
+            const rect = this.currentCell.getBoundingClientRect()
+            this.$refs.autocomplete.style.top = rect.bottom + 'px'
+            this.$refs.autocomplete.style.left = rect.left + 'px'
+            this.$refs.autocomplete.style.width = rect.width + 'px'
+          })
         }, force ? 0 : 700)
       }
     },
@@ -1295,8 +1304,10 @@ input:focus, input:active:focus, input.active:focus {
   transition: none !important;
 }
 .autocomplete-results {
+  z-index: 15;
+  position: fixed;
   padding: 3px;
-  margin: 0px -4px;
+  margin: -1px;
   background-color: lightyellow;
   border: 1px solid rgb(108, 143, 108);
   height: fit-content;
@@ -1397,7 +1408,7 @@ input:focus, input:active:focus, input.active:focus {
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 0;
-  margin-left: 39px;
+  margin-left: 40px;
 }
 .systable.no-number {
   margin-left: 0 !important;
@@ -1494,7 +1505,7 @@ input:focus, input:active:focus, input.active:focus {
   z-index: 10;
 }
 .footer {
-  z-index: 10;
+  z-index: 5;
   padding: 0;
   font-size: 14px;
   color: dimgray;
