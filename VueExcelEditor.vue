@@ -1588,7 +1588,7 @@ input:focus, input:active:focus, input.active:focus {
   left: 0;
   width: 100%;
   height: 0;
-  line-height: 2;
+  line-height: 2.3;
   border-top: 1px solid lightgray;
 }
 .footer .left-block {
