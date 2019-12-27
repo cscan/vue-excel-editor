@@ -1421,7 +1421,7 @@ input:focus, input:active:focus, input.active:focus {
   border: 0;
   padding: 2px;
   white-space: nowrap;
-  font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans serif;
+  /* font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans serif; */
   overflow: hidden;
   background: white;
   font-size: 0.88rem;
@@ -1431,7 +1431,7 @@ input:focus, input:active:focus, input.active:focus {
   flex-flow: column;
   position: relative;
   max-width:fit-content;
-  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+  /* font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif; */
   word-spacing: 0.02rem;
   line-height: 1.1;
   overflow: hidden;
@@ -1581,7 +1581,7 @@ input:focus, input:active:focus, input.active:focus {
 .footer {
   z-index: 5;
   padding: 0;
-  font-size: 14px;
+  font-size: 12px;
   color: dimgray;
   position: absolute;
   bottom: 25px;
