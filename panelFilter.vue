@@ -64,7 +64,7 @@
             </div>
           </div>
           <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">
-            <span v-html="localizedLabel.lastFirstNValuesOnly(nFilterCount)" />
+            <span v-html="localizedLabel.listFirstNValuesOnly(nFilterCount)" />
           </div>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default {
           lessThanOrEqualTo: '≤ Less Than Or Equal To',
           regularExpression: '~ Regular Expression',
           customFilter: 'Custom Filter',
-          listFirstNValuesOnly: (n) => `List first ${n} values only`,
+          listFirstNValuesOnly: n => `List first ${n} values only`,
           apply: 'Apply'
         }
       }

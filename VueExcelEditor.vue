@@ -250,7 +250,7 @@ export default {
           lessThanOrEqualTo: '≤ Less Than Or Equal To',
           regularExpression: '~ Regular Expression',
           customFilter: 'Custom Filter',
-          listFirstNValuesOnly: (n) => `List first ${n} values only`,
+          listFirstNValuesOnly: n => `List first ${n} values only`,
           apply: 'Apply',
           noRecordIsRead: 'No record is read',
           readonlyColumnDetected: 'Readonly column detected',
