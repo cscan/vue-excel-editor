@@ -119,7 +119,7 @@
       </div>
 
       <!-- Autocomplete List -->
-      <ul ref="autocomplete" v-if="focused && autocompleteInputs.length" class="autocomplete-results">
+      <ul ref="autocomplete" v-show="focused && autocompleteInputs.length" class="autocomplete-results">
         <li v-for="(item,i) in autocompleteInputs"
             :key="i"
             :class="{select: autocompleteSelect === i}"
@@ -1244,12 +1244,10 @@ export default {
           }
           this.autocompleteSelect = -1
           this.autocompleteInputs = list
-          this.lazy(() => {
-            const rect = this.currentCell.getBoundingClientRect()
-            this.$refs.autocomplete.style.top = rect.bottom + 'px'
-            this.$refs.autocomplete.style.left = rect.left + 'px'
-            this.$refs.autocomplete.style.width = rect.width + 'px'
-          })
+          const rect = this.currentCell.getBoundingClientRect()
+          this.$refs.autocomplete.style.top = rect.bottom + 'px'
+          this.$refs.autocomplete.style.left = rect.left + 'px'
+          this.$refs.autocomplete.style.minWidth = rect.width + 'px'
         }, force ? 0 : 700)
       }
     },
@@ -1373,7 +1371,7 @@ input:focus, input:active:focus, input.active:focus {
   padding: 0;
   z-index: 0;
   border: 2px solid rgb(108, 143, 108);
-  transition: all 0.08s linear;
+  /* transition: all 0.04s linear; */
 }
 .no-transition {
   transition: none !important;
@@ -1387,6 +1385,7 @@ input:focus, input:active:focus, input.active:focus {
   border: 1px solid rgb(108, 143, 108);
   height: fit-content;
   font-size: 0.88rem;
+  max-width: 300px;
 }
 .autocomplete-result {
   list-style: none;
