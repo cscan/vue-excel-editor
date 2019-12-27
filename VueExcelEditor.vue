@@ -1421,7 +1421,6 @@ input:focus, input:active:focus, input.active:focus {
   border: 0;
   padding: 2px;
   white-space: nowrap;
-  /* font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans serif; */
   overflow: hidden;
   background: white;
   font-size: 0.88rem;
@@ -1431,11 +1430,10 @@ input:focus, input:active:focus, input.active:focus {
   flex-flow: column;
   position: relative;
   max-width:fit-content;
-  /* font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif; */
   word-spacing: 0.02rem;
   line-height: 1.1;
   overflow: hidden;
-  border-bottom: 1px solid lightgray;
+  border: 1px solid lightgray;
 }
 .center-text {
   text-align: center;
@@ -1443,8 +1441,6 @@ input:focus, input:active:focus, input.active:focus {
 .table-content {
   flex: 1 1 auto;
   font-size: 1rem;
-  border: 1px solid lightgray;
-  border-bottom: 0;
   text-shadow: 0.3px 0.3px 1px #ccc;
   overflow: scroll;
   -webkit-touch-callout: none;
@@ -1454,9 +1450,15 @@ input:focus, input:active:focus, input.active:focus {
   -ms-user-select: none;
   user-select: none;
   position: relative;
+  scrollbar-width: none;
 }
 .table-content :focus {
   outline: none;
+}
+@-moz-document url-prefix() {
+  .table-content {
+    margin-bottom: 25px;
+  }
 }
 .table-content::-webkit-scrollbar {
   background: white;
@@ -1465,6 +1467,7 @@ input:focus, input:active:focus, input.active:focus {
 }
 .table-content.no-footer {
   border-bottom: 0;
+  margin-bottom: 0 !important;
 }
 .table-content.no-footer::-webkit-scrollbar {
   height: 0;
@@ -1499,7 +1502,7 @@ input:focus, input:active:focus, input.active:focus {
 }
 .systable th, .systable td {
   vertical-align: bottom;
-  padding: 0.3rem;
+  padding: 0.2rem 0.3rem;
   font-size: 0.88rem;
   height: 24px;
   border-top: 0;
@@ -1595,9 +1598,8 @@ input:focus, input:active:focus, input.active:focus {
   position: absolute;
   left: 0;
   height: 25px;
-  width: 41px;
+  width: 40px;
   background-color: #e9ecef;
-  border-left: 1px solid lightgray;
   border-right: 1px solid lightgray;
 }
 .footer a {

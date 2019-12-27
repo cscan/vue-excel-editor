@@ -72,7 +72,6 @@ input:focus, button:focus {
   overflow: hidden;
   background-color: #0007;
   z-index: 999;
-  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-weight: 400;
   font-size: 1rem;
   text-shadow: none;
@@ -155,6 +154,12 @@ input:focus, button:focus {
 }
 .fa-sm {
   font-size: 0.875em;
+}
+.fa-1x {
+  font-size: 1em;
+}
+.fa-2x {
+  font-size: 2em;
 }
 .fa-3x {
   font-size: 3em;

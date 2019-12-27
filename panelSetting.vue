@@ -3,7 +3,7 @@
     <div ref="panelSetting"
          class="panel-body">
       <div class="panel-title">
-        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-bars fa-w-14 fa-xs"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z" class=""></path></svg>
+        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-bars fa-w-14 fa-1x"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z" class=""></path></svg>
         <span v-html="localizedLabel.tableSetting" />
       </div>
       <div class="panel-content">
@@ -128,7 +128,6 @@ input:focus, button:focus {
   overflow: hidden;
   background-color: #0007;
   z-index: 999;
-  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   font-weight: 400;
   font-size: 1rem;
   text-shadow: none;
@@ -153,10 +152,10 @@ input:focus, button:focus {
 .panel-title {
   padding: 1rem;
   display: flex;
-  color: black;
+  color: dimgray;
   font-size: 1.25rem;
   line-height: 1.5rem;
-  align-items: center;
+  align-items: flex-end;
   justify-content: flex-start;
   border-bottom: 1px solid lightgray;
 }
@@ -266,6 +265,12 @@ div.panel-title span, button.panel-button span {
 }
 .fa-sm {
   font-size: 0.875em;
+}
+.fa-1x {
+  font-size: 1em;
+}
+.fa-2x {
+  font-size: 2em;
 }
 .fa-3x {
   font-size: 3em;
