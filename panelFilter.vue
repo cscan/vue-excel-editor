@@ -247,7 +247,7 @@ input:focus, button:focus {
   color: dimgray;
   font-size: 1.25rem;
   line-height: 1.5rem;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
   border-bottom: 1px solid lightgray;
 }

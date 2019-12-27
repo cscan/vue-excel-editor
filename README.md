@@ -242,6 +242,9 @@ In your HTML call it likes
 #### Validation
 ![Validation](/assets/validate.png?raw=true "Validation")
 
+## Compatibility
+Chrome 79+, FireFox 71+, Safari 13+
+
 ## License
 MIT
 
