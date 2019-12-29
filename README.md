@@ -76,7 +76,6 @@ In your template
 | row-style           | Optional  | Function | Conditional row formatting, default is null |
 | header-label        | Optional  | Function | Func to return the label, parameter are the field label, field object |
 | record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
-total# |
 | localized-label     | Optional  | Object   | Customize labels and messages for localization purpose |
 | n-filter-count      | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
 
@@ -178,7 +177,7 @@ export default {
             {key: 'U0005', user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
         ]
     },
-    method: {
+    methods: {
         validPhoneNum (content) {
             if (content === '') return 'Mandatory field'
             if (!/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(content)) return 'Invalid Phone Number'
@@ -189,7 +188,7 @@ export default {
 ```
 
 #### Important
-The Array-Of-Object (AOO) data (e.g. U0001, U0002 ... in above example) is required an unique "key" field to operate
+The Array-Of-Object (AOO) data is required an unique "key" field (e.g. U0001, U0002 ... in above example) to operate
 
 ## Work with redis for saving
 
@@ -200,9 +199,9 @@ The Array-Of-Object (AOO) data (e.g. U0001, U0002 ... in above example) is requi
 ```
 ```js
 methods: {
-    save (record) {
-      record = record.map(rec => ['hset', rec.key, rec.field, rec.newVal])
-      redis.multi(record).exec()
+    save (records) {
+      records = records.map(rec => ['hset', rec.key, rec.field, rec.newVal])
+      redis.multi(records).exec()
     }
 }
 ```
