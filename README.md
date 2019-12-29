@@ -73,7 +73,8 @@ In your template
 | autocomplete        | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
 | readonly            | Optional  | Boolean  | Set all columns read only, default is false |
 | readonly-style      | Optional  | Object   | The style of the read-only cell |
-| height              | Optional  | Number   | Define the exact height of the component in px |
+| height              | Optional  | String   | Define the exact height of the component |
+| width               | Optional  | String   | Define the maximum width of the component, default is '100%' |
 | header-label        | Optional  | Function | Func to return the label, parameter are the field label, field object |
 | record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
 | footer-left-label   | Optional  | Function | Func to return the left label of footer, parameters are top#, bottom#, total# |

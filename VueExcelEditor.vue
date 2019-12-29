@@ -1,5 +1,5 @@
 <template>
-  <div style="display: inline-block; max-width: 100%">
+  <div :style="{display: 'inline-block', 'max-width': width}">
     <div class="component-content">
       <div ref="tableContent"
            class="table-content"
@@ -96,7 +96,7 @@
 
         <!-- Editor Square -->
         <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
-          <div style="position: relative; height: 100%; padding: 2px">
+          <div style="position: relative; height: 100%; padding: 2px 2px 1px">
             <textarea ref="inputBox"
                       class="input-box"
                       :style="{opacity: inputBoxShow}"
@@ -128,12 +128,13 @@
       </ul>
 
       <!-- Footer -->
-      <div ref="footer" class="footer center-text" :class="{hide: noFooter}">
+      <div ref="footer" class="footer center-text" :class="{hide: noFooter}" style="position:relative">
+        <div ref="scrollbar" class="scroll-bar" @mousedown="sbMouseDown" />
         <span class="left-block"></span>
         <span v-show="!noPaging" style="position: absolute; left: 46px">
           <span v-html="localizedLabel.footerLeft(pageTop + 1, pageBottom, table.length)"></span>
         </span>
-        <span v-show="!noPaging">
+        <span v-show="!noPaging && pageBottom - pageTop < table.length">
           <template v-if="processing">
             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-sm"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
             <span v-html="localizedLabel.processing" />
@@ -220,7 +221,8 @@ export default {
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     newRecord: {type: Function, default: null},     // return the new record from caller if provided
     nFilterCount: {type: Number, default: 200},     // show top n values in filter dialog
-    height: {type: Number, default: 0},
+    height: {type: String, default: ''},
+    width: {type: String, default: '100%'},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     readonly: {type: Boolean, default: false},
     readonlyStyle: {type: Object, default: null},
@@ -319,7 +321,8 @@ export default {
       redo: [],                     // redo log
 
       lazyTimeout: {},
-      lazyBuffer: {}
+      lazyBuffer: {},
+      hScroller: {}
     }
   },
   computed: {
@@ -467,7 +470,7 @@ export default {
     this.frontdrop = this.$refs.frontdrop
 
     if (this.height)
-      this.systable.parentNode.style.height = this.height + 'px'
+      this.systable.parentNode.style.height = this.height
 
     this.reset()
     this.lazy(this.refreshPageSize, 200)
@@ -480,6 +483,51 @@ export default {
     window.addEventListener('keydown', this.winKeydown)
   },
   methods: {
+    sbMouseDown (e) {
+      if (!this.hScroller.mouseX) {
+        const sleft = this.$refs.scrollbar.getBoundingClientRect().left
+        const fleft = this.footer.getBoundingClientRect().left + 40
+        this.hScroller.left = sleft - fleft
+        this.hScroller.mouseX = e.clientX
+        window.addEventListener('mousemove', this.sbMouseMove)
+        this.$refs.scrollbar.classList.add('focus')
+      }
+    },
+    sbMouseMove (e) {
+      if (e.buttons === 0) {
+        window.removeEventListener('mousemove', this.sbMouseMove)
+        this.lazy(() => this.$refs.scrollbar.classList.remove('focus'))
+        this.hScroller.mouseX = 0
+      }
+      else {
+        const diff = e.clientX - this.hScroller.mouseX
+        const ratio = (this.hScroller.left + diff) / this.hScroller.scrollerUnseenWidth
+        this.tableContent.scrollTo(this.hScroller.tableUnseenWidth * ratio, this.tableContent.scrollTop)
+      }
+    },
+    tableScroll () {
+      this.calCellLeft = this.tableContent.scrollLeft
+      this.calCellTop = this.tableContent.scrollTop
+      this.calCellTop2 = this.tableContent.scrollTop + this.labelTr.offsetHeight
+      this.autocompleteInputs = []
+
+      if (this.hScroller.tableUnseenWidth) {
+        this.$refs.scrollbar.classList.add('focus')
+        this.lazy(() => this.$refs.scrollbar.classList.remove('focus'), 1000)
+        const ratio = this.tableContent.scrollLeft / this.hScroller.tableUnseenWidth
+        this.$refs.scrollbar.style.left = (this.hScroller.scrollerUnseenWidth * ratio) + 'px'
+      }
+      /*
+      if (this.currentCell) {
+        const cellRect = this.currentCell.getBoundingClientRect()
+        const tableRect = this.systable.getBoundingClientRect()
+        // this.inputSquare.classList.add('no-transition')
+        this.inputSquare.style.left = (cellRect.left - tableRect.left + 38) + 'px'
+        this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
+        // setTimeout(() => this.inputSquare.classList.remove('no-transition'))
+      }
+      */
+    },
     importTable (cb) {
       this.$refs.importFile.click()
       this.importCallback = cb
@@ -721,22 +769,6 @@ export default {
         }
       }
     },
-    tableScroll () {
-      this.calCellLeft = this.tableContent.scrollLeft
-      this.calCellTop = this.tableContent.scrollTop
-      this.calCellTop2 = this.tableContent.scrollTop + this.labelTr.offsetHeight
-      this.autocompleteInputs = []
-      /*
-      if (this.currentCell) {
-        const cellRect = this.currentCell.getBoundingClientRect()
-        const tableRect = this.systable.getBoundingClientRect()
-        // this.inputSquare.classList.add('no-transition')
-        this.inputSquare.style.left = (cellRect.left - tableRect.left + 38) + 'px'
-        this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
-        // setTimeout(() => this.inputSquare.classList.remove('no-transition'))
-      }
-      */
-    },
     registerColumn (field) {
       let pos = this.fields.findIndex(item => item.pos > field.pos)
       if (pos === -1) pos = this.fields.length
@@ -914,6 +946,13 @@ export default {
       target.setAttribute('style', `width:${rect.width}px; height:${rect.height}px;`)
     },
     refreshPageSize () {
+      const fullWidth = this.systable.getBoundingClientRect().width
+      const viewWidth = this.tableContent.getBoundingClientRect().width - 40
+      this.hScroller.tableUnseenWidth = fullWidth - viewWidth
+      this.$refs.scrollbar.style.width = (100 * viewWidth / fullWidth) + '%'
+      const scrollerWidth = this.$refs.scrollbar.getBoundingClientRect().width
+      this.hScroller.scrollerUnseenWidth = this.footer.getBoundingClientRect().width - 40 - scrollerWidth
+
       if (this.noPaging) return
       // eslint-disable-next-line
       // console.log(window.innerHeight, this.recordBody.getBoundingClientRect().top, this.footer.getBoundingClientRect().height)
@@ -1414,16 +1453,17 @@ input:focus, input:active:focus, input.active:focus {
 }
 .input-box {
   opacity: 0;
-  margin: 0;
+  font-family: inherit;
+  color: inherit;
+  text-shadow: inherit;
+  font-size: 0.88rem;
   width: 100%;
   height: 100%;
-  resize: none;
   border: 0;
-  padding: 2px;
+  resize: none;
   white-space: nowrap;
   overflow: hidden;
   background: white;
-  font-size: 0.88rem;
 }
 .component-content {
   display: flex;
@@ -1450,24 +1490,19 @@ input:focus, input:active:focus, input.active:focus {
   -ms-user-select: none;
   user-select: none;
   position: relative;
+  width: calc(100% + 2px);
   scrollbar-width: none;
 }
 .table-content :focus {
   outline: none;
 }
-@-moz-document url-prefix() {
-  .table-content {
-    margin-bottom: 25px;
-  }
-}
 .table-content::-webkit-scrollbar {
   background: white;
   width: 0;
-  height: 25px;
+  height: 0;
 }
 .table-content.no-footer {
   border-bottom: 0;
-  margin-bottom: 0 !important;
 }
 .table-content.no-footer::-webkit-scrollbar {
   height: 0;
@@ -1586,13 +1621,12 @@ input:focus, input:active:focus, input.active:focus {
   padding: 0;
   font-size: 12px;
   color: dimgray;
-  position: absolute;
-  bottom: 25px;
-  left: 0;
+  background-color: white;
   width: 100%;
-  height: 0;
+  height: 25px;
   line-height: 2.3;
   border-top: 1px solid lightgray;
+  user-select: none;
 }
 .footer .left-block {
   position: absolute;
@@ -1601,6 +1635,18 @@ input:focus, input:active:focus, input.active:focus {
   width: 40px;
   background-color: #e9ecef;
   border-right: 1px solid lightgray;
+}
+.scroll-bar {
+  z-index: -1;
+  position: absolute;
+  background-color: #f4f6f9;
+  height: 25px;
+  margin-left: 40px;
+  width: 65%;
+  cursor: pointer;
+}
+.scroll-bar:hover, .scroll-bar.focus {
+  background-color: lightgray;
 }
 .footer a {
   cursor: pointer;
