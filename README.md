@@ -62,8 +62,6 @@ In your template
 | :---                | :---      | :---     | :---        |
 | v-model             | Mandatory | Array    | Edited data in Array Of Object | 
 | page                | Optional  | Number   | Specific page size, default is auto-calculating by screen height |
-| n-filter-count      | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
-| row-style           | Optional  | Function | Conditional row formatting, default is null |
 | no-paging           | Optional  | Boolean  | Disable paging feature, default is false |
 | no-num-col          | Optional  | Boolean  | No number column, default is false |
 | filter-row          | Optional  | Boolean  | Show fixed filter row, default is false |
@@ -75,11 +73,12 @@ In your template
 | readonly-style      | Optional  | Object   | The style of the read-only cell |
 | height              | Optional  | String   | Define the exact height of the component |
 | width               | Optional  | String   | Define the maximum width of the component, default is '100%' |
+| row-style           | Optional  | Function | Conditional row formatting, default is null |
 | header-label        | Optional  | Function | Func to return the label, parameter are the field label, field object |
 | record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
-| footer-left-label   | Optional  | Function | Func to return the left label of footer, parameters are top#, bottom#, total# |
-| footer-middle-label | Optional  | Object   | Object to specify the first, previous, next and last labels of footer |
-| footer-right-label  | Optional  | Function | Func to return the right label of footer, parameters are select#, filter# & total# |
+total# |
+| localized-label     | Optional  | Object   | Customize labels and messages for localization purpose |
+| n-filter-count      | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
 
 #### Component: vue-excel-column
 | Name                 | Mandatory | Type     | Description |
@@ -95,7 +94,7 @@ In your template
 | allow-edit-when-new* | Optional  | Boolean  | Allow edit (For readonly column) when it is new record |
 | allow-keys           | Optional  | Array    | Array of char which allow to input |
 | mandatory            | Optional  | String   | If specified, it will be shown if the cell is blank, default is '' |
-| lengthLimit          | Optional  | Number   | Not allow to input when the content length reaches the limit |
+| length-limit         | Optional  | Number   | Not allow to input when the content length reaches the limit |
 | autocomplete         | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
 | pos                  | Optional  | Number   | Specified column sequence |
 | text-transform       | Optional  | String   | Force the input to upppercase or lowercase when editing |
@@ -242,6 +241,51 @@ In your HTML call it likes
 
 #### Validation
 ![Validation](/assets/validate.png?raw=true "Validation")
+
+## Localization
+Developer may override the default values through localized-label prop
+```html
+<template>
+    <vue-excel-editor v-model="jsondata" localized-label="myLabels">
+    ...
+    </vue-excel-editor>
+</template>
+```
+
+```javascript
+data: {
+    myLabels = {
+        footerLeft: (top, bottom, total) => `Record ${top} to ${bottom} of ${total}`,
+        first: 'First',
+        previous: 'Previous',
+        next: 'Next',
+        last: 'Last',
+        footerRight: (selected, filtered, loaded) => `Selected: ${selected} | Filtered: ${filtered} | Loaded: ${loaded}`,
+        processing: 'Processing',
+        tableSetting: 'Table Setting',
+        exportExcel: 'Export Excel',
+        importExcel: 'Import Excel',
+        back: 'Back',
+        sortingAndFiltering: 'Sorting And Filtering',
+        sortAscending: 'Sort Ascending',
+        sortDescending: 'Sort Descending',
+        near: '≒ Near',
+        exactMatch: '= Exact Match',
+        greaterThan: '&gt; Greater Than',
+        greaterThanOrEqualTo: '≥ Greater Than or Equal To',
+        lessThan: '&lt; Less Than',
+        lessThanOrEqualTo: '≤ Less Than Or Equal To',
+        regularExpression: '~ Regular Expression',
+        customFilter: 'Custom Filter',
+        listFirstNValuesOnly: n => `List first ${n} values only`,
+        apply: 'Apply',
+        noRecordIsRead: 'No record is read',
+        readonlyColumnDetected: 'Readonly column detected',
+        columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
+        noMatchedColumnName: 'No matched column name'
+    }
+}
+```
 
 ## Compatibility
 Chrome 79+, FireFox 71+, Safari 13+
