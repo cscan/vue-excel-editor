@@ -53,7 +53,7 @@ In your template
 ```
 
 ## Outlook
-![Simple Outlook](/assets/simple.png?raw=true "VueExcelEditor")
+![Simple Outlook](https://i.ibb.co/F6W7Xpg/simple.png "VueExcelEditor")
 
 ## Props List
 
@@ -222,25 +222,25 @@ In your HTML call it likes
 </template>
 ```
 #### Filter + Footer Rows
-![Filter + Footer Rows](/assets/footerfilter.png?raw=true "Filter + Footer Rows")
+![Filter + Footer Rows](https://i.ibb.co/0CtB6Hg/footerfilter.png "Filter + Footer Rows")
 
 #### Filtering
-![Filtering](/assets/filtering.png?raw=true "Filtering")
+![Filtering](https://i.ibb.co/VDB7jDd/filtering.png "Filtering")
 
 #### Sorting
-![Sorting](/assets/sorting.png?raw=true "Sorting")
+![Sorting](https://i.ibb.co/ggtJxYm/sorting.png "Sorting")
 
 #### Options
-![Options](/assets/options.png?raw=true "Options")
+![Options](https://i.ibb.co/GQ6rKBM/options.png "Options")
 
 #### Autocomplete
-![Autocomplete](/assets/autocomplete.png?raw=true "Autocomplete")
+![Autocomplete](https://i.ibb.co/7VRtFhT/autocomplete.png "Autocomplete")
 
 #### Select
-![Select](/assets/select.png?raw=true "Select")
+![Select](https://i.ibb.co/GxJGtrv/select.png "Select")
 
 #### Validation
-![Validation](/assets/validate.png?raw=true "Validation")
+![Validation](https://i.ibb.co/tzbKmMt/validate.png "Validation")
 
 ## Localization
 Developer may override the default values through localized-label prop
