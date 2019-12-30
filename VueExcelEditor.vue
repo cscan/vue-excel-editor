@@ -81,7 +81,7 @@
                 <td v-show="item.visible"
                     :id="`${record.key}:${item.name}`"
                     :class="{readonly: item.readonly, error: errmsg[`${record.key}:${item.name}`], select: item.options.length}"
-                    :style="item.initStyle"
+                    :style="item.readonly? Object.assign(item.initStyle, readonlyStyle): item.initStyle"
                     :key="`f${p}`"
                     @mouseover="cellMouseOver"
                     @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
