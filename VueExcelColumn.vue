@@ -84,7 +84,7 @@ export default {
       case 'date':
         allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-']
         if (!validate) validate = (val) => {
-          if (!moment(val, 'YY-MM-DD', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
+          if (!moment(val, 'YYYY-MM-DD', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
           return ''
         }
         break
