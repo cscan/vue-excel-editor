@@ -457,6 +457,12 @@ export default {
       }
     }
   },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.winResize)
+    window.removeEventListener('paste', this.winPaste)
+    window.removeEventListener('keydown', this.winKeydown)
+    window.removeEventListener('mousemove', this.sbMouseMove)
+  },
   mounted () {
     this.tableContent = this.$refs.tableContent
     this.systable = this.$refs.systable
@@ -478,7 +484,7 @@ export default {
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
       this.calCellTop2 = this.labelTr.offsetHeight
     })
-    window.onresize = this.winResize
+    window.addEventListener('resize', this.winResize)
     window.addEventListener('paste', this.winPaste)
     window.addEventListener('keydown', this.winKeydown)
   },
@@ -946,18 +952,16 @@ export default {
       target.setAttribute('style', `width:${rect.width}px; height:${rect.height}px;`)
     },
     refreshPageSize () {
-      const fullWidth = this.systable.getBoundingClientRect().width
-      const viewWidth = this.tableContent.getBoundingClientRect().width - 40
-      this.hScroller.tableUnseenWidth = fullWidth - viewWidth
-      this.$refs.scrollbar.style.width = (100 * viewWidth / fullWidth) + '%'
-      const scrollerWidth = this.$refs.scrollbar.getBoundingClientRect().width
-      this.hScroller.scrollerUnseenWidth = this.footer.getBoundingClientRect().width - 40 - scrollerWidth
-
+      if (this.$refs.scrollbar) {
+        const fullWidth = this.systable.getBoundingClientRect().width
+        const viewWidth = this.tableContent.getBoundingClientRect().width - 40
+        this.hScroller.tableUnseenWidth = fullWidth - viewWidth
+        this.$refs.scrollbar.style.width = (100 * viewWidth / fullWidth) + '%'
+        const scrollerWidth = this.$refs.scrollbar.getBoundingClientRect().width
+        this.hScroller.scrollerUnseenWidth = this.footer.getBoundingClientRect().width - 40 - scrollerWidth
+      }
       if (this.noPaging) return
-      // eslint-disable-next-line
-      // console.log(window.innerHeight, this.recordBody.getBoundingClientRect().top, this.footer.getBoundingClientRect().height)
-      this.pageSize = this.page || Math.floor((
-        window.innerHeight - this.recordBody.getBoundingClientRect().top - 35) / 24)
+      this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - 35) / 24)
     },
     firstPage () {
       this.processing = true
