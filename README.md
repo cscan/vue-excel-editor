@@ -281,7 +281,8 @@ data: {
         noRecordIsRead: 'No record is read',
         readonlyColumnDetected: 'Readonly column detected',
         columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
-        noMatchedColumnName: 'No matched column name'
+        noMatchedColumnName: 'No matched column name',
+        invalidInputValue: 'Invalid input value'
     }
 }
 ```

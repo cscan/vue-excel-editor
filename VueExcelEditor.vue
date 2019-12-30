@@ -257,7 +257,8 @@ export default {
           noRecordIsRead: 'No record is read',
           readonlyColumnDetected: 'Readonly column detected',
           columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
-          noMatchedColumnName: 'No matched column name'
+          noMatchedColumnName: 'No matched column name',
+          invalidInputValue: 'Invalid input value'
         }
       }
     }
@@ -517,7 +518,7 @@ export default {
       this.calCellTop2 = this.tableContent.scrollTop + this.labelTr.offsetHeight
       this.autocompleteInputs = []
 
-      if (this.hScroller.tableUnseenWidth) {
+      if (this.$refs.scrollbar && this.hScroller.tableUnseenWidth) {
         this.$refs.scrollbar.classList.add('focus')
         this.lazy(() => this.$refs.scrollbar.classList.remove('focus'), 1000)
         const ratio = this.tableContent.scrollLeft / this.hScroller.tableUnseenWidth

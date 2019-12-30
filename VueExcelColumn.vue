@@ -84,19 +84,22 @@ export default {
       case 'date':
         allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-']
         if (!validate) validate = (val) => {
-          return moment(val, 'YY-MM-DD', true).isValid()
+          if (!moment(val, 'YY-MM-DD', true).isValid()) return this.localizedLabel.invalidInputValue
+          return ''
         }
         break
       case 'datetime':
         allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
         if (!validate) validate = (val) => {
-          return moment(val, 'YY-MM-DD hh:mm', true).isValid()
+          if (!moment(val, 'YY-MM-DD hh:mm', true).isValid()) return this.localizedLabel.invalidInputValue
+          return ''
         }
         break
       case 'datetimesec':
         allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
         if (!validate) validate = (val) => {
-          return moment(val, 'YY-MM-DD hh:mm:ss', true).isValid()
+          if (!moment(val, 'YY-MM-DD hh:mm:ss', true).isValid()) return this.localizedLabel.invalidInputValue
+          return ''
         }
         break
       case 'datetick':
