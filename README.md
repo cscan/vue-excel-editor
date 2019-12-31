@@ -74,6 +74,7 @@ In your template
 | height              | Optional  | String   | Define the exact height of the component |
 | width               | Optional  | String   | Define the maximum width of the component, default is '100%' |
 | row-style           | Optional  | Function | Conditional row formatting, default is null |
+| cell-style          | Optional  | Function | Conditional cell formatting, default is null |
 | header-label        | Optional  | Function | Func to return the label, parameter are the field label, field object |
 | record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
 | localized-label     | Optional  | Object   | Customize labels and messages for localization purpose |
@@ -87,6 +88,7 @@ In your template
 | type                 | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
 | readonly             | Optional  | Boolean  | Read-only, default is parent prop: readonly |
 | init-style           | Optional  | Object   | Cell inital style in css |
+| sticky               | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
 | width                | Optional  | String   | Specified column width, default is 100px |
 | validate             | Optional  | Function | Custom function to validate and return the error message |
 | key-field*           | Optional  | Number   | Sequence number to create record key, default is 0 = Not key field |
