@@ -1362,7 +1362,7 @@ export default {
     lazy (p, delay, p1) {
       if (typeof p !== 'function') return this.lazyBuf(p, delay, p1)
       if (!delay) delay = 20
-      const hash = this.hashCode(p.name)
+      const hash = this.hashCode(p.name + p.toString())
       if (this.lazyTimeout[hash]) clearTimeout(this.lazyTimeout[hash])
       this.lazyTimeout[hash] = setTimeout(() => {
         p()
@@ -1371,7 +1371,7 @@ export default {
     },
     lazyBuf (item, p, delay) {
       if (!delay) delay = 20
-      const hash = this.hashCode(p.name)
+      const hash = this.hashCode(p.name + p.toString())
       if (this.lazyBuffer[hash])
         this.lazyBuffer[hash].push(item)
       else
