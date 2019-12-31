@@ -88,7 +88,7 @@
                       select: item.options.length,
                       'sticky-column': item.sticky
                     }"
-                    :style="Object.assign(cellStyle(record, item), item.style(), {left: item.left})"
+                    :style="Object.assign(cellStyle(record, item), columnCellStyle(item))"
                     :key="`f${p}`"
                     @mouseover="cellMouseOver"
                     @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
@@ -233,7 +233,7 @@ export default {
     width: {type: String, default: '100%'},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     readonly: {type: Boolean, default: false},
-    readonlyStyle: {type: Object, default: null},
+    readonlyStyle: {type: Object, default () {return {}}},
     localizedLabel: {
       type: Object,
       default () {
@@ -500,6 +500,12 @@ export default {
     window.addEventListener('keydown', this.winKeydown)
   },
   methods: {
+    columnCellStyle (field) {
+      let result = field.initStyle
+      if (field.readonly) result = Object.assign(result, this.readonlyStyle)
+      if (field.left) result = Object.assign(result, {left: field.left})
+      return result
+    },
     calStickyLeft () {
       let left = 0, n = 0
       this.leftMost = -1

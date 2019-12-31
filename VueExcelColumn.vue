@@ -162,14 +162,7 @@ export default {
       pos: Number(this.pos),
       options: this.options,
       toValue: this.toValue,
-      toText: this.toText,
-
-      style: () => {
-        let result = this.initStyle
-        if (this.readonly) result = Object.assign(style, this.$parent.readonlyStyle)
-        if (this.left) result = Object.assign(style, {left: this.left})
-        return result
-      }
+      toText: this.toText
     })
   }
 }
