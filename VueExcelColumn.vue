@@ -20,6 +20,7 @@ export default {
 
     keyField: {type: Number, default: 0},
     allowEditWhenNew: {type: Boolean, default: true},
+    sticky: {type: Boolean, default: false},
 
     allowKeys: {type: Array, default () {return null}},
     mandatory: {type: Boolean, default: false},
@@ -149,6 +150,7 @@ export default {
 
       keyField: Number(this.keyField),
       allowEditWhenNew: this.allowEditWhenNew,
+      sticky: this.sticky,
       allowKeys: allowKeys,
       mandatory: this.mandatory,
       lengthLimit: Number(lengthLimit),
@@ -160,7 +162,14 @@ export default {
       pos: Number(this.pos),
       options: this.options,
       toValue: this.toValue,
-      toText: this.toText
+      toText: this.toText,
+
+      style: () => {
+        let result = this.initStyle
+        if (this.readonly) result = Object.assign(style, this.$parent.readonlyStyle)
+        if (this.left) result = Object.assign(style, {left: this.left})
+        return result
+      }
     })
   }
 }
