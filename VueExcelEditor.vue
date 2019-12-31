@@ -1355,15 +1355,14 @@ export default {
       }
     },
     hashCode (s) {
-      return - s.split('').reduce((a, b) => {
-        a = ((a << 5) - a) + b.charCodeAt(0)
-        return a & a
+      return s.split('').reduce((a, b) => {
+        return a = ((a << 5) - a) + b.charCodeAt(0) | 0
       }, 0)
     },
     lazy (p, delay, p1) {
       if (typeof p !== 'function') return this.lazyBuf(p, delay, p1)
       if (!delay) delay = 20
-      const hash = this.hashCode(p.toString())
+      const hash = this.hashCode(p.name)
       if (this.lazyTimeout[hash]) clearTimeout(this.lazyTimeout[hash])
       this.lazyTimeout[hash] = setTimeout(() => {
         p()
@@ -1372,7 +1371,7 @@ export default {
     },
     lazyBuf (item, p, delay) {
       if (!delay) delay = 20
-      const hash = this.hashCode(p.toString())
+      const hash = this.hashCode(p.name)
       if (this.lazyBuffer[hash])
         this.lazyBuffer[hash].push(item)
       else
