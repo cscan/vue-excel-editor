@@ -1304,8 +1304,13 @@ export default {
       }
     },
     cellMouseMove (e) {
-      if (e.target.classList.contains('select') || e.target.classList.contains('datepick'))
-        e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : (this.inputBoxShow ? 'default' : 'cell')
+      let cursor = 'cell'
+      if (this.inputBoxShow) cursor = 'default'
+      if (!e.target.classList.contains('readonly')
+        && (e.target.classList.contains('select') || e.target.classList.contains('datepick'))
+        && e.target.offsetWidth - e.offsetX < 15)
+        cursor = 'pointer'
+      e.target.style.cursor = cursor
     },
     cellMouseOver (e) {
       const cell = e.target
@@ -1339,8 +1344,12 @@ export default {
       }
     },
     inputBoxMouseMove (e) {
-      if (this.currentField.options.length)
-        e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : 'text'
+      let cursor = 'text'
+      if (!this.currentField.readonly
+        && (this.currentField.options.length || this.currentField.type === 'date')
+        && e.target.offsetWidth - e.offsetX < 15)
+        cursor = 'pointer'
+      e.target.style.cursor = cursor
     },
     inputBoxMouseDown (e) {
       if (e.target.offsetWidth - e.offsetX > 15) return
@@ -1415,6 +1424,7 @@ export default {
       }
       this.inputBox.style.opacity = 0
       this.focused = false
+      this.showDatePicker = false
       if (this.currentRowPos !== -1) {
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
         this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
