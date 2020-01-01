@@ -86,6 +86,7 @@
                       readonly: item.readonly,
                       error: errmsg[`${record.key}:${item.name}`],
                       select: item.options.length,
+                      datepick: item.type == 'date',
                       'sticky-column': item.sticky
                     }"
                     :style="Object.assign(cellStyle(record, item), columnCellStyle(item))"
@@ -104,7 +105,9 @@
         <!-- Editor Square -->
         <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
           <div style="position: relative; height: 100%; padding: 2px 2px 1px">
+            <div class="rb-square" />
             <textarea ref="inputBox"
+                      id="inputBox"
                       class="input-box"
                       :style="{opacity: inputBoxShow}"
                       @blur="inputBoxBlur"
@@ -115,8 +118,12 @@
                       autocorrect="off"
                       autocompitaize="off"
                       spellcheck="false"></textarea>
-            <div class="rb-square" />
           </div>
+        </div>
+
+        <!-- Date Picker -->
+        <div ref="dpContainer" v-show="showDatePicker" style="z-index:20; position:fixed">
+          <date-picker ref="datepicker" inline v-model="inputDateTime" @input="dpClick" valueType="format"></date-picker>
         </div>
 
         <!-- Waiting scene -->
@@ -195,7 +202,10 @@ import VueExcelFilter from './VueExcelFilter'
 import PanelFilter from './panelFilter'
 import PanelSetting from './panelSetting'
 import PanelFind from './panelFind'
+import DatePicker from 'vue2-datepicker'
 import XLSX from 'xlsx'
+
+import 'vue2-datepicker/index.css'
 
 export default {
   components: {
@@ -203,6 +213,7 @@ export default {
     'panel-filter': PanelFilter,
     'panel-setting': PanelSetting,
     'panel-find': PanelFind,
+    'date-picker': DatePicker
   },
   props: {
     value: {type: Array, default () {return []}},
@@ -332,7 +343,10 @@ export default {
       lazyTimeout: {},
       lazyBuffer: {},
       hScroller: {},
-      leftMost: 0
+      leftMost: 0,
+
+      showDatePicker: false,
+      inputDateTime: ''
     }
   },
   computed: {
@@ -472,6 +486,7 @@ export default {
     window.removeEventListener('paste', this.winPaste)
     window.removeEventListener('keydown', this.winKeydown)
     window.removeEventListener('mousemove', this.sbMouseMove)
+    window.removeEventListener('scroll', this.winScroll)
   },
   mounted () {
     this.tableContent = this.$refs.tableContent
@@ -498,8 +513,20 @@ export default {
     window.addEventListener('resize', this.winResize)
     window.addEventListener('paste', this.winPaste)
     window.addEventListener('keydown', this.winKeydown)
+    window.addEventListener('scroll', this.winScroll)
   },
   methods: {
+    showDatePickerDiv () {
+      const cellRect = this.currentCell.getBoundingClientRect()
+      this.$refs.dpContainer.style.left = (cellRect.left) + 'px'
+      this.$refs.dpContainer.style.top = (cellRect.bottom) + 'px'
+      this.inputDateTime = this.currentCell.textContent
+      this.showDatePicker = true
+    },
+    dpClick () {
+      this.inputCellWrite(this.inputDateTime)
+      this.showDatePicker = false
+    },
     columnCellStyle (field) {
       let result = field.initStyle
       if (field.readonly) result = Object.assign(result, this.readonlyStyle)
@@ -546,6 +573,7 @@ export default {
       this.calCellTop = this.tableContent.scrollTop
       this.calCellTop2 = this.tableContent.scrollTop + this.labelTr.offsetHeight
       */
+      this.showDatePicker = false
       this.autocompleteInputs = []
       if (this.focused && this.currentField)
         this.inputSquare.style.marginLeft = (this.currentField.sticky ? this.tableContent.scrollLeft : 0) + 'px'
@@ -653,6 +681,10 @@ export default {
         fileReader.readAsBinaryString(file)
       }, 500)      
     },
+    winScroll () {
+      this.showDatePicker = false
+      this.autocompleteInputs = []
+    },
     winResize () {
       this.lazy(this.refreshPageSize, 200)
     },
@@ -755,6 +787,7 @@ export default {
                 this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
             break
           case 27:
+            this.showDatePicker = false
             this.autocompleteInputs = []
             this.autocompleteSelect = -1
             if (this.inputBoxShow) {
@@ -796,6 +829,10 @@ export default {
             if (!this.inputBoxShow) {
               if (this.currentField.type === 'select') {
                 this.calAutocompleteList(true)
+                return
+              }
+              if (this.currentField.type === 'date') {
+                this.showDatePickerDiv()
                 return
               }
               this.inputBox.value = ''
@@ -846,6 +883,7 @@ export default {
       this.currentField = this.fields[colPos]
       this.inputSquare.style.zIndex = this.currentField.sticky ? 3 : 1
       this.currentCell = cell
+      this.showDatePicker = false
       this.autocompleteInputs = []
       this.autocompleteSelect = -1
       if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
@@ -1244,12 +1282,13 @@ export default {
         const colPos = Array.from(row.children).indexOf(e.target) - 1
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
         this.moveInputSquare(rowPos, colPos)
-        if (e.target.classList.contains('select') && e.target.offsetWidth - e.offsetX < 15)
-          this.calAutocompleteList(true)
+        if (e.target.offsetWidth - e.offsetX > 15) return
+        if (e.target.classList.contains('select')) this.calAutocompleteList(true)
+        if (e.target.classList.contains('datepick')) this.showDatePickerDiv()
       }
     },
     cellMouseMove (e) {
-      if (e.target.classList.contains('select'))
+      if (e.target.classList.contains('select') || e.target.classList.contains('datepick'))
         e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : (this.inputBoxShow ? 'default' : 'cell')
     },
     cellMouseOver (e) {
@@ -1288,9 +1327,14 @@ export default {
         e.target.style.cursor = e.target.offsetWidth - e.offsetX < 15 ? 'pointer' : 'text'
     },
     inputBoxMouseDown (e) {
-      if (this.currentField.options.length && e.target.offsetWidth - e.offsetX < 15) {
+      if (e.target.offsetWidth - e.offsetX > 15) return
+      if (this.currentField.options.length) {
         e.preventDefault()
         this.calAutocompleteList(true)
+      }
+      if (this.currentField.type === 'date') {
+        e.preventDefault()
+        this.showDatePickerDiv()
       }
     },
     calAutocompleteList (force) {
@@ -1627,8 +1671,14 @@ input:focus, input:active:focus, input.active:focus {
 .systable td.first-col.focus {
   border-right: 1px solid rgb(61, 85, 61) !important;
 }
-.systable tbody td.select {
+.systable tbody td.select:not(.readonly) {
   background-image: url('./assets/down.png');
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position: right 5px top 8px;
+}
+.systable tbody td.datepick:not(.readonly) {
+  background-image: url('./assets/datepick.png');
   background-repeat: no-repeat;
   background-size: 8px 8px;
   background-position: right 5px top 8px;
