@@ -1589,7 +1589,7 @@ input:focus, input:active:focus, input.active:focus {
   -ms-user-select: none;
   user-select: none;
   position: relative;
-  width: calc(100% + 2px);
+  width: 100%;
   scrollbar-width: none;
 }
 .table-content :focus {
@@ -1676,7 +1676,7 @@ input:focus, input:active:focus, input.active:focus {
 }
 .systable thead td.column-filter {
   text-align: left;
-  background-color: lightyellow;
+  background-color: #fffff2;
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
