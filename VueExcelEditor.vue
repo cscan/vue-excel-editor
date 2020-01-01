@@ -852,12 +852,28 @@ export default {
     },
     moveInputSquare (rowPos, colPos) {
       if (colPos < 0) return
+      const row = this.recordBody.children[rowPos]
+      if (!row) {
+        if (rowPos > this.currentRowPos) {
+          if (this.pageTop + this.pageSize + 1 < this.table.length) {
+            this.pageTop += 1
+            setTimeout(() => this.moveInputSquare(rowPos - 1, colPos))
+          }
+          return
+        }
+        else {
+          if (this.pageTop - 1 >= 0) {
+            this.pageTop -= 1
+            setTimeout(() => this.moveInputSquare(rowPos + 1, colPos))
+          }
+          return
+        }
+      }
+
       this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length)
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
 
-      const row = this.recordBody.children[rowPos]
-      if (!row) return
       const cell = row.children[colPos + 1]
       if (!cell) return
       const cellRect = cell.getBoundingClientRect()
@@ -1266,7 +1282,7 @@ export default {
       }
     },
     moveNorth () {
-      if (this.focused && this.currentRowPos > 0)
+      if (this.focused)
         this.moveInputSquare(this.currentRowPos - 1, this.currentColPos)
     },
     moveSouth () {
