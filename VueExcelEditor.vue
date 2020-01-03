@@ -234,6 +234,7 @@ export default {
     noFinding: {type: Boolean, default: false},
     noFindingNext: {type: Boolean, default: false},
     filterRow: {type: Boolean, default: false},
+    freeSelect: {type: Boolean, default: false},
     noFooter: {type: Boolean, default: false},
     noPaging: {type: Boolean, default: false},
     noNumCol: {type: Boolean, default: false},
@@ -1098,8 +1099,10 @@ export default {
               this.selectRecord(i)
         }
       }
-      else
+      else {
+        if (!this.freeSelect && !(e.ctrlKey || e.metaKey)) this.clearAllSelected()
         this.toggleSelectRecord(rowPos)
+      }
       this.prevSelect = rowPos
     },
     settingClick () {

@@ -68,6 +68,7 @@ In your template
 | no-footer           | Optional  | Boolean  | No footer row, default is false |
 | no-finding          | Optional  | Boolean  | Disable find key (ctrl-f) and finding dialog, default is false |
 | no-finding-next     | Optional  | Boolean  | Disable find-next key (ctrl-g), default is false |
+| free-select         | Optional  | Boolean  | Select multiple rows without pressing ctrl/meta key |
 | autocomplete        | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
 | readonly            | Optional  | Boolean  | Set all columns read only, default is false |
 | readonly-style      | Optional  | Object   | The style of the read-only cell |
