@@ -459,11 +459,7 @@ export default {
       // detect a loading process, reset something
       this.redo = []
       this.errmsg = []
-      this.processing = true
-      setTimeout(() => {
-        this.reset()
-        this.processing = false
-      }, 0)
+      this.lazy(this.reset)
     },
     columnFilterString () {
       this.processing = true
@@ -916,6 +912,7 @@ export default {
       this.pageTop = 0
       this.prevSelect = -1
       this.reviseSelectedAfterTableChange()
+      this.refreshPageSize()
     },
     getSelectedRecords () {
       return this.table.filter((rec, i) => this.selected[i])
