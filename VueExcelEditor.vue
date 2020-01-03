@@ -521,6 +521,8 @@ export default {
       this.showDatePicker = true
     },
     dpClick () {
+      this.inputBox.value = this.inputDateTime
+      this.inputBox.style.opacity = 0
       this.inputCellWrite(this.inputDateTime)
       this.showDatePicker = false
       this.focused = true
@@ -1419,13 +1421,14 @@ export default {
         this.updateCell(row, col, this.fields[col].name, setText)
     },
     inputBoxBlur () {
+      if (this.$refs.dpContainer.querySelector(':hover')) return
       if (this.inputBoxChanged) {
         this.inputCellWrite(this.inputBox.value)
         this.inputBoxChanged = false
       }
       this.inputBox.style.opacity = 0
       this.focused = false
-      this.lazy(() => (this.showDatePicker = false), 200)
+      this.showDatePicker = false
       if (this.currentRowPos !== -1) {
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
         this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
