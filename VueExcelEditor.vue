@@ -523,6 +523,7 @@ export default {
     dpClick () {
       this.inputCellWrite(this.inputDateTime)
       this.showDatePicker = false
+      this.focused = true
     },
     columnCellStyle (field) {
       let result = field.initStyle
@@ -1424,7 +1425,7 @@ export default {
       }
       this.inputBox.style.opacity = 0
       this.focused = false
-      this.showDatePicker = false
+      this.lazy(() => (this.showDatePicker = false), 200)
       if (this.currentRowPos !== -1) {
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
         this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
