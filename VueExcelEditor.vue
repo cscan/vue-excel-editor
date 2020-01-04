@@ -506,6 +506,8 @@ export default {
       this.systable.parentNode.style.height = this.height
 
     this.reset()
+    this.redo = []
+    this.errmsg = []
     this.lazy(this.refreshPageSize, 200)
     setTimeout(() => {
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
