@@ -92,7 +92,7 @@ In your template
 | sticky               | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
 | width                | Optional  | String   | Specified column width, default is 100px |
 | validate             | Optional  | Function | Custom function to validate and return the error message |
-| key-field            | Optional  | Boolean  | The key fields will be included in keys parameter of @update event |
+| key-field            | Optional  | Boolean  | Specified the key field which is included in keys parameter in @update event |
 | allow-edit-when-new* | Optional  | Boolean  | Allow edit (For readonly column) when it is new record |
 | allow-keys           | Optional  | Array    | Array of char which allow to input |
 | mandatory            | Optional  | String   | If specified, it will be shown if the cell is blank, default is '' |
@@ -134,24 +134,24 @@ In your template
 #### Component: vue-excel-editor
 | Name               | Arguments            | Description |
 | :---               | :---                 | :---        |
-| exportTable        | format, selectedOnly | export the filtered table as xlsx/csv |
-| importTable        | callback             | import the specified formatted xlsx |
-| clearAllSelected   |                      | Unselect all selected rows |
-| undoTransaction    |                      | Undo the latest update |
 | firstPage          |                      | Move to the first page |
 | lastPage           |                      | Move to the last page |
 | prevPage           |                      | Move to the previous page |
 | nextPage           |                      | Move to the next page |
-| getSelectedRecords |                      | Get an array of the selected rows |
-| doFind             | FindText             | Find the specified text in whole table and locate the cursor cell |
-| doFindNext         |                      | Contnue the last find |
-| selectRecord       | row                  | Select the row |
-| unSelectRecord     | row                  | UnSelect the row |
 | moveNorth          |                      | Move the cursor cell to upper cell |
 | moveSouth          |                      | Move the cursor cell to lower cell |
 | moveWest           |                      | Move the cursor cell to previous cell |
 | moveEast           |                      | Move the cursor cell to next cell |
+| doFind             | text                 | Find the specified text in whole table and locate the cursor cell |
+| doFindNext         |                      | Contnue the last find |
 | sort               | n, pos               | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
+| selectRecord       | row                  | Select the row |
+| unSelectRecord     | row                  | UnSelect the row |
+| clearAllSelected   |                      | Unselect all selected rows |
+| getSelectedRecords |                      | Get an array of the selected rows |
+| exportTable        | format, selectedOnly | export the filtered table as xlsx/csv |
+| importTable        | callback             | import the specified formatted xlsx |
+| undoTransaction    |                      | Undo the last update |
 
 ## Variable List
 
@@ -160,10 +160,10 @@ In your template
 | :---               | :---            | :---        |
 | fields             | Array of Object | It contains the column spec, each will create during mount, developer can still change the col spec via this after mounted |
 | filterColumn       | Object          | Contains the current filters, developer can access the filter string via this |
-| selected           | Object          | Contains all the selected rows, the key is row number and the value is record key |
+| selected           | Object          | Contains all the selected rows, the key is row number and the value is internal $id |
 | selectedCount      | Number          | Number of rows are selected |
-| errmsg             | Object          | Contains all the validation error messages, the key is record key and field name |
-| redo               | Array of array  | The buffer of undo, it will be removed after undo |
+| errmsg             | Object          | Contains all the validation error messages, the key is internal $id plus field name |
+| redo               | Array of array  | The buffer of undo, it will be removed after undo or table changed |
 | pageTop            | Number          | The top row number of the current page |
 
 ## Example

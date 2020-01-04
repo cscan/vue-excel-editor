@@ -518,6 +518,10 @@ export default {
     window.addEventListener('scroll', this.winScroll)
   },
   methods: {
+    getKeys (rec) {
+      if (!rec) rec = this.currentRecord
+      return this.fields.filter(field => field.keyField).map(field => rec[field.name])
+    },
     showDatePickerDiv () {
       const cellRect = this.currentCell.getBoundingClientRect()
       this.$refs.dpContainer.style.left = (cellRect.left) + 'px'
@@ -527,7 +531,7 @@ export default {
     },
     dpClick () {
       this.inputBox.value = this.inputDateTime
-      this.inputBox.style.opacity = 0
+      this.inputBoxShow = 0
       this.inputCellWrite(this.inputDateTime)
       this.showDatePicker = false
       this.focused = true
@@ -785,8 +789,16 @@ export default {
             break
           case 13:
             e.preventDefault()
-            if (this.autocompleteInputs.length === 0 || this.autocompleteSelect === -1)
-              this.moveSouth(e)
+            if (this.autocompleteInputs.length === 0 || this.autocompleteSelect === -1) {
+              if (!this.moveSouth(e)) {
+                if (this.inputBoxChanged) {
+                  this.inputCellWrite(this.inputBox.value)
+                  this.inputBoxChanged = false
+                }
+                this.inputBoxShow = 0
+              }
+              return
+            }
             else
               if (this.autocompleteSelect !== -1)
                 this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
@@ -856,7 +868,7 @@ export default {
       this.fields.splice(pos, 0, field)
     },
     moveInputSquare (rowPos, colPos) {
-      if (colPos < 0) return
+      if (colPos < 0) return false
       const row = this.recordBody.children[rowPos]
       if (!row) {
         if (rowPos > this.currentRowPos) {
@@ -864,14 +876,14 @@ export default {
             this.pageTop += 1
             setTimeout(() => this.moveInputSquare(rowPos - 1, colPos))
           }
-          return
+          return false
         }
         else {
           if (this.pageTop - 1 >= 0) {
             this.pageTop -= 1
             setTimeout(() => this.moveInputSquare(rowPos + 1, colPos))
           }
-          return
+          return false
         }
       }
 
@@ -880,7 +892,7 @@ export default {
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
 
       const cell = row.children[colPos + 1]
-      if (!cell) return
+      if (!cell) return false
       const cellRect = cell.getBoundingClientRect()
       const tableRect = this.systable.getBoundingClientRect()
       const boundRect = this.$el.getBoundingClientRect()
@@ -915,6 +927,7 @@ export default {
         row.children[0].classList.add('focus')
         this.labelTr.children[colPos + 1].classList.add('focus')
       }
+      return true
     },
     reset () {
       this.pageTop = 0
@@ -1230,7 +1243,7 @@ export default {
         const field = this.fields[colPos]
         const transaction = {
           $id: tableRow.$id,
-          keys: this.fields.filter(field => field.keyField).map(field => tableRow[field.name]),
+          keys: this.getKeys(tableRow),
           colPos: colPos,
           field: name,
           newVal: content,
@@ -1298,7 +1311,8 @@ export default {
     },
     moveSouth () {
       if (this.focused && this.currentRowPos < this.table.length)
-        this.moveInputSquare(this.currentRowPos + 1, this.currentColPos)
+        return this.moveInputSquare(this.currentRowPos + 1, this.currentColPos)
+      return false
     },
     mouseDown (e) {
       if (e.target.parentNode.parentNode.tagName === 'TBODY' && !e.target.classList.contains('first-col')) {
@@ -1434,7 +1448,7 @@ export default {
         this.inputCellWrite(this.inputBox.value)
         this.inputBoxChanged = false
       }
-      this.inputBox.style.opacity = 0
+      this.inputBoxShow = 0
       this.focused = false
       this.showDatePicker = false
       if (this.currentRowPos !== -1) {
