@@ -18,7 +18,7 @@ export default {
     textTransform: {type: String, default: null}, // replace uppercase prop
     textAlign: {type: String, default: null},
 
-    keyField: {type: Number, default: 0},
+    keyField: {type: Boolean, default: false},
     allowEditWhenNew: {type: Boolean, default: true},
     sticky: {type: Boolean, default: false},
 
@@ -148,7 +148,7 @@ export default {
       width: this.width,
       validate: validate,
 
-      keyField: Number(this.keyField),
+      keyField: this.keyField,
       allowEditWhenNew: this.allowEditWhenNew,
       sticky: this.sticky,
       allowKeys: allowKeys,

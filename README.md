@@ -92,7 +92,7 @@ In your template
 | sticky               | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
 | width                | Optional  | String   | Specified column width, default is 100px |
 | validate             | Optional  | Function | Custom function to validate and return the error message |
-| key-field*           | Optional  | Number   | Sequence number to create record key, default is 0 = Not key field |
+| key-field            | Optional  | Boolean  | The key fields will be included in keys parameter of @update event |
 | allow-edit-when-new* | Optional  | Boolean  | Allow edit (For readonly column) when it is new record |
 | allow-keys           | Optional  | Array    | Array of char which allow to input |
 | mandatory            | Optional  | String   | If specified, it will be shown if the cell is blank, default is '' |
@@ -173,11 +173,11 @@ export default {
     name: 'app',
     data: {
         jsondata: [
-            {key: 'U0001', user: 'kc', name: 'Kenneth Cheng', phone: '852-1234-5678', gender: 'M', age: 25, birth: '1997-07-01'},
-            {key: 'U0002', user: 'sm', name: 'Simon Minolta', phone: '852-1234-5682', gender: 'M', age: 20, birth: '1999-11-12'},
-            {key: 'U0003', user: 'ra', name: 'Raymond Atom', phone: '852-1234-5683', gender: 'M', age: 18, birth: '2000-06-11'},
-            {key: 'U0004', user: 'ag', name: 'Mary George', phone: '852-1234-5684', gender: 'F', age: 22, birth: '2002-08-01'},
-            {key: 'U0005', user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
+            {user: 'kc', name: 'Kenneth Cheng', phone: '852-1234-5678', gender: 'M', age: 25, birth: '1997-07-01'},
+            {user: 'sm', name: 'Simon Minolta', phone: '852-1234-5682', gender: 'M', age: 20, birth: '1999-11-12'},
+            {user: 'ra', name: 'Raymond Atom', phone: '852-1234-5683', gender: 'M', age: 18, birth: '2000-06-11'},
+            {user: 'ag', name: 'Mary George', phone: '852-1234-5684', gender: 'F', age: 22, birth: '2002-08-01'},
+            {user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
         ]
     },
     methods: {
@@ -190,9 +190,6 @@ export default {
 }
 ```
 
-#### Important
-The Array-Of-Object (AOO) data is required an unique "key" field (e.g. U0001, U0002 ... in above example) to operate
-
 ## Work with redis for saving
 
 ```html
@@ -203,7 +200,7 @@ The Array-Of-Object (AOO) data is required an unique "key" field (e.g. U0001, U0
 ```js
 methods: {
     save (records) {
-      records = records.map(rec => ['hset', rec.key, rec.field, rec.newVal])
+      records = records.map(rec => ['hset', rec.keys.join(), rec.field, rec.newVal])
       redis.multi(records).exec()
     }
 }
@@ -214,7 +211,7 @@ In your HTML call it likes
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" no-paging autocomplete filter-row>
-        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly />
+        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly key-field sticky />
         <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
         <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
         <vue-excel-column field="gender" label="Gender"        type="select" width="50px" :options="['F','M','U']" />

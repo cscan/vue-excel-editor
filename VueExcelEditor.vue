@@ -81,10 +81,10 @@
               </td>
               <template v-for="(item, p) in fields">
                 <td v-show="item.visible"
-                    :id="`${record.key}:${item.name}`"
+                    :id="`${record.$id}:${item.name}`"
                     :class="{
                       readonly: item.readonly,
-                      error: errmsg[`${record.key}:${item.name}`],
+                      error: errmsg[`${record.$id}:${item.name}`],
                       select: item.options.length,
                       datepick: item.type == 'date',
                       'sticky-column': item.sticky
@@ -355,6 +355,11 @@ export default {
       return JSON.stringify(this.columnFilter)
     },
     table () {
+      // add unique key to each row if no key is provided
+      let seed = new Date().getTime() - 1578101000000
+      this.value.forEach((rec,i) => {
+        if (!rec.$id) rec.$id = seed + '.' + i
+      })
       Object.keys(this.columnFilter).forEach((key) => {
         (this.columnFilter[key].trim() === '') && delete this.columnFilter[key]
       })
@@ -1100,8 +1105,10 @@ export default {
         }
       }
       else {
+        const selected = this.selected[rowPos]
         if (!this.freeSelect && !(e.ctrlKey || e.metaKey)) this.clearAllSelected()
-        this.toggleSelectRecord(rowPos)
+        if (!selected) this.selectRecord(rowPos)
+        else this.unSelectRecord(rowPos)
       }
       this.prevSelect = rowPos
     },
@@ -1145,13 +1152,13 @@ export default {
     },
     reviseSelectedAfterTableChange () {
       this.rowIndex = {}
-      this.table.forEach((rec, i) => (this.rowIndex[rec.key] = i))
+      this.table.forEach((rec, i) => (this.rowIndex[rec.$id] = i))
       const temp = Object.assign(this.selected)
       this.selected = {}
       Object.keys(temp).forEach((p) => {
-        const key = temp[p]
-        if (typeof this.rowIndex[key] !== 'undefined')
-          this.selected[this.rowIndex[key]] = key
+        const id = temp[p]
+        if (typeof this.rowIndex[id] !== 'undefined')
+          this.selected[this.rowIndex[id]] = id
       })
       this.selectedCount = Object.keys(this.selected).length
     },
@@ -1162,7 +1169,7 @@ export default {
     selectRecord (rowPos) {
       if (typeof this.selected[rowPos] === 'undefined') {
         this.selectedCount++
-        this.selected[rowPos] = this.table[rowPos].key
+        this.selected[rowPos] = this.table[rowPos].$id
         if (this.recordBody.children[rowPos - this.pageTop])
           this.recordBody.children[rowPos - this.pageTop].classList.add('select')
         this.lazy(rowPos, (buf) => {
@@ -1195,8 +1202,8 @@ export default {
       }
     },
     clearAllSelected () {
-      for (let i = 0; i < this.$refs.systable.children[2].children.length; i++)
-        this.unSelectRecord(i)
+      // for (let i = 0; i < this.$refs.systable.children[2].children.length; i++)
+      //  this.unSelectRecord(this.pageTop + i)
       this.selected = {}
       this.selectedCount = 0
     },
@@ -1205,7 +1212,7 @@ export default {
       if (this.redo.length === 0) return
       const transaction = this.redo.pop()
       transaction.forEach((rec) => {
-        this.updateCell(this.rowIndex[rec.key], rec.colPos, rec.field, rec.oldVal, true)
+        this.updateCell(this.rowIndex[rec.$id], rec.colPos, rec.field, rec.oldVal, true)
       })
     },
     updateCellByColPos (row, colPos, content) {
@@ -1222,7 +1229,8 @@ export default {
       setTimeout(() => {
         const field = this.fields[colPos]
         const transaction = {
-          key: tableRow.key,
+          $id: tableRow.$id,
+          keys: this.fields.filter(field => field.keyField).map(field => tableRow[field.name]),
           colPos: colPos,
           field: name,
           newVal: content,
@@ -1230,7 +1238,7 @@ export default {
           err: ''
         }
 
-        const id = `${transaction.key}:${name}`
+        const id = `${tableRow.$id}:${name}`
         if (field.validate !== null) transaction.err = field.validate(content)
         if (field.mandatory && content === '')
           transaction.err += (transaction.err ? '\n' : '') + field.mandatory
