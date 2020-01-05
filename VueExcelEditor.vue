@@ -1239,7 +1239,8 @@ export default {
     },
     updateCell (row, colPos, name, content, restore) {
       const tableRow = this.table[row]
-      const oldRec = Object.assign({}, tableRow)
+      const oldVal = tableRow[name]
+      const oldKeys = this.getKeys(tableRow)
       tableRow[name] = content
 
       setTimeout(() => {
@@ -1247,15 +1248,13 @@ export default {
         const transaction = {
           $id: tableRow.$id,
           keys: this.getKeys(tableRow),
-          oldKeys: this.getKeys(oldRec),
+          oldKeys: oldKeys,
           rowPos: row,
           colPos: colPos,
           name: name,
           field: field,
-          oldVal: oldRec[name],
+          oldVal: oldVal,
           newVal: content,
-          oldRec: oldRec,
-          newRec: Object.assign({}, tableRow),
           err: ''
         }
 
