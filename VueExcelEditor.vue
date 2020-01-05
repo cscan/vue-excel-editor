@@ -347,7 +347,9 @@ export default {
       leftMost: 0,
 
       showDatePicker: false,
-      inputDateTime: ''
+      inputDateTime: '',
+
+      table: []
     }
   },
   computed: {
@@ -356,100 +358,6 @@ export default {
         if (this.columnFilter[key].trim() === '') delete this.columnFilter[key]
       })
       return JSON.stringify(this.columnFilter)
-    },
-    table () {
-      // add unique key to each row if no key is provided
-      let seed = new Date().getTime() - 1578101000000
-      this.value.forEach((rec,i) => {
-        if (!rec.$id) rec.$id = seed + '.' + i
-      })
-      const filterColumnList = Object.keys(this.columnFilter)
-      const filter = {}
-      filterColumnList.forEach((k) => {
-        switch (true) {
-          case this.columnFilter[k].startsWith('<='):
-            filter[k] = {type: 1, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
-            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
-            break
-          case this.columnFilter[k].startsWith('<'):
-            filter[k] = {type: 2, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
-            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
-            break
-          case this.columnFilter[k].startsWith('>='):
-            filter[k] = {type: 3, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
-            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
-            break
-          case this.columnFilter[k].startsWith('>'):
-            filter[k] = {type: 4, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
-            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
-            break
-          case this.columnFilter[k].startsWith('='):
-            filter[k] = {type: 0, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
-            break
-          case this.columnFilter[k].startsWith('*') && this.columnFilter[k].endsWith('*'):
-            filter[k] = {type: 5, value: this.columnFilter[k].slice(1).slice(0, -1).trim().toUpperCase()}
-            break
-          case this.columnFilter[k].startsWith('*') && !this.columnFilter[k].slice(1).includes('*'):
-            filter[k] = {type: 6, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
-            break
-          case this.columnFilter[k].endsWith('*') && !this.columnFilter[k].slice(0, -1).includes('*'):
-            filter[k] = {type: 7, value: this.columnFilter[k].slice(0, -1).trim().toUpperCase()}
-            break
-          case this.columnFilter[k].startsWith('~'):
-            filter[k] = {type: 8, value: this.columnFilter[k].slice(1).trim()}
-            break
-          case this.columnFilter[k].includes('*') || this.columnFilter[k].includes('?'):
-            filter[k] = {type: 8, value: '^' + this.columnFilter[k].replace(/\*/g, '.*').replace(/\?/g, '.').trim() + '$'}
-            break
-          default:
-            filter[k] = {type: 5, value: this.columnFilter[k].trim().toUpperCase()}
-            break
-        }
-      })
-      return this.value.filter((record) => {
-        const content = {}
-        filterColumnList.forEach((k) => {
-          const val = record[this.fields[k].name]
-          content[k] = typeof val === 'undefined' ? '' : String(val).toUpperCase()
-        })
-        for (let i = 0; i < filterColumnList.length; i++) {
-          const k = filterColumnList[i]
-          switch (filter[k].type) {
-            case 0:
-              if (`${content[k]}` !== `${filter[k].value}`) return false
-              break
-            case 1:
-              if (this.fields[k].type === 'number') content[k] = Number(content[k])
-              if (filter[k].value < content[k]) return false
-              break
-            case 2:
-              if (this.fields[k].type === 'number') content[k] = Number(content[k])
-              if (filter[k].value <= content[k]) return false
-              break
-            case 3:
-              if (this.fields[k].type === 'number') content[k] = Number(content[k])
-              if (filter[k].value > content[k]) return false
-              break
-            case 4:
-              if (this.fields[k].type === 'number') content[k] = Number(content[k])
-              if (filter[k].value >= content[k]) return false
-              break
-            case 5:
-              if (!content[k].includes(filter[k].value)) return false
-              break
-            case 6:
-              if (!content[k].endsWith(filter[k].value)) return false
-              break
-            case 7:
-              if (!content[k].startsWith(filter[k].value)) return false
-              break
-            case 8:
-              if (!new RegExp(filter[k].value, 'i').test(content[k])) return false
-              break
-          }
-        }
-        return true
-      })
     },
     pagingTable () {
       return this.table.slice(this.pageTop, this.pageTop + this.pageSize)
@@ -520,6 +428,100 @@ export default {
     window.addEventListener('scroll', this.winScroll)
   },
   methods: {
+    calTable () {
+      // add unique key to each row if no key is provided
+      let seed = new Date().getTime() - 1578101000000
+      this.value.forEach((rec,i) => {
+        if (!rec.$id) rec.$id = seed + '.' + i
+      })
+      const filterColumnList = Object.keys(this.columnFilter)
+      const filter = {}
+      filterColumnList.forEach((k) => {
+        switch (true) {
+          case this.columnFilter[k].startsWith('<='):
+            filter[k] = {type: 1, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
+            break
+          case this.columnFilter[k].startsWith('<'):
+            filter[k] = {type: 2, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
+            break
+          case this.columnFilter[k].startsWith('>='):
+            filter[k] = {type: 3, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
+            break
+          case this.columnFilter[k].startsWith('>'):
+            filter[k] = {type: 4, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
+            if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
+            break
+          case this.columnFilter[k].startsWith('='):
+            filter[k] = {type: 0, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
+            break
+          case this.columnFilter[k].startsWith('*') && this.columnFilter[k].endsWith('*'):
+            filter[k] = {type: 5, value: this.columnFilter[k].slice(1).slice(0, -1).trim().toUpperCase()}
+            break
+          case this.columnFilter[k].startsWith('*') && !this.columnFilter[k].slice(1).includes('*'):
+            filter[k] = {type: 6, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
+            break
+          case this.columnFilter[k].endsWith('*') && !this.columnFilter[k].slice(0, -1).includes('*'):
+            filter[k] = {type: 7, value: this.columnFilter[k].slice(0, -1).trim().toUpperCase()}
+            break
+          case this.columnFilter[k].startsWith('~'):
+            filter[k] = {type: 8, value: this.columnFilter[k].slice(1).trim()}
+            break
+          case this.columnFilter[k].includes('*') || this.columnFilter[k].includes('?'):
+            filter[k] = {type: 8, value: '^' + this.columnFilter[k].replace(/\*/g, '.*').replace(/\?/g, '.').trim() + '$'}
+            break
+          default:
+            filter[k] = {type: 5, value: this.columnFilter[k].trim().toUpperCase()}
+            break
+        }
+      })
+      this.table = this.value.filter((record) => {
+        const content = {}
+        filterColumnList.forEach((k) => {
+          const val = record[this.fields[k].name]
+          content[k] = typeof val === 'undefined' ? '' : String(val).toUpperCase()
+        })
+        for (let i = 0; i < filterColumnList.length; i++) {
+          const k = filterColumnList[i]
+          switch (filter[k].type) {
+            case 0:
+              if (`${content[k]}` !== `${filter[k].value}`) return false
+              break
+            case 1:
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
+              if (filter[k].value < content[k]) return false
+              break
+            case 2:
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
+              if (filter[k].value <= content[k]) return false
+              break
+            case 3:
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
+              if (filter[k].value > content[k]) return false
+              break
+            case 4:
+              if (this.fields[k].type === 'number') content[k] = Number(content[k])
+              if (filter[k].value >= content[k]) return false
+              break
+            case 5:
+              if (!content[k].includes(filter[k].value)) return false
+              break
+            case 6:
+              if (!content[k].endsWith(filter[k].value)) return false
+              break
+            case 7:
+              if (!content[k].startsWith(filter[k].value)) return false
+              break
+            case 8:
+              if (!new RegExp(filter[k].value, 'i').test(content[k])) return false
+              break
+          }
+        }
+        return true
+      })
+    },
     getKeys (rec) {
       if (!rec) rec = this.currentRecord
       const key = this.fields.filter(field => field.keyField).map(field => rec[field.name])
@@ -865,7 +867,7 @@ export default {
       const row = this.recordBody.children[rowPos]
       if (!row) {
         if (rowPos > this.currentRowPos) {
-          if (this.pageTop + this.pageSize + 1 < this.table.length) {
+          if (this.pageTop + this.pageSize < this.table.length) {
             this.pageTop += 1
             setTimeout(() => this.moveInputSquare(rowPos - 1, colPos))
           }
@@ -927,6 +929,7 @@ export default {
       this.prevSelect = -1
       this.reviseSelectedAfterTableChange()
       this.refreshPageSize()
+      this.calTable()
     },
     getSelectedRecords () {
       return this.table.filter((rec, i) => this.selected[i])
@@ -1072,17 +1075,15 @@ export default {
     },
     firstPage () {
       this.processing = true
-      this.pageTop = 0
       setTimeout(() => {
-        this.moveTo(0)
+        this.pageTop = 0
         this.processing = false
       })
     },
     lastPage () {
       this.processing = true
-      this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
       setTimeout(() => {
-        this.moveTo(this.table.length - this.pageTop - 1)
+        this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
         this.processing = false
       })
     },
@@ -1090,17 +1091,14 @@ export default {
       this.processing = true
       setTimeout(() => {
         this.pageTop = this.pageTop < this.pageSize ? 0 : this.pageTop - this.pageSize
-        this.moveTo(0)
         this.processing = false
       })
     },
     nextPage () {
       this.processing = true
       setTimeout(() => {
-        if (this.pageTop + this.pageSize < this.table.length) {
+        if (this.pageTop + this.pageSize < this.table.length)
           this.pageTop += this.pageSize
-          this.moveTo(0)
-        }
         this.processing = false
       })
     },
