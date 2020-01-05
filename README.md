@@ -90,10 +90,10 @@ In your template
 | readonly             | Optional  | Boolean  | Read-only, default is parent prop: readonly |
 | init-style           | Optional  | Object   | Cell inital style in css |
 | sticky               | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
+| invisible            | Optional  | Boolean  | Column visibility, default is false |
 | width                | Optional  | String   | Specified column width, default is 100px |
 | validate             | Optional  | Function | Custom function to validate and return the error message |
 | key-field            | Optional  | Boolean  | Specified the key field which is included in keys parameter in @update event |
-| allow-edit-when-new* | Optional  | Boolean  | Allow edit (For readonly column) when it is new record |
 | allow-keys           | Optional  | Array    | Array of char which allow to input |
 | mandatory            | Optional  | String   | If specified, it will be shown if the cell is blank, default is '' |
 | length-limit         | Optional  | Number   | Not allow to input when the content length reaches the limit |
@@ -104,8 +104,6 @@ In your template
 | options              | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
 | to-text              | Optional  | Function | The custom conversion function from object value to edit-text |
 | to-value             | Optional  | Function | The custom conversion function from edit-text to object value |
-
-(*) Still Under Testing
 
 ## Hot Key List
 
@@ -200,7 +198,7 @@ export default {
 ```js
 methods: {
     save (records) {
-      records = records.map(rec => ['hset', rec.keys.join(), rec.field, rec.newVal])
+      records = records.map(rec => ['hset', rec.keys.join(), rec.name, rec.newVal])
       redis.multi(records).exec()
     }
 }

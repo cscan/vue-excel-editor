@@ -34,7 +34,7 @@
                 </span>
               </th>
               <th v-for="(item, p) in fields"
-                  v-show="item.visible"
+                  v-show="!item.invisible"
                   :key="`th-${p}`"
                   :class="{'sort-asc-sign': sortPos==p && sortDir==1,
                           'sort-des-sign': sortPos==p && sortDir==-1,
@@ -60,7 +60,7 @@
                 <svg v-else aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-check-circle fa-w-16 fa-sm"><path fill="currentColor" d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"></path></svg>
               </td>
               <vue-excel-filter v-for="(item, p) in fields"
-                                v-show="item.visible"
+                                v-show="!item.invisible"
                                 :key="`th2-${p}`"
                                 v-model="columnFilter[p]"
                                 :class="{'sticky-column': item.sticky}"
@@ -80,7 +80,7 @@
                 <span v-html="recordLabel(pageTop + rowPos + 1, record)"></span>
               </td>
               <template v-for="(item, p) in fields">
-                <td v-show="item.visible"
+                <td v-show="!item.invisible"
                     :id="`${record.$id}:${item.name}`"
                     :class="{
                       readonly: item.readonly,
@@ -352,6 +352,9 @@ export default {
   },
   computed: {
     columnFilterString () {
+      Object.keys(this.columnFilter).forEach((key) => {
+        if (this.columnFilter[key].trim() === '') delete this.columnFilter[key]
+      })
       return JSON.stringify(this.columnFilter)
     },
     table () {
@@ -359,9 +362,6 @@ export default {
       let seed = new Date().getTime() - 1578101000000
       this.value.forEach((rec,i) => {
         if (!rec.$id) rec.$id = seed + '.' + i
-      })
-      Object.keys(this.columnFilter).forEach((key) => {
-        (this.columnFilter[key].trim() === '') && delete this.columnFilter[key]
       })
       const filterColumnList = Object.keys(this.columnFilter)
       const filter = {}
@@ -522,7 +522,9 @@ export default {
   methods: {
     getKeys (rec) {
       if (!rec) rec = this.currentRecord
-      return this.fields.filter(field => field.keyField).map(field => rec[field.name])
+      const key = this.fields.filter(field => field.keyField).map(field => rec[field.name])
+      if (key.length && key.join() !== '') return key
+      return [rec.$id]
     },
     showDatePickerDiv () {
       const cellRect = this.currentCell.getBoundingClientRect()
@@ -579,11 +581,6 @@ export default {
       }
     },
     tableScroll () {
-      /*
-      this.calCellLeft = this.tableContent.scrollLeft
-      this.calCellTop = this.tableContent.scrollTop
-      this.calCellTop2 = this.tableContent.scrollTop + this.labelTr.offsetHeight
-      */
       this.showDatePicker = false
       this.autocompleteInputs = []
       if (this.focused && this.currentField)
@@ -595,16 +592,6 @@ export default {
         const ratio = this.tableContent.scrollLeft / this.hScroller.tableUnseenWidth
         this.$refs.scrollbar.style.left = (this.hScroller.scrollerUnseenWidth * ratio) + 'px'
       }
-      /*
-      if (this.currentCell) {
-        const cellRect = this.currentCell.getBoundingClientRect()
-        const tableRect = this.systable.getBoundingClientRect()
-        // this.inputSquare.classList.add('no-transition')
-        this.inputSquare.style.left = (cellRect.left - tableRect.left + 38) + 'px'
-        this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
-        // setTimeout(() => this.inputSquare.classList.remove('no-transition'))
-      }
-      */
     },
     importTable (cb) {
       this.$refs.importFile.click()
@@ -700,8 +687,9 @@ export default {
       this.lazy(this.refreshPageSize, 200)
     },
     winPaste (e) {
+      if (e.target.tagName !== 'TEXTAREA') return
       if (!this.mousein && !this.focused) return
-      if (this.currentField.readonly) return
+      if (!this.currentField || this.currentField.readonly) return
       if (this.inputBoxShow) {
         this.inputBoxChanged = true
         return
@@ -798,6 +786,9 @@ export default {
                   this.inputBoxChanged = false
                 }
                 this.inputBoxShow = 0
+                this.showDatePicker = false
+                this.autocompleteInputs = []
+                this.autocompleteSelect = -1
               }
               return
             }
@@ -1227,7 +1218,7 @@ export default {
       if (this.redo.length === 0) return
       const transaction = this.redo.pop()
       transaction.forEach((rec) => {
-        this.updateCell(this.rowIndex[rec.$id], rec.colPos, rec.field, rec.oldVal, true)
+        this.updateCell(this.rowIndex[rec.$id], rec.colPos, rec.name, rec.oldVal, true)
       })
     },
     updateCellByColPos (row, colPos, content) {
@@ -1238,7 +1229,7 @@ export default {
     },
     updateCell (row, colPos, name, content, restore) {
       const tableRow = this.table[row]
-      const oldVal = tableRow[name]
+      const oldRec = Object.assign({}, tableRow)
       tableRow[name] = content
 
       setTimeout(() => {
@@ -1246,10 +1237,15 @@ export default {
         const transaction = {
           $id: tableRow.$id,
           keys: this.getKeys(tableRow),
+          oldKeys: this.getKeys(oldRec),
+          rowPos: row,
           colPos: colPos,
-          field: name,
+          name: name,
+          field: field,
+          oldVal: oldRec[name],
           newVal: content,
-          oldVal: oldVal,
+          oldRec: oldRec,
+          newRec: Object.assign({}, tableRow),
           err: ''
         }
 
@@ -1268,20 +1264,6 @@ export default {
           this.$emit('update', buf)
           if (!restore) this.redo.push(buf)
         }, 50)
-
-        /*
-        if (!this.saveLazyBuffer) this.saveLazyBuffer = []
-        this.saveLazyBuffer.push(transaction)
-
-        // Delay the propagation so that it can accumulate the result until no update
-        if (this.delayTimeout) clearTimeout(this.delayTimeout)
-        this.delayTimeout = setTimeout(() => {
-          this.$emit('update', this.saveLazyBuffer)
-          if (!restore)
-            this.redo.push(this.saveLazyBuffer)
-          this.saveLazyBuffer = []
-        }, 50)
-        */
       })
     },
     updateSelectedRowsByCol (colPos, field, content) {
@@ -1294,7 +1276,7 @@ export default {
     moveWest () {
       if (this.focused && this.currentColPos > 0) {
         let goColPos = this.currentColPos - 1
-        while (!this.fields[goColPos].visible && goColPos >= 0) goColPos--
+        while (this.fields[goColPos].invisible && goColPos >= 0) goColPos--
         if (goColPos === -1) return
         this.moveInputSquare(this.currentRowPos, goColPos)
       }
@@ -1302,7 +1284,7 @@ export default {
     moveEast () {
       if (this.focused && this.currentColPos < this.fields.length - 1) {
         let goColPos = this.currentColPos + 1
-        while (!this.fields[goColPos].visible && goColPos < this.fields.length - 1) goColPos++
+        while (this.fields[goColPos].invisible && goColPos < this.fields.length - 1) goColPos++
         if (goColPos === this.fields.length) return
         this.moveInputSquare(this.currentRowPos, goColPos)
       }

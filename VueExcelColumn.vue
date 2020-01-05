@@ -13,13 +13,12 @@ export default {
     validate: {type: Function, default: null},
     initStyle: {type: Object, default () {return {}}},
     width: {type: String, default: '100px'},
-    visible: {type: Boolean, default: true},
+    invisible: {type: Boolean, default: false},
     readonly: {type: Boolean, default: null},
     textTransform: {type: String, default: null}, // replace uppercase prop
     textAlign: {type: String, default: null},
 
     keyField: {type: Boolean, default: false},
-    allowEditWhenNew: {type: Boolean, default: true},
     sticky: {type: Boolean, default: false},
 
     allowKeys: {type: Array, default () {return null}},
@@ -58,6 +57,9 @@ export default {
     toText: {
       type: Function,
       default (val) {
+        // § magic to hide the temp key
+        if (this.keyField && val && val.startsWith('§')) return ''
+
         switch (this.type) {
           case 'datetick':
             return moment(Number(val)).format('YY-MM-DD')
@@ -149,7 +151,6 @@ export default {
       validate: validate,
 
       keyField: this.keyField,
-      allowEditWhenNew: this.allowEditWhenNew,
       sticky: this.sticky,
       allowKeys: allowKeys,
       mandatory: this.mandatory,
@@ -157,7 +158,7 @@ export default {
 
       autocomplete: this.autocomplete === null ? this.$parent.autocomplete : this.autocomplete,
       initStyle: style,
-      visible: this.visible,
+      invisible: this.invisible,
       readonly: this.readonly === null ? this.$parent.readonly : this.readonly,
       pos: Number(this.pos),
       options: this.options,
