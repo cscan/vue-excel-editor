@@ -931,6 +931,11 @@ export default {
     getSelectedRecords () {
       return this.table.filter((rec, i) => this.selected[i])
     },
+    deleteSelectedRecords () {
+      this.table = this.table.filter((rec, i) => typeof this.selected[i] === 'undefined')
+      this.selected = {}
+      this.selectedCount = 0
+    },
     colSepMouseDown (e) {
       e.preventDefault()
       e.stopPropagation()
@@ -1067,15 +1072,17 @@ export default {
     },
     firstPage () {
       this.processing = true
+      this.pageTop = 0
       setTimeout(() => {
-        this.pageTop = 0
+        this.moveTo(0)
         this.processing = false
       })
     },
     lastPage () {
       this.processing = true
+      this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
       setTimeout(() => {
-        this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
+        this.moveTo(this.table.length - this.pageTop - 1)
         this.processing = false
       })
     },
@@ -1083,16 +1090,19 @@ export default {
       this.processing = true
       setTimeout(() => {
         this.pageTop = this.pageTop < this.pageSize ? 0 : this.pageTop - this.pageSize
+        this.moveTo(0)
         this.processing = false
-      }, 0)
+      })
     },
     nextPage () {
       this.processing = true
       setTimeout(() => {
-        if (this.pageTop + this.pageSize < this.table.length)
+        if (this.pageTop + this.pageSize < this.table.length) {
           this.pageTop += this.pageSize
+          this.moveTo(0)
+        }
         this.processing = false
-      }, 0)
+      })
     },
     rowLabelClick (e) {
       let target = e.target
@@ -1272,6 +1282,10 @@ export default {
         Object.keys(this.selected).forEach(i => this.updateCell(i, colPos, field, content))
         this.processing = false
       }, 0)
+    },
+    moveTo (rowPos, colPos) {
+      colPos = colPos || 0
+      this.moveInputSquare(rowPos, colPos)
     },
     moveWest () {
       if (this.focused && this.currentColPos > 0) {
