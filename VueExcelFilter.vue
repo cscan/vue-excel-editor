@@ -99,7 +99,7 @@ export default {
       const sel = document.getSelection()
       if (e.target.textContent === sel.toString() || sel.focusOffset === 0) {
         let td = e.target.previousSibling
-        if (td && td.style.display === 'none') td = td.previousSibling
+        if (td && td.style && td.style.display === 'none') td = td.previousSibling
         if (!td) return td
         if (!td.tagName) td = td.previousSibling
         if (td.focus) td.focus()
@@ -110,7 +110,7 @@ export default {
       const sel = document.getSelection()
       if (e.target.textContent === sel.toString() || sel.focusOffset >= e.target.textContent.length) {
         let td = e.target.nextSibling
-        if (td && td.style.display === 'none') td = td.nextSibling
+        if (td && td.style && td.style.display === 'none') td = td.nextSibling
         if (!td) return td
         if (!td.tagName) td = td.nextSibling
         if (td.focus) td.focus()

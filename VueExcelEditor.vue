@@ -534,6 +534,13 @@ export default {
       this.$refs.dpContainer.style.top = (cellRect.bottom) + 'px'
       this.inputDateTime = this.currentCell.textContent
       this.showDatePicker = true
+      this.lazy(() => {
+        const r = this.$refs.dpContainer.getBoundingClientRect()
+        if (r.bottom > window.innerHeight)
+          this.$refs.dpContainer.style.top = (cellRect.top - r.height) + 'px'
+        if (r.right > window.innerWidth)
+          this.$refs.dpContainer.style.top = (window.innerWidth - r.width) + 'px'
+      })
     },
     dpClick () {
       this.inputBox.value = this.inputDateTime
@@ -586,7 +593,8 @@ export default {
       this.showDatePicker = false
       this.autocompleteInputs = []
       if (this.focused && this.currentField)
-        this.inputSquare.style.marginLeft = (this.currentField.sticky ? this.tableContent.scrollLeft : 0) + 'px'
+        this.inputSquare.style.marginLeft =
+          (this.currentField.sticky ? this.tableContent.scrollLeft - this.squareSavedLeft : 0) + 'px'
 
       if (this.$refs.scrollbar && this.hScroller.tableUnseenWidth) {
         this.$refs.scrollbar.classList.add('focus')
@@ -888,17 +896,22 @@ export default {
 
       const cell = row.children[colPos + 1]
       if (!cell) return false
+      this.currentField = this.fields[colPos]
       const cellRect = cell.getBoundingClientRect()
       const tableRect = this.systable.getBoundingClientRect()
-      const boundRect = this.$el.getBoundingClientRect()
+      this.inputSquare.style.marginLeft = 0
+      this.squareSavedLeft = this.tableContent.scrollLeft
       this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
       this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
       this.inputSquare.style.width = (cellRect.width + 1) + 'px'
       this.inputSquare.style.height = (cellRect.height + 1) + 'px'
-      if (cellRect.right >= boundRect.right)
-        this.tableContent.scrollBy(cellRect.right - boundRect.right + 1, 0)
-      if (cellRect.left <= boundRect.left + this.leftMost)
-        this.tableContent.scrollBy(cellRect.left - boundRect.left - this.leftMost - 1, 0)
+      if (!this.currentField.sticky) {
+        const boundRect = this.$el.getBoundingClientRect()
+        if (cellRect.right >= boundRect.right)
+          this.tableContent.scrollBy(cellRect.right - boundRect.right + 1, 0)
+        if (cellRect.left <= boundRect.left + this.leftMost)
+          this.tableContent.scrollBy(cellRect.left - boundRect.left - this.leftMost - 1, 0)
+      }
 
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
@@ -908,7 +921,6 @@ export default {
 
       this.currentRowPos = rowPos
       this.currentColPos = colPos
-      this.currentField = this.fields[colPos]
       this.inputSquare.style.zIndex = this.currentField.sticky ? 3 : 1
       this.currentCell = cell
       this.showDatePicker = false
@@ -1416,6 +1428,13 @@ export default {
           this.$refs.autocomplete.style.top = rect.bottom + 'px'
           this.$refs.autocomplete.style.left = rect.left + 'px'
           this.$refs.autocomplete.style.minWidth = rect.width + 'px'
+          this.lazy(() => {
+            const r = this.$refs.autocomplete.getBoundingClientRect()
+            if (r.bottom > window.innerHeight)
+              this.$refs.autocomplete.style.top = (rect.top - r.height) + 'px'
+            if (r.right > window.innerWidth)
+              this.$refs.autocomplete.style.top = (window.innerWidth - r.width) + 'px'
+          })
         }, force ? 0 : 700)
       }
     },
