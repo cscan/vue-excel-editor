@@ -927,9 +927,9 @@ export default {
     reset () {
       this.pageTop = 0
       this.prevSelect = -1
+      this.calTable()
       this.reviseSelectedAfterTableChange()
       this.refreshPageSize()
-      this.calTable()
     },
     getSelectedRecords () {
       return this.table.filter((rec, i) => this.selected[i])
