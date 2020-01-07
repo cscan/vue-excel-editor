@@ -6,9 +6,7 @@
            :class="{'no-footer': noFooter}"
            @scroll="tableScroll"
            @mouseover="mouseOver"
-           @mouseout="mouseOut"
-           @mousemove="mouseMove"
-           @mouseup="mouseUp">
+           @mouseout="mouseOut">
 
         <!-- Main Table -->
         <table ref="systable"
@@ -872,9 +870,11 @@ export default {
     },
     moveInputSquare (rowPos, colPos) {
       if (colPos < 0) return false
+
       const row = this.recordBody.children[rowPos]
       if (!row) {
         if (rowPos > this.currentRowPos) {
+          // move the whole page down 1 record
           if (this.pageTop + this.pageSize < this.table.length) {
             this.pageTop += 1
             setTimeout(() => this.moveInputSquare(rowPos - 1, colPos))
@@ -882,6 +882,7 @@ export default {
           return false
         }
         else {
+          // move the whole page up 1 record
           if (this.pageTop - 1 >= 0) {
             this.pageTop -= 1
             setTimeout(() => this.moveInputSquare(rowPos + 1, colPos))
@@ -890,21 +891,26 @@ export default {
         }
       }
 
+      // Clear the label markers
       this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length)
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
 
+      // Relocate the inputSquare
       const cell = row.children[colPos + 1]
       if (!cell) return false
       this.currentField = this.fields[colPos]
       const cellRect = cell.getBoundingClientRect()
       const tableRect = this.systable.getBoundingClientRect()
-      this.inputSquare.style.marginLeft = 0
       this.squareSavedLeft = this.tableContent.scrollLeft
+      this.inputSquare.style.marginLeft = 0
       this.inputSquare.style.left = (cellRect.left - tableRect.left - 1) + 'px'
       this.inputSquare.style.top =  (cellRect.top - tableRect.top - 1) + 'px'
       this.inputSquare.style.width = (cellRect.width + 1) + 'px'
       this.inputSquare.style.height = (cellRect.height + 1) + 'px'
+      this.inputSquare.style.zIndex = this.currentField.sticky ? 3 : 1
+
+      // Adjust the scrolling to display the whole focusing cell
       if (!this.currentField.sticky) {
         const boundRect = this.$el.getBoundingClientRect()
         if (cellRect.right >= boundRect.right)
@@ -913,6 +919,7 @@ export default {
           this.tableContent.scrollBy(cellRect.left - boundRect.left - this.leftMost - 1, 0)
       }
 
+      // Off the textarea when moving, write to value if changed
       this.inputBoxShow = 0
       if (this.inputBoxChanged) {
         this.inputCellWrite(this.currentField.toValue(this.inputBox.value))
@@ -921,13 +928,15 @@ export default {
 
       this.currentRowPos = rowPos
       this.currentColPos = colPos
-      this.inputSquare.style.zIndex = this.currentField.sticky ? 3 : 1
       this.currentCell = cell
+
+      // Off all editors
       this.showDatePicker = false
       this.autocompleteInputs = []
       this.autocompleteSelect = -1
       if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
 
+      // set the label markers
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
         this.inputBox.focus()
         this.focused = true
@@ -972,6 +981,8 @@ export default {
       this.sep.curColWidth = this.sep.curCol.offsetWidth - padding
       if (this.sep.nxtCol)
         this.sep.nxtColWidth = this.sep.nxtCol.offsetWidth - padding
+      window.addEventListener('mousemove', this.colSepMouseMove)
+      window.addEventListener('mouseup', this.colSepMouseUp)
     },
     colSepMouseOver (e) {
       e.target.style.borderRight = '5px solid #cccccc'
@@ -981,16 +992,18 @@ export default {
       e.target.style.borderRight = ''
       e.target.style.height = '100%'
     },
-    mouseMove (e) {
+    colSepMouseMove (e) {
       if (!this.sep || !this.sep.curCol) return
       const diffX = e.pageX - this.sep.pageX
       this.sep.curCol.style.width = (this.sep.curColWidth + diffX) + 'px'
       this.lazy(this.calStickyLeft)
     },
-    mouseUp (e) {
+    colSepMouseUp (e) {
       e.preventDefault()
       e.stopPropagation()
       delete this.sep
+      window.removeEventListener('mousemove', this.colSepMouseMove)
+      window.removeEventListener('mouseup', this.colSepMouseUp)
     },
     doFindNext () {
       return this.doFind()
@@ -1238,37 +1251,34 @@ export default {
       if (this.redo.length === 0) return
       const transaction = this.redo.pop()
       transaction.forEach((rec) => {
-        this.updateCell(this.rowIndex[rec.$id], rec.colPos, rec.name, rec.oldVal, true)
+        this.updateCell(this.rowIndex[rec.$id], rec.field, rec.oldVal, true)
       })
     },
-    updateCellByColPos (row, colPos, content) {
-      return this.updateCell(row, colPos, this.fields[colPos], content)
+    updateCellByColPos (recPos, colPos, content) {
+      return this.updateCell(recPos, this.fields[colPos], content)
     },
-    updateCellByName (row, name, content) {
-      return this.updateCell(row, this.fields.findIndex(f => f.name === name), name, content)
+    updateCellByName (recPos, name, content) {
+      return this.updateCell(recPos, this.fields.find(f => f.name === name), content)
     },
-    updateCell (row, colPos, name, content, restore) {
-      const tableRow = this.table[row]
-      const oldVal = tableRow[name]
+    updateCell (recPos, field, content, restore) {
+      const tableRow = this.table[recPos]
+      const oldVal = tableRow[field.name]
       const oldKeys = this.getKeys(tableRow)
-      tableRow[name] = content
+      tableRow[field.name] = content
 
       setTimeout(() => {
-        const field = this.fields[colPos]
         const transaction = {
           $id: tableRow.$id,
           keys: this.getKeys(tableRow),
           oldKeys: oldKeys,
-          rowPos: row,
-          colPos: colPos,
-          name: name,
+          name: field.name,
           field: field,
           oldVal: oldVal,
           newVal: content,
           err: ''
         }
 
-        const id = `${tableRow.$id}:${name}`
+        const id = `${tableRow.$id}:${field.name}`
         if (field.validate !== null) transaction.err = field.validate(content)
         if (field.mandatory && content === '')
           transaction.err += (transaction.err ? '\n' : '') + field.mandatory
@@ -1285,10 +1295,10 @@ export default {
         }, 50)
       })
     },
-    updateSelectedRowsByCol (colPos, field, content) {
+    updateSelectedRows (field, content) {
       this.processing = true
       setTimeout(() => {
-        Object.keys(this.selected).forEach(i => this.updateCell(i, colPos, field, content))
+        Object.keys(this.selected).forEach(recPos => this.updateCell(recPos, field, content))
         this.processing = false
       }, 0)
     },
@@ -1448,13 +1458,14 @@ export default {
         this.inputBoxChanged = false
       })
     },
-    inputCellWrite (setText, col, row) {
-      if (typeof col === 'undefined') col = this.currentColPos
-      if (typeof row === 'undefined') row = this.pageTop + this.currentRowPos
-      if (typeof this.selected[row] !== 'undefined')
-        this.updateSelectedRowsByCol(col, this.fields[col].name, setText)
+    inputCellWrite (setText, colPos, recPos) {
+      const field = this.currentField
+      if (typeof colPos !== 'undefined') field = this.fields[colPos]
+      if (typeof recPos === 'undefined') recPos = this.pageTop + this.currentRowPos
+      if (typeof this.selected[recPos] !== 'undefined')
+        this.updateSelectedRows(field, setText)
       else
-        this.updateCell(row, col, this.fields[col].name, setText)
+        this.updateCell(recPos, field, setText)
     },
     inputBoxBlur () {
       if (this.$refs.dpContainer.querySelector(':hover')) return
@@ -1711,10 +1722,6 @@ input:focus, input:active:focus, input.active:focus {
 .systable td:not(:last-child) {
   border-right: 1px solid lightgray;
 }
-.systable thead th {
-  background-color: #e9ecef !important;
-  cursor: s-resize;
-}
 .systable thead th, .systable thead td {
   padding: 0.4rem 0.3rem;
   font-weight: 400;
@@ -1723,6 +1730,11 @@ input:focus, input:active:focus, input.active:focus {
   position: sticky;
   z-index: 5;
   border-bottom: 1px solid lightgray;
+}
+.systable thead th {
+  background-color: #e9ecef !important;
+  cursor: s-resize;
+  z-index: 6;
 }
 .systable thead td.column-filter {
   text-align: left;
@@ -1766,7 +1778,10 @@ input:focus, input:active:focus, input.active:focus {
   z-index: 2;
   background-color: white;
 }
-.systable thead .sticky-column {
+.systable thead th.sticky-column {
+  z-index: 7;
+}
+.systable thead td.sticky-column {
   z-index: 6;
 }
 .systable thead .tl-setting {
@@ -1839,7 +1854,7 @@ a:disabled {
   width: 5px;
   cursor: col-resize;
   height: 100%;
-  z-index: 2;
+  z-index: 15;
 }
 .sort-asc-sign {
   background-image: url('./assets/sortasc.png');

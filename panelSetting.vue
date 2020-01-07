@@ -22,8 +22,8 @@
             <draggable v-model="fields" draggable=".panel-list-item">
               <div v-for="(item, k) in fields" :key="k"
                    class="panel-list-item"
-                   @click.prevent="item.visible = !item.visible">
-                <input type="checkbox" :checked="item.visible" class="panel-checkbox">
+                   @click.prevent="columnLabelClick(item)">
+                <input type="checkbox" :checked="!item.invisible" class="panel-checkbox">
                 <span>{{ item.label }}</span>
               </div>
             </draggable>
@@ -81,6 +81,10 @@ export default {
   methods: {
     clickOutside (e) {
       if (e.target.id === 'panelModal') this.hidePanel()
+    },
+    columnLabelClick (item) {
+      item.invisible = !item.invisible
+      setTimeout(this.$parent.calStickyLeft)
     },
     freezePanelSizeAfterShown () {
       const target = this.$refs.panelList
