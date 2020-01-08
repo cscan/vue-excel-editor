@@ -449,17 +449,22 @@ export default {
     summary (field) {
       if (!field.summary) return ''
       const i = field.name
+      let result = ''
       switch(field.summary) {
         case 'sum':
-          return this.table.reduce((a, b) => (a + Number(b[i])), 0)
+          result = this.table.reduce((a, b) => (a + Number(b[i])), 0)
+          break
         case 'avg':
-          return this.table.reduce((a, b) => (a + Number(b[i])), 0) / this.table.length
+          result = this.table.reduce((a, b) => (a + Number(b[i])), 0) / this.table.length
+          break
         case 'max':
-          return this.table.reduce((a, b) => (a > b[i] ? a : b[i]), Number.MIN_VALUE)
+          result = this.table.reduce((a, b) => (a > b[i] ? a : b[i]), Number.MIN_VALUE)
+          break
         case 'min':
-          return this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
+          result = this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
+          break
       }
-      return ''
+      return field.toText(result)
     },
     calTable () {
       // add unique key to each row if no key is provided
