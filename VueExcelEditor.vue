@@ -451,9 +451,9 @@ export default {
       const i = field.name
       switch(field.summary) {
         case 'sum':
-          return this.table.reduce((a, b) => (a + b[i]), 0)
+          return this.table.reduce((a, b) => (a + Number(b[i])), 0)
         case 'avg':
-          return this.table.reduce((a, b) => (a + b[i]), 0) / this.table.length
+          return this.table.reduce((a, b) => (a + Number(b[i])), 0) / this.table.length
         case 'max':
           return this.table.reduce((a, b) => (a > b[i] ? a : b[i]), Number.MIN_VALUE)
         case 'min':
