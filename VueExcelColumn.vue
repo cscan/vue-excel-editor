@@ -27,6 +27,7 @@ export default {
     autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
     options: {type: Array, default () {return []}},
+    summary: {type: String, default: null},
     toValue: {
       type: Function,
       default (text) {
@@ -162,6 +163,7 @@ export default {
       readonly: this.readonly === null ? this.$parent.readonly : this.readonly,
       pos: Number(this.pos),
       options: this.options,
+      summary: this.summary,
       toValue: this.toValue,
       toText: this.toText
     })

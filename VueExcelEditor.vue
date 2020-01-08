@@ -88,12 +88,28 @@
                       'sticky-column': item.sticky
                     }"
                     :style="Object.assign(cellStyle(record, item), columnCellStyle(item))"
-                    :key="`f${p}`"
+                    :key="p"
                     @mouseover="cellMouseOver"
                     @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
               </template>
             </tr>
           </tbody>
+          <tfoot>
+            <tr v-show="summaryRow">
+              <td class="row-summary first-col">&nbsp;</td>
+              <template v-for="(field, p) in fields">
+                <td v-show="!field.invisible"
+                    class="row-summary"
+                    :class="{
+                      'sticky-column': field.sticky,
+                      'summary-column1': p+1 < fields.length && fields[p+1].summary,
+                      'summary-column2': field.summary
+                    }"
+                    :style="Object.assign(cellStyle(record, field), columnCellStyle(field))"
+                    :key="`f${p}`">{{ summary(field) }}</td>
+              </template>
+            </tr>
+          </tfoot>
           <slot></slot>
         </table>
 
@@ -348,7 +364,8 @@ export default {
       showDatePicker: false,
       inputDateTime: '',
 
-      table: []
+      table: [],
+      summaryRow: false,
     }
   },
   computed: {
@@ -429,6 +446,21 @@ export default {
     window.addEventListener('scroll', this.winScroll)
   },
   methods: {
+    summary (field) {
+      if (!field.summary) return ''
+      const i = field.name
+      switch(field.summary) {
+        case 'sum':
+          return this.table.reduce((a, b) => (a + b[i]), 0)
+        case 'avg':
+          return this.table.reduce((a, b) => (a + b[i]), 0) / this.table.length
+        case 'max':
+          return this.table.reduce((a, b) => (a > b[i] ? a : b[i]), Number.MIN_VALUE)
+        case 'min':
+          return this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
+      }
+      return ''
+    },
     calTable () {
       // add unique key to each row if no key is provided
       let seed = new Date().getTime() - 1578101000000
@@ -879,6 +911,7 @@ export default {
       let pos = this.fields.findIndex(item => item.pos > field.pos)
       if (pos === -1) pos = this.fields.length
       this.fields.splice(pos, 0, field)
+      if (field.summary) this.summaryRow = true
     },
     moveInputSquare (rowPos, colPos) {
       if (colPos < 0) return false
@@ -1104,7 +1137,8 @@ export default {
         this.hScroller.scrollerUnseenWidth = this.footer.getBoundingClientRect().width - 40 - scrollerWidth
       }
       if (this.noPaging) return
-      this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - 35) / 24)
+      const offset = this.summaryRow ? 60 : 35
+      this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - offset) / 24)
     },
     firstPage () {
       this.processing = true
@@ -1802,6 +1836,38 @@ input:focus, input:active:focus, input.active:focus {
 .systable thead td.first-col, .systable thead th.first-col {
   cursor: pointer !important;
   z-index: 10;
+}
+.systable tfoot .row-summary {
+  height: 25px;
+  border-right: 0;
+  border-top: 1px solid lightgray;
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  background: #fffff2;
+}
+.systable tfoot .row-summary.sticky-column {
+  z-index: 5;
+}
+.systable tfoot .row-summary.summary-column1 {
+  border-right: 1px solid lightgray;
+}
+.systable tfoot .row-summary.summary-column2 {
+  border-right: 1px solid lightgray;
+  background: white;
+}
+.systable tfoot .row-summary:last-child {
+  border-right: 0 !important;
+}
+.systable tfoot .row-summary.first-col {
+  height: 25px;
+  border-top: 1px solid lightgray;
+  border-right: 1px solid lightgray;
+  background: #e9ecef;
+  position: sticky;
+  left: 0;
+  top: auto;
+  z-index: 6;
 }
 .footer {
   z-index: 5;

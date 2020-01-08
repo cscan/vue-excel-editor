@@ -102,6 +102,7 @@ In your template
 | text-transform       | Optional  | String   | Force the input to upppercase or lowercase when editing |
 | text-align           | Optional  | String   | Text alignment, default is 'left' |
 | options              | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
+| summary              | Optional  | String   | Summary: 'sum', 'avg', 'max', 'min'. Default is null |
 | to-text              | Optional  | Function | The custom conversion function from object value to edit-text |
 | to-value             | Optional  | Function | The custom conversion function from edit-text to object value |
 
@@ -238,6 +239,9 @@ In your HTML call it likes
 
 #### Validation
 ![Validation](https://i.ibb.co/tzbKmMt/validate.png "Validation")
+
+#### Summary
+![Summary](https://i.ibb.co/1R53rzH/summary.png" "Summary")
 
 ## Localization
 Developer may override the default values through localized-label prop
