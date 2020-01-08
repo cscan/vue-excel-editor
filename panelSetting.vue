@@ -171,6 +171,7 @@ div.panel-title span, button.panel-button span {
 .panel-content {
   padding: 1rem;
   text-align: left;
+  overflow-y: scroll;
 }
 
 .panel-content .panel-button {

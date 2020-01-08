@@ -276,7 +276,8 @@ export default {
           readonlyColumnDetected: 'Readonly column detected',
           columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
           noMatchedColumnName: 'No matched column name',
-          invalidInputValue: 'Invalid input value'
+          invalidInputValue: 'Invalid input value',
+          missingKeyColumn: 'Missing key column'
         }
       }
     }
@@ -381,7 +382,7 @@ export default {
     },
     processing (newVal) {
       if (newVal) {
-        const rect = this.$el.getBoundingClientRect()
+        const rect = this.$el.children[0].getBoundingClientRect()
         this.frontdrop.style.top = rect.top + 'px'
         this.frontdrop.style.left = rect.left + 'px'
         this.frontdrop.style.height = rect.height + 'px'
@@ -609,7 +610,7 @@ export default {
     },
     doImport (e) {
       this.processing = true
-      this.clearAllSelected()
+      this.reset()
       setTimeout(() => {
         const files = e.target.files
         if (!files || files.length === 0) return
@@ -624,22 +625,30 @@ export default {
             const importData = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheet])
             const keyStart = new Date().getTime()
             if (importData.length === 0) throw new Error('VueExcelEditor: ' + this.localizedLabel.noRecordIsRead)
+            if (this.fields
+              .filter(f => f.keyField)
+              .filter(f => typeof importData[0][f.name] === 'undefined' && typeof importData[0][f.label] === 'undefined').length > 0)
+              throw new Error(`VueExcelEditor: ${this.localizedLabel.missingKeyColumn}`)
 
             let pass = 0
             let inserted = 0
             let updated = 0
             while (pass < 2) {
               importData.forEach((line, i) => {
-                const rec = {
-                  key: typeof line.key === 'undefined' ? keyStart + i : line.key
+                let rowPos = this.table.findIndex(v => {
+                  return this.fields
+                    .filter(f => f.keyField)
+                    .filter(f => v[f.name] !== line[f.name] && v[f.name] !== line[f.label]).length === 0
+                })
+                let rec = {
+                  $id: typeof line.$id === 'undefined' ? keyStart + '-' + i : line.$id
                 }
-                let rowPos = this.value.findIndex(v => v.key === rec.key)
-                let real = rowPos >= 0
+
                 this.fields.forEach((field) => {
-                  if (field.name === 'key') return
+                  if (field.name.startsWith('$')) return
                   let val = line[field.name]
                   if (typeof val === 'undefined') val = line[field.label]
-                  if (typeof val === 'undefined') val = ''
+                  if (typeof val === 'undefined') val = null
                   else {
                     if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected)
                     if (field.validate) {
@@ -647,43 +656,44 @@ export default {
                       if ((err = field.validate(val)))
                         throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.columnHasValidationError(field.name, err))
                     }
-                    real = true
                   }
-                  if (!real) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.noMatchedColumnName)
-                  rec[field.name] = val
+                  if (val !== null) rec[field.name] = val
                 })
                 if (pass === 1) {
                   if (rowPos >= 0) {
-                    this.value[rowPos] = rec
                     updated++
                   }
                   else {
-                    rowPos = this.value.push(rec) - 1
+                    rowPos = this.table.push(rec) - 1
                     inserted++
                   }
-                  this.selectRecord(rowPos)
+                  Object.keys(rec).forEach(name => {
+                    if (name.startsWith('$')) return
+                    this.updateCellByName(rowPos, name, rec[name])
+                  })
                 }
               })
               pass++
             }
-            if (pass === 2 && this.importCallback)
+            if (pass === 2 && this.importCallback) {
               this.importCallback({
                 inserted: inserted,
                 updated: updated,
                 recordAffected: inserted + updated
               })
+            }
           }
           catch (e) {
             throw new Error('VueExcelEditor: ' + e.stack)
           }
           finally {
             this.processing = false
-            e.target.value = ''
+            this.$refs.importFile.value = ''
           }
         }
         fileReader.onerror = (e) => {
           this.processing = false
-          this.$refs.importFile.reset()
+          this.$refs.importFile.value = ''
           throw new Error('VueExcelEditor: ' + e.stack)
         }
         fileReader.readAsBinaryString(file)
@@ -877,18 +887,14 @@ export default {
       if (!row) {
         if (rowPos > this.currentRowPos) {
           // move the whole page down 1 record
-          if (this.pageTop + this.pageSize < this.table.length) {
+          if (this.pageTop + this.pageSize < this.table.length)
             this.pageTop += 1
-            setTimeout(() => this.moveInputSquare(rowPos - 1, colPos))
-          }
           return false
         }
         else {
           // move the whole page up 1 record
-          if (this.pageTop - 1 >= 0) {
+          if (this.pageTop - 1 >= 0)
             this.pageTop -= 1
-            setTimeout(() => this.moveInputSquare(rowPos + 1, colPos))
-          }
           return false
         }
       }
@@ -1927,6 +1933,7 @@ a:disabled {
   max-width: 200px;
   word-wrap: break-word;
   border-radius: 4px;
+  z-index: 50;
 }
 .tool-tip:before {
   content: '';

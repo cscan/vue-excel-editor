@@ -280,7 +280,8 @@ data: {
         readonlyColumnDetected: 'Readonly column detected',
         columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
         noMatchedColumnName: 'No matched column name',
-        invalidInputValue: 'Invalid input value'
+        invalidInputValue: 'Invalid input value',
+        missingKeyColumn: 'Missing key column'
     }
 }
 ```
