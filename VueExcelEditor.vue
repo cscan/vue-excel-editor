@@ -79,10 +79,10 @@
               </td>
               <template v-for="(item, p) in fields">
                 <td v-show="!item.invisible"
-                    :id="`${record.$id}:${item.name}`"
+                    :id="`id-${record.$id}-${item.name}`"
                     :class="{
                       readonly: item.readonly,
-                      error: errmsg[`${record.$id}:${item.name}`],
+                      error: errmsg[`id-${record.$id}-${item.name}`],
                       select: item.options.length,
                       datepick: item.type == 'date',
                       'sticky-column': item.sticky
@@ -414,12 +414,14 @@ export default {
     this.reset()
     this.redo = []
     this.errmsg = []
-    this.lazy(this.refreshPageSize, 200)
-    setTimeout(() => {
+
+    this.lazy(() => {
+      this.refreshPageSize()
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
       this.calCellTop2 = this.labelTr.offsetHeight
-    })
-    this.lazy(this.calStickyLeft)
+      this.calStickyLeft()
+    }, 200)
+
     window.addEventListener('resize', this.winResize)
     window.addEventListener('paste', this.winPaste)
     window.addEventListener('keydown', this.winKeydown)
@@ -430,7 +432,7 @@ export default {
       // add unique key to each row if no key is provided
       let seed = new Date().getTime() - 1578101000000
       this.value.forEach((rec,i) => {
-        if (!rec.$id) rec.$id = seed + '.' + i
+        if (!rec.$id) rec.$id = seed + '-' + i
       })
       const filterColumnList = Object.keys(this.columnFilter)
       const filter = {}
@@ -896,6 +898,13 @@ export default {
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length)
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
 
+      // Off the textarea when moving, write to value if changed
+      this.inputBoxShow = 0
+      if (this.inputBoxChanged) {
+        this.inputCellWrite(this.currentField.toValue(this.inputBox.value))
+        this.inputBoxChanged = false
+      }
+
       // Relocate the inputSquare
       const cell = row.children[colPos + 1]
       if (!cell) return false
@@ -917,13 +926,6 @@ export default {
           this.tableContent.scrollBy(cellRect.right - boundRect.right + 1, 0)
         if (cellRect.left <= boundRect.left + this.leftMost)
           this.tableContent.scrollBy(cellRect.left - boundRect.left - this.leftMost - 1, 0)
-      }
-
-      // Off the textarea when moving, write to value if changed
-      this.inputBoxShow = 0
-      if (this.inputBoxChanged) {
-        this.inputCellWrite(this.currentField.toValue(this.inputBox.value))
-        this.inputBoxChanged = false
       }
 
       this.currentRowPos = rowPos
@@ -1278,14 +1280,14 @@ export default {
           err: ''
         }
 
-        const id = `${tableRow.$id}:${field.name}`
+        const id = `id-${tableRow.$id}-${field.name}`
         if (field.validate !== null) transaction.err = field.validate(content)
         if (field.mandatory && content === '')
           transaction.err += (transaction.err ? '\n' : '') + field.mandatory
 
         if (transaction.err !== '') {
           this.errmsg[id] = transaction.err
-          document.getElementById(id).classList.add('error')
+          this.systable.querySelector('td#'+id).classList.add('error')
         }
         else delete this.errmsg[id]
 
@@ -1459,7 +1461,7 @@ export default {
       })
     },
     inputCellWrite (setText, colPos, recPos) {
-      const field = this.currentField
+      let field = this.currentField
       if (typeof colPos !== 'undefined') field = this.fields[colPos]
       if (typeof recPos === 'undefined') recPos = this.pageTop + this.currentRowPos
       if (typeof this.selected[recPos] !== 'undefined')
