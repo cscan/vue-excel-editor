@@ -261,7 +261,11 @@ data: {
         previous: 'Previous',
         next: 'Next',
         last: 'Last',
-        footerRight: (selected, filtered, loaded) => `Selected: ${selected} | Filtered: ${filtered} | Loaded: ${loaded}`,
+          footerRight: {
+            selected: 'Selected:',
+            filtered: 'Filtered:',
+            loaded: 'Loaded:'
+          },
         processing: 'Processing',
         tableSetting: 'Table Setting',
         exportExcel: 'Export Excel',
