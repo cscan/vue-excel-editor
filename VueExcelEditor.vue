@@ -453,9 +453,11 @@ export default {
       switch(field.summary) {
         case 'sum':
           result = this.table.reduce((a, b) => (a + Number(b[i])), 0)
+          result = Number(Math.round(result + 'e+5') + 'e-5')  // solve the infinite .9 issue of javascript
           break
         case 'avg':
           result = this.table.reduce((a, b) => (a + Number(b[i])), 0) / this.table.length
+          result = Number(Math.round(result + 'e+5') + 'e-5')  // solve the infinite .9 issue of javascript
           break
         case 'max':
           result = this.table.reduce((a, b) => (a > b[i] ? a : b[i]), Number.MIN_VALUE)
