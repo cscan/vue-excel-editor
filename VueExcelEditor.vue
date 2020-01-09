@@ -196,21 +196,18 @@
         </span>
         <span style="position: absolute; right: 6px">
           <!--span v-html="localizedLabel.footerRight(Object.keys(selected).length, table.length, value.length)" /-->
-          <a :class="{disabled: !showSelectedOnly && selectedCount <= 1}" @click.prevent="toggleSelectView">
+          <a :class="{disabled: !showSelectedOnly && selectedCount <= 1}" @click.prevent="toggleSelectView()">
             <span v-html="localizedLabel.footerRight.selected" />
-            &nbsp;
             <span :style="{color: selectedCount>0 ? 'red': 'inherit'}">{{ selectedCount }}</span>
           </a>
           &nbsp;|&nbsp;
-          <a :class="{disabled: columnFilterString === '{}'}" @click.prevent="toggleFilterView">
+          <a :class="{disabled: columnFilterString === '{}'}" @click.prevent="toggleFilterView()">
             <span v-html="localizedLabel.footerRight.filtered" />
-            &nbsp;
             <span :style="{color: table.length !== value.length ? 'red': 'inherit'}">{{ table.length }}</span>
           </a>
           &nbsp;|&nbsp;
           <a :class="{disabled: true}">
             <span v-html="localizedLabel.footerRight.loaded" />
-            &nbsp;
             <span>{{ value.length }}</span>
           </a>
         </span>
@@ -488,6 +485,8 @@ export default {
     toggleSelectView (bool) {
       if (typeof bool !== 'undefined') this.showSelectedOnly = bool
       else this.showSelectedOnly = !this.showSelectedOnly
+      // eslint-disable-next-line
+      console.log(this.showSelectedOnly)
       return this.refresh()
     },
     toggleFilterView (bool) {
