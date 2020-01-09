@@ -156,7 +156,7 @@
       </ul>
 
       <!-- Footer -->
-      <div ref="footer" class="footer center-text" :class="{hide: noFooter}" style="position:relative">
+      <div ref="footer" class="footer center-text" :class="{hide: noFooter}" style="position:relative" @mousedown="ftMouseDown">
         <div ref="scrollbar" class="scroll-bar" @mousedown="sbMouseDown" />
         <span class="left-block"></span>
         <span v-show="!noPaging" style="position: absolute; left: 46px">
@@ -169,25 +169,25 @@
             <span v-html="localizedLabel.processing" />
           </template>
           <template v-else>
-            <a :class="{disabled: pageTop <= 0}" @click="firstPage">
+            <a :class="{disabled: pageTop <= 0}" @mousedown="firstPage">
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-backward fa-w-14 fa-sm"><path fill="currentColor" d="M64 468V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12v176.4l195.5-181C352.1 22.3 384 36.6 384 64v384c0 27.4-31.9 41.7-52.5 24.6L136 292.7V468c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12z"></path></svg>
               &nbsp;
               <span v-html="localizedLabel.first" />
             </a>
             &nbsp;|&nbsp;
-            <a :class="{disabled: pageTop <= 0}" @click="prevPage">
+            <a :class="{disabled: pageTop <= 0}" @mousedown="prevPage">
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="backward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-backward fa-w-16 fa-sm"><path fill="currentColor" d="M11.5 280.6l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2zm256 0l192 160c20.6 17.2 52.5 2.8 52.5-24.6V96c0-27.4-31.9-41.8-52.5-24.6l-192 160c-15.3 12.8-15.3 36.4 0 49.2z"></path></svg>
               &nbsp;
               <span v-html="localizedLabel.previous" />
             </a>
             &nbsp;|&nbsp;
-            <a :class="{disabled: pageTop + pageSize >= table.length}" @click="nextPage">
+            <a :class="{disabled: pageTop + pageSize >= table.length}" @mousedown="nextPage">
               <span v-html="localizedLabel.next" />
               &nbsp;
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-forward fa-w-16 fa-sm"><path fill="currentColor" d="M500.5 231.4l-192-160C287.9 54.3 256 68.6 256 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2zm-256 0l-192-160C31.9 54.3 0 68.6 0 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2z"></path></svg>
             </a>
             &nbsp;|&nbsp;
-            <a :class="{disabled: pageTop + pageSize >= table.length}" @click="lastPage">
+            <a :class="{disabled: pageTop + pageSize >= table.length}" @mousedown="lastPage">
               <span v-html="localizedLabel.last" />
               &nbsp;
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="step-forward" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-step-forward fa-w-14 fa-sm"><path fill="currentColor" d="M384 44v424c0 6.6-5.4 12-12 12h-48c-6.6 0-12-5.4-12-12V291.6l-195.5 181C95.9 489.7 64 475.4 64 448V64c0-27.4 31.9-41.7 52.5-24.6L312 219.3V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12z"></path></svg>
@@ -196,12 +196,12 @@
         </span>
         <span style="position: absolute; right: 6px">
           <!--span v-html="localizedLabel.footerRight(Object.keys(selected).length, table.length, value.length)" /-->
-          <a :class="{disabled: !showSelectedOnly && selectedCount <= 1}" @click.prevent="toggleSelectView()">
+          <a :class="{disabled: !showSelectedOnly && selectedCount <= 1}" @mousedown="toggleSelectView">
             <span v-html="localizedLabel.footerRight.selected" />
             <span :style="{color: selectedCount>0 ? 'red': 'inherit'}">{{ selectedCount }}</span>
           </a>
           &nbsp;|&nbsp;
-          <a :class="{disabled: columnFilterString === '{}'}" @click.prevent="toggleFilterView()">
+          <a :class="{disabled: columnFilterString === '{}'}" @mousedown="toggleFilterView">
             <span v-html="localizedLabel.footerRight.filtered" />
             <span :style="{color: table.length !== value.length ? 'red': 'inherit'}">{{ table.length }}</span>
           </a>
@@ -482,14 +482,14 @@ export default {
       this.rowIndex = {}
       this.refresh()
     },
-    toggleSelectView (bool) {
-      if (typeof bool !== 'undefined') this.showSelectedOnly = bool
-      else this.showSelectedOnly = !this.showSelectedOnly
+    toggleSelectView (e) {
+      if (e) e.stopPropagation()
+      this.showSelectedOnly = !this.showSelectedOnly
       return this.refresh()
     },
-    toggleFilterView (bool) {
-      if (typeof bool !== 'undefined') this.showFilteredOnly = bool
-      else this.showFilteredOnly = !this.showFilteredOnly
+    toggleFilterView (e) {
+      if (e) e.stopPropagation()
+      this.showFilteredOnly = !this.showFilteredOnly
       return this.refresh()
     },
     summary (field) {
@@ -665,7 +665,15 @@ export default {
       })
       this.$forceUpdate()
     },
+    ftMouseDown (e) {
+      const footerRect = this.footer.getBoundingClientRect()
+      const ratio = (e.x - footerRect.left - 40) / (footerRect.width - 40)
+      const fullWidth = this.systable.getBoundingClientRect().width
+      const viewWidth = this.tableContent.getBoundingClientRect().width
+      this.tableContent.scrollTo(fullWidth * ratio - viewWidth / 2, this.tableContent.scrollTop)
+    },
     sbMouseDown (e) {
+      e.stopPropagation()
       if (!this.hScroller.mouseX) {
         const sleft = this.$refs.scrollbar.getBoundingClientRect().left
         const fleft = this.footer.getBoundingClientRect().left + 40
@@ -1205,28 +1213,32 @@ export default {
       const offset = this.summaryRow ? 60 : 35
       this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - offset) / 24)
     },
-    firstPage () {
+    firstPage (e) {
+      if (e) e.stopPropagation()
       this.processing = true
       setTimeout(() => {
         this.pageTop = 0
         this.processing = false
       })
     },
-    lastPage () {
+    lastPage (e) {
+      if (e) e.stopPropagation()
       this.processing = true
       setTimeout(() => {
         this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
         this.processing = false
       })
     },
-    prevPage () {
+    prevPage (e) {
+      if (e) e.stopPropagation()
       this.processing = true
       setTimeout(() => {
         this.pageTop = this.pageTop < this.pageSize ? 0 : this.pageTop - this.pageSize
         this.processing = false
       })
     },
-    nextPage () {
+    nextPage (e) {
+      if (e) e.stopPropagation()
       this.processing = true
       setTimeout(() => {
         if (this.pageTop + this.pageSize < this.table.length)
@@ -1974,6 +1986,9 @@ input:focus, input:active:focus, input.active:focus {
   cursor: not-allowed;
   color: gray;
   pointer-events: none;
+}
+.footer a:hover {
+  text-decoration: underline;
 }
 .front-drop {
   position: fixed;

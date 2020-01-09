@@ -241,7 +241,7 @@ In your HTML call it likes
 ![Validation](https://i.ibb.co/tzbKmMt/validate.png "Validation")
 
 #### Summary
-![Summary](https://i.ibb.co/1R53rzH/summary.png" "Summary")
+![Summary](https://i.ibb.co/0B26s9Q/summary.png "Summary")
 
 ## Localization
 Developer may override the default values through localized-label prop
@@ -261,11 +261,11 @@ data: {
         previous: 'Previous',
         next: 'Next',
         last: 'Last',
-          footerRight: {
+        footerRight: {
             selected: 'Selected:',
             filtered: 'Filtered:',
             loaded: 'Loaded:'
-          },
+        },
         processing: 'Processing',
         tableSetting: 'Table Setting',
         exportExcel: 'Export Excel',
