@@ -485,8 +485,6 @@ export default {
     toggleSelectView (bool) {
       if (typeof bool !== 'undefined') this.showSelectedOnly = bool
       else this.showSelectedOnly = !this.showSelectedOnly
-      // eslint-disable-next-line
-      console.log(this.showSelectedOnly)
       return this.refresh()
     },
     toggleFilterView (bool) {
