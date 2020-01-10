@@ -17,8 +17,9 @@
               ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
           <colgroup>
-            <!--col class="first-col">
-            <col v-for="item in nFields" :key="`col-${item}`" style="width: 100px"-->
+            <col style="width:40px">
+            <col v-for="(item, p) in fields" :key="p" :style="{width: item.width}">
+            <col style="width:12px">
           </colgroup>
           <thead class="center-text">
             <tr>
@@ -34,11 +35,12 @@
               <th v-for="(item, p) in fields"
                   v-show="!item.invisible"
                   :key="`th-${p}`"
+                  :colspan="p === fields.length - 1? 2: 1"
                   :class="{'sort-asc-sign': sortPos==p && sortDir==1,
                           'sort-des-sign': sortPos==p && sortDir==-1,
                           'sticky-column': item.sticky}"
                   class="table-col-header"
-                  :style="{width: item.width, left: item.left}"
+                  :style="{left: item.left}"
                   @mousedown="headerClick($event, p)">
                 <div :class="{'filter-sign': columnFilter[p]}">
                   <span v-html="headerLabel(item.label, item)"></span>
@@ -59,6 +61,7 @@
               </td>
               <vue-excel-filter v-for="(item, p) in fields"
                                 v-show="!item.invisible"
+                                :colspan="p === fields.length - 1? 2: 1"
                                 :key="`th2-${p}`"
                                 v-model="columnFilter[p]"
                                 :class="{'sticky-column': item.sticky}"
@@ -92,6 +95,7 @@
                     @mouseover="cellMouseOver"
                     @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
               </template>
+              <td class="last-col"></td>
             </tr>
           </tbody>
           <tfoot>
@@ -100,6 +104,7 @@
               <template v-for="(field, p) in fields">
                 <td v-show="!field.invisible"
                     class="row-summary"
+                    :colspan="p === fields.length - 1? 2: 1"
                     :class="{
                       'sticky-column': field.sticky,
                       'summary-column1': p+1 < fields.length && fields[p+1].summary,
@@ -144,6 +149,17 @@
         <div v-show="processing" ref="frontdrop" class="front-drop">
           <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-spin fa-3x"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>
         </div>
+      </div>
+
+      <!-- Vertical Scroll Bar -->
+      <div ref="vScroll"
+           class="v-scroll"
+           :style="{top: `${vScroll.top}px`, height: `${vScroll.height}px`}"
+           @mousedown="vsMouseDown">
+        <div ref="vScrollButton"
+             class="v-scroll-button"
+             :style="{marginTop: `${vScroll.buttonTop}px`, height: `${vScroll.buttonHeight}px`}"
+             @mousedown="vsbMouseDown" />
       </div>
 
       <!-- Autocomplete List -->
@@ -386,7 +402,12 @@ export default {
       table: [],
       summaryRow: false,
       showFilteredOnly: true,
-      showSelectedOnly: false
+      showSelectedOnly: false,
+      vScroll: {
+        top: 0,
+        height: 0,
+        buttonHeight: 0
+      }
     }
   },
   computed: {
@@ -453,9 +474,9 @@ export default {
     this.reset()
 
     this.lazy(() => {
-      this.refreshPageSize()
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
       this.calCellTop2 = this.labelTr.offsetHeight
+      this.refreshPageSize()
       this.calStickyLeft()
     }, 200)
 
@@ -465,6 +486,19 @@ export default {
     window.addEventListener('scroll', this.winScroll)
   },
   methods: {
+    calVScroll () {
+      let d = this.labelTr.getBoundingClientRect().height
+      if (this.filterRow) d += 29
+      this.vScroll.top = d
+      if (!this.noFooter) d += 25
+      if (this.summaryRow) d += 27
+      const fullHeight = this.$el.getBoundingClientRect().height
+      this.vScroll.height = fullHeight - d
+      const ratio =  this.vScroll.height / (this.table.length * 24)
+      this.vScroll.buttonHeight = Math.max(24, this.vScroll.height * ratio)
+      const prop = (this.tableContent.scrollTop + this.pageTop * 24) / (this.table.length * 24 - this.vScroll.height)
+      this.vScroll.buttonTop = (this.vScroll.height - this.vScroll.buttonHeight) * prop
+    },
     reset () {
       this.errmsg = {}
       this.redo = []
@@ -665,6 +699,51 @@ export default {
       })
       this.$forceUpdate()
     },
+    vsMouseDown (e) {
+      e.stopPropagation()
+      const pos = e.offsetY - this.vScroll.buttonHeight / 2
+      let ratio = Math.max(0, pos)
+      ratio = Math.min(ratio, this.vScroll.height - this.vScroll.buttonHeight)
+      ratio = ratio / (this.vScroll.height - this.vScroll.buttonHeight)
+      if (this.noPaging)
+        this.tableContent.scrollTo(this.tableContent.scrollLeft, this.table.length * 24 * ratio)
+      else {
+        this.vScroll.buttonTop = ratio * (this.vScroll.height - this.vScroll.buttonHeight)
+        this.$refs.vScrollButton.style.marginTop = this.vScroll.buttonTop + 'px'
+        this.pageTop = Math.round((this.table.length - this.pageSize) * ratio)
+      }
+    },
+    vsbMouseDown (e) {
+      e.stopPropagation()
+      if (!this.vScroll.mouseY) {
+        this.vScroll.saveButtonTop = this.vScroll.buttonTop
+        this.vScroll.mouseY = e.clientY
+        window.addEventListener('mousemove', this.vsbMouseMove)
+        this.$refs.vScrollButton.classList.add('focus')
+      }
+    },
+    vsbMouseMove (e) {
+      if (e.buttons === 0) {
+        window.removeEventListener('mousemove', this.vsbMouseMove)
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'))
+        this.vScroll.mouseY = 0
+        if (!this.noPaging) {
+          const ratio = this.vScroll.buttonTop / (this.vScroll.height - this.vScroll.buttonHeight)
+          this.pageTop = Math.round((this.table.length - this.pageSize) * ratio)
+        }
+      }
+      else {
+        const diff = e.clientY - this.vScroll.mouseY
+        if (this.noPaging) {
+          const ratio = (this.vScroll.saveButtonTop + diff) / (this.vScroll.height - this.vScroll.buttonHeight)
+          this.tableContent.scrollTo(this.tableContent.scrollLeft, this.table.length * 24 * ratio)
+        }
+        else {
+          this.vScroll.buttonTop = Math.max(0, Math.min(this.vScroll.height - this.vScroll.buttonHeight, this.vScroll.saveButtonTop + diff))
+          this.$refs.vScrollButton.style.marginTop = this.vScroll.buttonTop + 'px'
+        }
+      }
+    },
     ftMouseDown (e) {
       const footerRect = this.footer.getBoundingClientRect()
       const ratio = (e.x - footerRect.left - 40) / (footerRect.width - 40)
@@ -702,6 +781,9 @@ export default {
         this.inputSquare.style.marginLeft =
           (this.currentField.sticky ? this.tableContent.scrollLeft - this.squareSavedLeft : 0) + 'px'
 
+      this.calVScroll()
+      this.$refs.vScrollButton.classList.add('focus')
+      this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
       if (this.$refs.scrollbar && this.hScroller.tableUnseenWidth) {
         this.$refs.scrollbar.classList.add('focus')
         this.lazy(() => this.$refs.scrollbar.classList.remove('focus'), 1000)
@@ -861,9 +943,9 @@ export default {
         }
       else {
         if (this.currentRowPos < 0) return
-        if (!this.focused) return
         switch (e.keyCode) {
-          case 37:
+          case 37:  // Left Arrow
+            if (!this.focused) return
             if (!this.inputBoxShow) {
               this.moveWest(e)
               e.preventDefault()
@@ -875,15 +957,17 @@ export default {
               }
             }
             break
-          case 38:
+          case 38:  // Up Arrow
+            if (!this.focused) return
             e.preventDefault()
             if (this.autocompleteInputs.length === 0)
               this.moveNorth()
             else
               if (this.autocompleteSelect > 0) this.autocompleteSelect--
             break
-          case 9:
-          case 39:
+          case 9:  // Tab
+          case 39: // Right Arrow
+            if (!this.focused) return
             if (!this.inputBoxShow) {
               this.moveEast(e)
               e.preventDefault()
@@ -895,14 +979,16 @@ export default {
               }
             }
             break
-          case 40:
+          case 40:  // Down Arrow
+            if (!this.focused) return
             e.preventDefault()
             if (this.autocompleteInputs.length === 0)
               this.moveSouth(e)
             else
               if (this.autocompleteSelect < this.autocompleteInputs.length - 1) this.autocompleteSelect++
             break
-          case 13:
+          case 13:  // Enter
+            if (!this.focused) return
             e.preventDefault()
             if (this.autocompleteInputs.length === 0 || this.autocompleteSelect === -1) {
               if (!this.moveSouth(e)) {
@@ -921,7 +1007,8 @@ export default {
               if (this.autocompleteSelect !== -1)
                 this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
             break
-          case 27:
+          case 27:  // Esc
+            if (!this.focused) return
             this.showDatePicker = false
             this.autocompleteInputs = []
             this.autocompleteSelect = -1
@@ -932,16 +1019,17 @@ export default {
               this.inputBoxChanged = false
             }
             break
-          case 33:
+          case 33:  // Page Up
             this.prevPage()
             e.preventDefault()
             break
-          case 34:
+          case 34:  // Page Down
             this.nextPage()
             e.preventDefault()
             break
-          case 8:
-          case 46:
+          case 8:   // Delete
+          case 46:  // BS
+            if (!this.focused) return
             if (this.inputBoxShow) {
               this.inputBoxChanged = true
               setTimeout(this.calAutocompleteList)
@@ -956,6 +1044,7 @@ export default {
             }
             break
           default:
+            if (!this.focused) return
             if (this.currentField.readonly) return
             if (e.altKey) return
             if (e.key !== 'Process' && e.key.length > 1) return
@@ -1034,8 +1123,8 @@ export default {
       // Adjust the scrolling to display the whole focusing cell
       if (!this.currentField.sticky) {
         const boundRect = this.$el.getBoundingClientRect()
-        if (cellRect.right >= boundRect.right)
-          this.tableContent.scrollBy(cellRect.right - boundRect.right + 1, 0)
+        if (cellRect.right >= boundRect.right - 12)
+          this.tableContent.scrollBy(cellRect.right - boundRect.right + 13, 0)
         if (cellRect.left <= boundRect.left + this.leftMost)
           this.tableContent.scrollBy(cellRect.left - boundRect.left - this.leftMost - 1, 0)
       }
@@ -1209,41 +1298,47 @@ export default {
         const scrollerWidth = this.$refs.scrollbar.getBoundingClientRect().width
         this.hScroller.scrollerUnseenWidth = this.footer.getBoundingClientRect().width - 40 - scrollerWidth
       }
-      if (this.noPaging) return
-      const offset = this.summaryRow ? 60 : 35
-      this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - offset) / 24)
+      if (!this.noPaging) {
+        const offset = this.summaryRow ? 60 : 35
+        this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - offset) / 24)
+      }
+      setTimeout(this.calVScroll, 50)
     },
     firstPage (e) {
       if (e) e.stopPropagation()
-      this.processing = true
+      this.pageTop = 0
+      this.calVScroll()
       setTimeout(() => {
-        this.pageTop = 0
-        this.processing = false
+        this.$refs.vScrollButton.classList.add('focus')
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
       })
     },
     lastPage (e) {
       if (e) e.stopPropagation()
-      this.processing = true
+      this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
+      this.calVScroll()
       setTimeout(() => {
-        this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
-        this.processing = false
+        this.$refs.vScrollButton.classList.add('focus')
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
       })
     },
     prevPage (e) {
       if (e) e.stopPropagation()
-      this.processing = true
+      this.pageTop = this.pageTop < this.pageSize ? 0 : this.pageTop - this.pageSize
+      this.calVScroll()
       setTimeout(() => {
-        this.pageTop = this.pageTop < this.pageSize ? 0 : this.pageTop - this.pageSize
-        this.processing = false
+        this.$refs.vScrollButton.classList.add('focus')
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
       })
     },
     nextPage (e) {
       if (e) e.stopPropagation()
-      this.processing = true
+      if (this.pageTop + this.pageSize < this.table.length)
+        this.pageTop = Math.min(this.pageTop + this.pageSize, this.table.length - this.pageSize)
+      this.calVScroll()
       setTimeout(() => {
-        if (this.pageTop + this.pageSize < this.table.length)
-          this.pageTop += this.pageSize
-        this.processing = false
+        this.$refs.vScrollButton.classList.add('focus')
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
       })
     },
     rowLabelClick (e) {
@@ -1442,12 +1537,21 @@ export default {
       }
     },
     moveNorth () {
-      if (this.focused)
+      if (this.focused) {
         this.moveInputSquare(this.currentRowPos - 1, this.currentColPos)
+        this.calVScroll()
+        this.$refs.vScrollButton.classList.add('focus')
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+      }
     },
     moveSouth () {
-      if (this.focused && this.currentRowPos < this.table.length)
-        return this.moveInputSquare(this.currentRowPos + 1, this.currentColPos)
+      if (this.focused && this.currentRowPos < this.table.length) {
+        const done = this.moveInputSquare(this.currentRowPos + 1, this.currentColPos)
+        this.calVScroll()
+        this.$refs.vScrollButton.classList.add('focus')
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        return done
+      }
       return false
     },
     mouseDown (e) {
@@ -1801,6 +1905,9 @@ input:focus, input:active:focus, input.active:focus {
   margin-bottom: 0;
   /* margin-left: 40px; */
 }
+.systable .last-col {
+  width: 12px;
+}
 .systable.no-number {
   margin-left: 0 !important;
 }
@@ -1975,9 +2082,10 @@ input:focus, input:active:focus, input.active:focus {
   width: 65%;
   cursor: pointer;
 }
-.scroll-bar:hover, .scroll-bar.focus {
+.scroll-bar:hover, .scroll-bar.focus, .footer:hover .scroll-bar {
   background-color: lightgray;
 }
+
 .footer a {
   cursor: pointer;
   color: #007bff;
@@ -1990,6 +2098,27 @@ input:focus, input:active:focus, input.active:focus {
 .footer a:hover {
   text-decoration: underline;
 }
+.v-scroll {
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  width: 13px;
+  z-index: 5;
+  background-color: white;
+  border-left: 1px solid lightgray;
+  user-select: none;
+}
+.v-scroll-button {
+  display: inline-block;
+  width: 100%;
+  z-index: 10;
+  background-color: #f4f6f9;
+  cursor: pointer;
+}
+.v-scroll-button.focus, .v-scroll-button:hover, .v-scroll:hover .v-scroll-button {
+  background-color: lightgray;
+}
+
 .front-drop {
   position: fixed;
   opacity: 0.4;
