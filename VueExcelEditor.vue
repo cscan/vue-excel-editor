@@ -1,5 +1,5 @@
 <template>
-  <div :style="{display: 'inline-block', 'max-width': width}">
+  <div class="vue-excel-editor" :style="{display: 'inline-block', 'max-width': width}">
     <div class="component-content">
       <div ref="tableContent"
            class="table-content"
@@ -154,11 +154,11 @@
       <!-- Vertical Scroll Bar -->
       <div ref="vScroll"
            class="v-scroll"
-           :style="{top: `${vScroll.top}px`, height: `${vScroll.height}px`}"
+           :style="{top: `${vScroller.top}px`, height: `${vScroller.height}px`}"
            @mousedown="vsMouseDown">
         <div ref="vScrollButton"
              class="v-scroll-button"
-             :style="{marginTop: `${vScroll.buttonTop}px`, height: `${vScroll.buttonHeight}px`}"
+             :style="{marginTop: `${vScroller.buttonTop}px`, height: `${vScroller.buttonHeight}px`}"
              @mousedown="vsbMouseDown" />
       </div>
 
@@ -291,6 +291,7 @@ export default {
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     readonly: {type: Boolean, default: false},
     readonlyStyle: {type: Object, default () {return {}}},
+    rememberSetting: {type: Boolean, default: true},
     localizedLabel: {
       type: Object,
       default () {
@@ -335,7 +336,7 @@ export default {
   },
   data () {
     const pageSize = this.noPaging ? 999999 : 20
-    return {
+    const dataset = {
       // selTarget: null,
       // selSquare: null,
       // selx: 0,
@@ -394,6 +395,7 @@ export default {
       lazyTimeout: {},
       lazyBuffer: {},
       hScroller: {},
+      vScroller: {},
       leftMost: 0,
 
       showDatePicker: false,
@@ -402,15 +404,15 @@ export default {
       table: [],
       summaryRow: false,
       showFilteredOnly: true,
-      showSelectedOnly: false,
-      vScroll: {
-        top: 0,
-        height: 0,
-        buttonHeight: 0
-      }
+      showSelectedOnly: false
     }
+    return dataset
   },
   computed: {
+    token () {
+      const id = Array.from(document.querySelectorAll('.vue-excel-editor')).indexOf(this.$el)
+      return `vue-excel-editor-${id}`
+    },
     columnFilterString () {
       Object.keys(this.columnFilter).forEach((key) => {
         if (this.columnFilter[key].trim() === '') delete this.columnFilter[key]
@@ -423,6 +425,30 @@ export default {
     pageBottom () {
       if (this.value.length === 0) return 0
       else return this.pageTop + this.pageSize > this.table.length ? this.table.length : this.pageTop + this.pageSize
+    },
+    setting: {
+      get () {
+        return null
+      },
+      set (setter) {
+        if (setter.fields) {
+          // ignore if fields counts are different
+          if (setter.fields.length !== this.fields.length) return
+          let valid = true
+          const newFields = setter.fields.map(field => {
+            const current = this.fields.find(f => f.name === field.name)
+            if (!current) valid = false
+            return Object.assign(current, {
+              invisible: field.invisible,
+              width: field.width
+            })
+          })
+          if (valid) {
+            this.fields = newFields
+            this.$forceUpdate()
+          }
+        }
+      }
     }
   },
   watch: {
@@ -439,6 +465,16 @@ export default {
         this.processing = false
       }, 0)
     },
+    fields: {
+      handler () {
+        this.lazy(() => {
+          const setting = this.getSetting()
+          if (this.rememberSetting) localStorage[this.token] = JSON.stringify(setting)
+          this.$emit('setting', setting)
+        })
+      },
+      deep: true
+    },
     processing (newVal) {
       if (newVal) {
         const rect = this.$el.children[0].getBoundingClientRect()
@@ -453,7 +489,6 @@ export default {
     window.removeEventListener('resize', this.winResize)
     window.removeEventListener('paste', this.winPaste)
     window.removeEventListener('keydown', this.winKeydown)
-    window.removeEventListener('mousemove', this.sbMouseMove)
     window.removeEventListener('scroll', this.winScroll)
   },
   mounted () {
@@ -472,7 +507,6 @@ export default {
       this.systable.parentNode.style.height = this.height
 
     this.reset()
-
     this.lazy(() => {
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
       this.calCellTop2 = this.labelTr.offsetHeight
@@ -484,20 +518,37 @@ export default {
     window.addEventListener('paste', this.winPaste)
     window.addEventListener('keydown', this.winKeydown)
     window.addEventListener('scroll', this.winScroll)
+
+    if (this.rememberSetting && localStorage[this.token])
+      this.setting = JSON.parse(localStorage[this.token])
   },
   methods: {
+    getSetting () {
+      const colWidth = Array.from(this.colgroupTr.children).map(col => col.style.width)
+      const fields = this.fields.map((field, i) => {
+        return {
+          name: field.name,
+          invisible: field.invisible,
+          width: colWidth[i + 1]
+        }
+      })
+      return {
+        fields: fields
+      }
+    },
     calVScroll () {
       let d = this.labelTr.getBoundingClientRect().height
       if (this.filterRow) d += 29
-      this.vScroll.top = d
+      this.vScroller.top = d
       if (!this.noFooter) d += 25
       if (this.summaryRow) d += 27
       const fullHeight = this.$el.getBoundingClientRect().height
-      this.vScroll.height = fullHeight - d
-      const ratio =  this.vScroll.height / (this.table.length * 24)
-      this.vScroll.buttonHeight = Math.max(24, this.vScroll.height * ratio)
-      const prop = (this.tableContent.scrollTop + this.pageTop * 24) / (this.table.length * 24 - this.vScroll.height)
-      this.vScroll.buttonTop = (this.vScroll.height - this.vScroll.buttonHeight) * prop
+      this.vScroller.height = fullHeight - d
+      const ratio =  this.vScroller.height / (this.table.length * 24)
+      this.vScroller.buttonHeight = Math.max(24, this.vScroller.height * ratio)
+      const prop = (this.tableContent.scrollTop + this.pageTop * 24) / (this.table.length * 24 - this.vScroller.height)
+      this.vScroller.buttonTop = (this.vScroller.height - this.vScroller.buttonHeight) * prop
+      this.$forceUpdate()
     },
     reset () {
       this.errmsg = {}
@@ -701,23 +752,23 @@ export default {
     },
     vsMouseDown (e) {
       e.stopPropagation()
-      const pos = e.offsetY - this.vScroll.buttonHeight / 2
+      const pos = e.offsetY - this.vScroller.buttonHeight / 2
       let ratio = Math.max(0, pos)
-      ratio = Math.min(ratio, this.vScroll.height - this.vScroll.buttonHeight)
-      ratio = ratio / (this.vScroll.height - this.vScroll.buttonHeight)
+      ratio = Math.min(ratio, this.vScroller.height - this.vScroller.buttonHeight)
+      ratio = ratio / (this.vScroller.height - this.vScroller.buttonHeight)
       if (this.noPaging)
         this.tableContent.scrollTo(this.tableContent.scrollLeft, this.table.length * 24 * ratio)
       else {
-        this.vScroll.buttonTop = ratio * (this.vScroll.height - this.vScroll.buttonHeight)
-        this.$refs.vScrollButton.style.marginTop = this.vScroll.buttonTop + 'px'
+        this.vScroller.buttonTop = ratio * (this.vScroller.height - this.vScroller.buttonHeight)
+        this.$refs.vScrollButton.style.marginTop = this.vScroller.buttonTop + 'px'
         this.pageTop = Math.round((this.table.length - this.pageSize) * ratio)
       }
     },
     vsbMouseDown (e) {
       e.stopPropagation()
-      if (!this.vScroll.mouseY) {
-        this.vScroll.saveButtonTop = this.vScroll.buttonTop
-        this.vScroll.mouseY = e.clientY
+      if (!this.vScroller.mouseY) {
+        this.vScroller.saveButtonTop = this.vScroller.buttonTop
+        this.vScroller.mouseY = e.clientY
         window.addEventListener('mousemove', this.vsbMouseMove)
         this.$refs.vScrollButton.classList.add('focus')
       }
@@ -726,21 +777,21 @@ export default {
       if (e.buttons === 0) {
         window.removeEventListener('mousemove', this.vsbMouseMove)
         this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'))
-        this.vScroll.mouseY = 0
+        this.vScroller.mouseY = 0
         if (!this.noPaging) {
-          const ratio = this.vScroll.buttonTop / (this.vScroll.height - this.vScroll.buttonHeight)
+          const ratio = this.vScroller.buttonTop / (this.vScroller.height - this.vScroller.buttonHeight)
           this.pageTop = Math.round((this.table.length - this.pageSize) * ratio)
         }
       }
       else {
-        const diff = e.clientY - this.vScroll.mouseY
+        const diff = e.clientY - this.vScroller.mouseY
         if (this.noPaging) {
-          const ratio = (this.vScroll.saveButtonTop + diff) / (this.vScroll.height - this.vScroll.buttonHeight)
+          const ratio = (this.vScroller.saveButtonTop + diff) / (this.vScroller.height - this.vScroller.buttonHeight)
           this.tableContent.scrollTo(this.tableContent.scrollLeft, this.table.length * 24 * ratio)
         }
         else {
-          this.vScroll.buttonTop = Math.max(0, Math.min(this.vScroll.height - this.vScroll.buttonHeight, this.vScroll.saveButtonTop + diff))
-          this.$refs.vScrollButton.style.marginTop = this.vScroll.buttonTop + 'px'
+          this.vScroller.buttonTop = Math.max(0, Math.min(this.vScroller.height - this.vScroller.buttonHeight, this.vScroller.saveButtonTop + diff))
+          this.$refs.vScrollButton.style.marginTop = this.vScroller.buttonTop + 'px'
         }
       }
     },
@@ -781,15 +832,22 @@ export default {
         this.inputSquare.style.marginLeft =
           (this.currentField.sticky ? this.tableContent.scrollLeft - this.squareSavedLeft : 0) + 'px'
 
-      this.calVScroll()
-      this.$refs.vScrollButton.classList.add('focus')
-      this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
-      if (this.$refs.scrollbar && this.hScroller.tableUnseenWidth) {
-        this.$refs.scrollbar.classList.add('focus')
-        this.lazy(() => this.$refs.scrollbar.classList.remove('focus'), 1000)
-        const ratio = this.tableContent.scrollLeft / this.hScroller.tableUnseenWidth
-        this.$refs.scrollbar.style.left = (this.hScroller.scrollerUnseenWidth * ratio) + 'px'
+      if (this.tableContent.scrollTop !== this.vScroller.lastTop) {
+        this.calVScroll()
+        this.$refs.vScrollButton.classList.add('focus')
+        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
       }
+      this.vScroller.lastTop = this.tableContent.scrollTop
+
+      if (this.tableContent.scrollLeft !== this.hScroller.lastLeft) {
+        if (this.$refs.scrollbar && this.hScroller.tableUnseenWidth) {
+          this.$refs.scrollbar.classList.add('focus')
+          this.lazy(() => this.$refs.scrollbar.classList.remove('focus'), 1000)
+          const ratio = this.tableContent.scrollLeft / this.hScroller.tableUnseenWidth
+          this.$refs.scrollbar.style.left = (this.hScroller.scrollerUnseenWidth * ratio) + 'px'
+        }
+      }
+      this.hScroller.lastLeft = this.tableContent.scrollLeft
     },
     importTable (cb) {
       this.$refs.importFile.click()
@@ -1100,7 +1158,7 @@ export default {
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
 
       // Off the textarea when moving, write to value if changed
-      this.inputBoxShow = 0
+      if (this.inputBoxShow) this.inputBoxShow = 0
       if (this.inputBoxChanged) {
         this.inputCellWrite(this.currentField.toValue(this.inputBox.value))
         this.inputBoxChanged = false
@@ -1134,10 +1192,12 @@ export default {
       this.currentCell = cell
 
       // Off all editors
-      this.showDatePicker = false
-      this.autocompleteInputs = []
-      this.autocompleteSelect = -1
-      if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
+      if (this.showDatePicker) this.showDatePicker = false
+      if (this.autocompleteInputs.length) {
+        this.autocompleteInputs = []
+        this.autocompleteSelect = -1
+      }
+      if (this.recalAutoCompleteList) clearTimeout(this.recalAutoCompleteList)
 
       // set the label markers
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
@@ -1171,8 +1231,8 @@ export default {
         window.getComputedStyle(elm, null).getPropertyValue(css)
       }
       this.sep = {}
-      this.sep.curCol = e.target.parentElement
-      this.sep.nxtCol = this.sep.curCol.nextElementSibling
+      this.sep.curCol = this.colgroupTr.children[Array.from(this.labelTr.children).indexOf(e.target.parentElement)]
+      // this.sep.nxtCol = this.sep.curCol.nextElementSibling
       this.sep.pageX = e.pageX
       let padding = 0
       if (getStyleVal(this.sep.curCol, 'box-sizing') !== 'border-box') {
@@ -1181,9 +1241,9 @@ export default {
         if (padLeft && padRight)
           padding = parseInt(padLeft) + parseInt(padRight)
       }
-      this.sep.curColWidth = this.sep.curCol.offsetWidth - padding
-      if (this.sep.nxtCol)
-        this.sep.nxtColWidth = this.sep.nxtCol.offsetWidth - padding
+      this.sep.curColWidth = e.target.parentElement.offsetWidth - padding
+      // if (this.sep.nxtCol)
+      //   this.sep.nxtColWidth = this.sep.nxtCol.offsetWidth - padding
       window.addEventListener('mousemove', this.colSepMouseMove)
       window.addEventListener('mouseup', this.colSepMouseUp)
     },
@@ -1207,6 +1267,9 @@ export default {
       delete this.sep
       window.removeEventListener('mousemove', this.colSepMouseMove)
       window.removeEventListener('mouseup', this.colSepMouseUp)
+      const setting = this.getSetting()
+      if (this.rememberSetting) localStorage[this.token] = JSON.stringify(setting)
+      this.$emit('setting', setting)
     },
     doFindNext () {
       return this.doFind()
@@ -1302,7 +1365,16 @@ export default {
         const offset = this.summaryRow ? 60 : 35
         this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - offset) / 24)
       }
-      setTimeout(this.calVScroll, 50)
+      else if (this.height === 'auto') {
+        let h = Math.floor((window.innerHeight - this.tableContent.getBoundingClientRect().top - 25))
+        let offset = 4
+        if (this.filterRow) offset += 29
+        if (this.summaryRow) offset += 25
+        if (!this.footerRow) offset += 25
+        h = Math.min(24 * (this.table.length - this.pageTop) + offset, h)
+        this.systable.parentNode.style.height = h + 'px'
+      }
+      setTimeout(this.calVScroll)
     },
     firstPage (e) {
       if (e) e.stopPropagation()

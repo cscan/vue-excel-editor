@@ -72,30 +72,31 @@ In your template
 | autocomplete        | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
 | readonly            | Optional  | Boolean  | Set all columns read only, default is false |
 | readonly-style      | Optional  | Object   | The style of the read-only cell |
-| height              | Optional  | String   | Define the exact height of the component |
-| width               | Optional  | String   | Define the maximum width of the component, default is '100%' |
+| height              | Optional  | String   | Define the exact height in px of the component, default is 'auto' |
+| width               | Optional  | String   | Define the maximum width in px of the component, default is '100%' |
 | row-style           | Optional  | Function | Conditional row formatting, default is null |
 | cell-style          | Optional  | Function | Conditional cell formatting, default is null |
 | header-label        | Optional  | Function | Func to return the label, parameter are the field label, field object |
 | record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
 | localized-label     | Optional  | Object   | Customize labels and messages for localization purpose |
 | n-filter-count      | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
+| remember-setting    | Optional  | Boolean  | Remember the setting in localStorage, default is true |
 
 #### Component: vue-excel-column
 | Name                 | Mandatory | Type     | Description |
 | :---                 | :---      | :---     | :---        |
 | field                | Mandatory | String   | Field name, row object key |
 | label                | Optional  | String   | Header label, default is field name |
-| type                 | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'money', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| type                 | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
 | readonly             | Optional  | Boolean  | Read-only, default is parent prop: readonly |
 | init-style           | Optional  | Object   | Cell inital style in css |
 | sticky               | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
 | invisible            | Optional  | Boolean  | Column visibility, default is false |
-| width                | Optional  | String   | Specified column width, default is 100px |
+| width                | Optional  | String   | Specified column width, default is '100px' |
 | validate             | Optional  | Function | Custom function to validate and return the error message |
 | key-field            | Optional  | Boolean  | Specified the key field which is included in keys parameter in @update event |
 | allow-keys           | Optional  | Array    | Array of char which allow to input |
-| mandatory            | Optional  | String   | If specified, it will be shown if the cell is blank, default is '' |
+| mandatory            | Optional  | String   | If specified, it is showed as error when it modified as blank, default is '' |
 | length-limit         | Optional  | Number   | Not allow to input when the content length reaches the limit |
 | autocomplete         | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
 | pos                  | Optional  | Number   | Specified column sequence |
@@ -124,7 +125,8 @@ In your template
 | Name    | Argument                  | Description |
 | :---    | :---                      | :---        |
 | update  | Array Of Array            | Update Cell information |
-| select  | Array of rows, select/not | Emit this when rows are selected/unselected |
+| select  | Array of rows, select/not | Emit when rows are selected/unselected |
+| setting | setting                   | Emit when setting (column width, invisible state) is changed |
 
 (TBD)
 
