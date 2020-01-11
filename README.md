@@ -80,7 +80,7 @@ In your template
 | record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
 | localized-label     | Optional  | Object   | Customize labels and messages for localization purpose |
 | n-filter-count      | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
-| remember-setting    | Optional  | Boolean  | Remember the setting in localStorage, default is true |
+| remember            | Optional  | Boolean  | Remember the setting in localStorage, default is false |
 
 #### Component: vue-excel-column
 | Name                 | Mandatory | Type     | Description |

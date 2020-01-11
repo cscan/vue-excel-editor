@@ -291,7 +291,7 @@ export default {
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     readonly: {type: Boolean, default: false},
     readonlyStyle: {type: Object, default () {return {}}},
-    rememberSetting: {type: Boolean, default: true},
+    remember: {type: Boolean, default: false},
     localizedLabel: {
       type: Object,
       default () {
@@ -469,7 +469,7 @@ export default {
       handler () {
         this.lazy(() => {
           const setting = this.getSetting()
-          if (this.rememberSetting) localStorage[this.token] = JSON.stringify(setting)
+          if (this.remember) localStorage[window.location.pathname + '.' + this.token] = JSON.stringify(setting)
           this.$emit('setting', setting)
         })
       },
@@ -519,8 +519,8 @@ export default {
     window.addEventListener('keydown', this.winKeydown)
     window.addEventListener('scroll', this.winScroll)
 
-    if (this.rememberSetting && localStorage[this.token])
-      this.setting = JSON.parse(localStorage[this.token])
+    if (this.remember && localStorage[window.location.pathname + '.' + this.token])
+      this.setting = JSON.parse(localStorage[window.location.pathname + '.' + this.token])
   },
   methods: {
     getSetting () {
@@ -1268,7 +1268,7 @@ export default {
       window.removeEventListener('mousemove', this.colSepMouseMove)
       window.removeEventListener('mouseup', this.colSepMouseUp)
       const setting = this.getSetting()
-      if (this.rememberSetting) localStorage[this.token] = JSON.stringify(setting)
+      if (this.remember) localStorage[window.location.pathname + '.' + this.token] = JSON.stringify(setting)
       this.$emit('setting', setting)
     },
     doFindNext () {
