@@ -243,10 +243,10 @@
 </template>
 
 <script>
-import VueExcelFilter from './VueExcelFilter'
-import PanelFilter from './panelFilter'
-import PanelSetting from './panelSetting'
-import PanelFind from './panelFind'
+import VueExcelFilter from './VueExcelFilter.vue'
+import PanelFilter from './panelFilter.vue'
+import PanelSetting from './panelSetting.vue'
+import PanelFind from './panelFind.vue'
 import DatePicker from 'vue2-datepicker'
 import XLSX from 'xlsx'
 

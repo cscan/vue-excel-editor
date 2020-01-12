@@ -1,7 +1,7 @@
 // index.js
 
-import VueExcelEditor from './VueExcelEditor'
-import VueExcelColumn from './VueExcelColumn'
+import VueExcelEditor from './VueExcelEditor.vue'
+import VueExcelColumn from './VueExcelColumn.vue'
 
 export default {
   install (Vue) {

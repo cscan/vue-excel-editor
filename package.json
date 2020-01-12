@@ -3,16 +3,30 @@
   "email": "apple.6502@gmail.com",
   "description": "Vue2 plugin for displaying and editing the array-of-object in Excel style",
   "version": "1.2.65",
-  "main": "src/main.js",
+  "main": "dist/vue-excel-editor.umd.js",
+  "module": "dist/vue-excel-editor.esm.js",
+  "unpkg": "dist/vue-excel-editor.min.js",
   "dependencies": {
     "moment": "^2.24.0",
     "vue2-datepicker": "^3.3.0",
     "vuedraggable": "^2.23.2",
     "xlsx": "^0.15.3"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\""
+    "build": "npm run build:umd & npm run build:es & npm run build:unpkg",
+    "build:umd": "rollup --config build/rollup.config.js --format umd --file dist/vue-excel-editor.umd.js",
+    "build:es": "rollup --config build/rollup.config.js --format es --file dist/vue-excel-editor.esm.js",
+    "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/vue-excel-editor.min.js"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^7.0.0",
+    "rollup": "^1.17.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-css-porter": "^1.0.2",
+    "rollup-plugin-vue": "^5.1.5",
+    "vue": "^2.6.10",
+    "vue-template-compiler": "^2.6.10"
   },
   "repository": {
     "type": "git",
