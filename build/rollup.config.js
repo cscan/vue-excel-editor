@@ -14,7 +14,7 @@ export default {
     globals: {
       'moment': 'moment',
       'vuedraggable': 'vuedraggable',
-      'xlsx': 'xlsx'
+      'xlsx': 'XLSX'
     }
   },
   plugins: [
