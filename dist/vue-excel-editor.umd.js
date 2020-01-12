@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vuedraggable'), require('vue2-datepicker'), require('xlsx'), require('moment')) :
   typeof define === 'function' && define.amd ? define(['exports', 'vuedraggable', 'vue2-datepicker', 'xlsx', 'moment'], factory) :
-  (global = global || self, factory(global.VueExcelComponent = {}, global.vueDraggable, global.vue2Picker, global.xlsx, global.moment));
+  (global = global || self, factory(global.VueExcelComponent = {}, global.vuedraggable, global['vue2-datepicker'], global.xlsx, global.moment));
 }(this, (function (exports, draggable, DatePicker, XLSX, moment) { 'use strict';
 
   draggable = draggable && draggable.hasOwnProperty('default') ? draggable['default'] : draggable;

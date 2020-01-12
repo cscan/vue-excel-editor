@@ -13,8 +13,8 @@ export default {
     exports: 'named',
     globals: {
       'moment': 'moment',
-      'vue2-datepicker': 'vue2Picker',
-      'vuedraggable': 'vueDraggable',
+      'vue2-datepicker': 'vue2-datepicker',
+      'vuedraggable': 'vuedraggable',
       'xlsx': 'xlsx'
     }
   },
