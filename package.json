@@ -1,15 +1,15 @@
 {
+  "name": "vue-excel-editor",
+  "email": "apple.6502@gmail.com",
+  "description": "Vue2 plugin for displaying and editing the array-of-object in Excel style",
+  "version": "1.2.64",
+  "main": "src/main.js",
   "dependencies": {
     "moment": "^2.24.0",
     "vue2-datepicker": "^3.3.0",
     "vuedraggable": "^2.23.2",
     "xlsx": "^0.15.3"
   },
-  "name": "vue-excel-editor",
-  "email": "apple.6502@gmail.com",
-  "description": "Vue2 plugin for displaying and editing the array-of-object in Excel style",
-  "version": "1.2.64",
-  "main": "index.js",
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\""
