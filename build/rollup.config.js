@@ -10,9 +10,9 @@ export default {
     name: 'VueExcelComponent',
     exports: 'named',
     globals: {
-      'moment': 'moment',
       'vuedraggable': 'vuedraggable',
-      'xlsx': 'xlsx'
+      'xlsx': 'XLSX',
+      'moment': 'moment'
     }
   },
   plugins: [
@@ -30,8 +30,8 @@ export default {
     css()
   ],
   external: [
-    'moment',
     'vuedraggable',
-    'xlsx'
+    'xlsx',
+    'moment'
   ]
 }

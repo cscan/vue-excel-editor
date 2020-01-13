@@ -847,8 +847,10 @@ export default {
 
       if (this.tableContent.scrollTop !== this.vScroller.lastTop) {
         this.calVScroll()
-        this.$refs.vScrollButton.classList.add('focus')
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        if (this.$refs.vScrollButton) {
+          this.$refs.vScrollButton.classList.add('focus')
+          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        }
       }
       this.vScroller.lastTop = this.tableContent.scrollTop
 
