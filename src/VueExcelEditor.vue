@@ -159,7 +159,9 @@
         <div ref="vScrollButton"
              class="v-scroll-button"
              :style="{marginTop: `${vScroller.buttonTop}px`, height: `${vScroller.buttonHeight}px`}"
-             @mousedown="vsbMouseDown" />
+             @mousedown="vsbMouseDown">
+          <div v-show="vScroller.runner" class="runner" v-html="vScroller.runner" />
+        </div>
       </div>
 
       <!-- Autocomplete List -->
@@ -173,7 +175,7 @@
 
       <!-- Footer -->
       <div ref="footer" class="footer center-text" :class="{hide: noFooter}" style="position:relative" @mousedown="ftMouseDown">
-        <div ref="scrollbar" class="scroll-bar" @mousedown="sbMouseDown" />
+        <div ref="hScroll" class="h-scroll" @mousedown="sbMouseDown" />
         <span class="left-block"></span>
         <span v-show="!noPaging" style="position: absolute; left: 46px">
           <span v-html="localizedLabel.footerLeft(pageTop + 1, pageBottom, table.length)"></span>
@@ -244,9 +246,9 @@
 
 <script>
 import VueExcelFilter from './VueExcelFilter.vue'
-import PanelFilter from './panelFilter.vue'
-import PanelSetting from './panelSetting.vue'
-import PanelFind from './panelFind.vue'
+import PanelFilter from './PanelFilter.vue'
+import PanelSetting from './PanelSetting.vue'
+import PanelFind from './PanelFind.vue'
 import DatePicker from 'vue2-datepicker'
 import XLSX from 'xlsx'
 
@@ -782,6 +784,7 @@ export default {
           const ratio = this.vScroller.buttonTop / (this.vScroller.height - this.vScroller.buttonHeight)
           this.pageTop = Math.round((this.table.length - this.pageSize) * ratio)
         }
+        this.vScroller.runner = ''
       }
       else {
         const diff = e.clientY - this.vScroller.mouseY
@@ -792,6 +795,15 @@ export default {
         else {
           this.vScroller.buttonTop = Math.max(0, Math.min(this.vScroller.height - this.vScroller.buttonHeight, this.vScroller.saveButtonTop + diff))
           this.$refs.vScrollButton.style.marginTop = this.vScroller.buttonTop + 'px'
+
+          const ratio = this.vScroller.buttonTop / (this.vScroller.height - this.vScroller.buttonHeight)
+          const recPos = Math.round((this.table.length - this.pageSize) * ratio) + 1
+          const rec = this.table[recPos]
+          this.vScroller.runner = recPos + '<br>' + this.fields
+            .filter((field, i) => field.keyField || field.sticky || this.sortPos === i)
+            .map(field => rec[field.name])
+            .join('<br>')
+          this.$forceUpdate()
         }
       }
     },
@@ -805,18 +817,18 @@ export default {
     sbMouseDown (e) {
       e.stopPropagation()
       if (!this.hScroller.mouseX) {
-        const sleft = this.$refs.scrollbar.getBoundingClientRect().left
+        const sleft = this.$refs.hScroll.getBoundingClientRect().left
         const fleft = this.footer.getBoundingClientRect().left + 40
         this.hScroller.left = sleft - fleft
         this.hScroller.mouseX = e.clientX
         window.addEventListener('mousemove', this.sbMouseMove)
-        this.$refs.scrollbar.classList.add('focus')
+        this.$refs.hScroll.classList.add('focus')
       }
     },
     sbMouseMove (e) {
       if (e.buttons === 0) {
         window.removeEventListener('mousemove', this.sbMouseMove)
-        this.lazy(() => this.$refs.scrollbar.classList.remove('focus'))
+        this.lazy(() => this.$refs.hScroll.classList.remove('focus'))
         this.hScroller.mouseX = 0
       }
       else {
@@ -840,11 +852,11 @@ export default {
       this.vScroller.lastTop = this.tableContent.scrollTop
 
       if (this.tableContent.scrollLeft !== this.hScroller.lastLeft) {
-        if (this.$refs.scrollbar && this.hScroller.tableUnseenWidth) {
-          this.$refs.scrollbar.classList.add('focus')
-          this.lazy(() => this.$refs.scrollbar.classList.remove('focus'), 1000)
+        if (this.$refs.hScroll && this.hScroller.tableUnseenWidth) {
+          this.$refs.hScroll.classList.add('focus')
+          this.lazy(() => this.$refs.hScroll.classList.remove('focus'), 1000)
           const ratio = this.tableContent.scrollLeft / this.hScroller.tableUnseenWidth
-          this.$refs.scrollbar.style.left = (this.hScroller.scrollerUnseenWidth * ratio) + 'px'
+          this.$refs.hScroll.style.left = (this.hScroller.scrollerUnseenWidth * ratio) + 'px'
         }
       }
       this.hScroller.lastLeft = this.tableContent.scrollLeft
@@ -1353,12 +1365,12 @@ export default {
       target.setAttribute('style', `width:${rect.width}px; height:${rect.height}px;`)
     },
     refreshPageSize () {
-      if (this.$refs.scrollbar) {
+      if (this.$refs.hScroll) {
         const fullWidth = this.systable.getBoundingClientRect().width
         const viewWidth = this.tableContent.getBoundingClientRect().width
         this.hScroller.tableUnseenWidth = fullWidth - viewWidth
-        this.$refs.scrollbar.style.width = (100 * viewWidth / fullWidth) + '%'
-        const scrollerWidth = this.$refs.scrollbar.getBoundingClientRect().width
+        this.$refs.hScroll.style.width = (100 * viewWidth / fullWidth) + '%'
+        const scrollerWidth = this.$refs.hScroll.getBoundingClientRect().width
         this.hScroller.scrollerUnseenWidth = this.footer.getBoundingClientRect().width - 40 - scrollerWidth
       }
       if (!this.noPaging) {
@@ -2145,7 +2157,7 @@ input:focus, input:active:focus, input.active:focus {
   background-color: #e9ecef;
   border-right: 1px solid lightgray;
 }
-.scroll-bar {
+.h-scroll {
   z-index: -1;
   position: absolute;
   background-color: #f4f6f9;
@@ -2154,7 +2166,7 @@ input:focus, input:active:focus, input.active:focus {
   width: 65%;
   cursor: pointer;
 }
-.scroll-bar:hover, .scroll-bar.focus, .footer:hover .scroll-bar {
+.h-scroll:hover, .h-scroll.focus, .footer:hover .h-scroll {
   background-color: lightgray;
 }
 
@@ -2181,6 +2193,7 @@ input:focus, input:active:focus, input.active:focus {
   user-select: none;
 }
 .v-scroll-button {
+  position: relative;
   display: inline-block;
   width: 100%;
   z-index: 10;
@@ -2189,6 +2202,31 @@ input:focus, input:active:focus, input.active:focus {
 }
 .v-scroll-button.focus, .v-scroll-button:hover, .v-scroll:hover .v-scroll-button {
   background-color: lightgray;
+}
+.runner {
+  font-size: 0.88rem;
+  padding: 0.5rem;
+  position: absolute;
+  right: 23px;
+  top: 4px;
+  display: inline-block;
+  width: fit-content;
+  z-index: 10;
+  background-color: lightsteelblue;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.runner:before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  border-top: 4px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid lightsteelblue;
+  right: -8px;
+  top: 4px;
 }
 
 .front-drop {
