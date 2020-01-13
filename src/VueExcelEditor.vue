@@ -19,7 +19,7 @@
           <colgroup>
             <col style="width:40px">
             <col v-for="(item, p) in fields" :key="p" :style="{width: item.width}">
-            <col style="width:12px">
+            <col v-if="vScroller.buttonHeight < vScroller.height" style="width:12px">
           </colgroup>
           <thead class="center-text">
             <tr>
@@ -35,7 +35,7 @@
               <th v-for="(item, p) in fields"
                   v-show="!item.invisible"
                   :key="`th-${p}`"
-                  :colspan="p === fields.length - 1? 2: 1"
+                  :colspan="p === fields.length - 1 && vScroller.buttonHeight < vScroller.height ? 2: 1"
                   :class="{'sort-asc-sign': sortPos==p && sortDir==1,
                           'sort-des-sign': sortPos==p && sortDir==-1,
                           'sticky-column': item.sticky}"
@@ -95,7 +95,7 @@
                     @mouseover="cellMouseOver"
                     @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
               </template>
-              <td class="last-col"></td>
+              <td v-if="vScroller.buttonHeight < vScroller.height" class="last-col"></td>
             </tr>
           </tbody>
           <tfoot>
@@ -104,7 +104,7 @@
               <template v-for="(field, p) in fields">
                 <td v-show="!field.invisible"
                     class="row-summary"
-                    :colspan="p === fields.length - 1? 2: 1"
+                    :colspan="p === fields.length - 1 && vScroller.buttonHeight < vScroller.height ? 2: 1"
                     :class="{
                       'sticky-column': field.sticky,
                       'summary-column1': p+1 < fields.length && fields[p+1].summary,
@@ -152,7 +152,8 @@
       </div>
 
       <!-- Vertical Scroll Bar -->
-      <div ref="vScroll"
+      <div v-if="vScroller.buttonHeight < vScroller.height"
+           ref="vScroll"
            class="v-scroll"
            :style="{top: `${vScroller.top}px`, height: `${vScroller.height}px`}"
            @mousedown="vsMouseDown">

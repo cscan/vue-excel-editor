@@ -1,10 +1,8 @@
 import commonjs from 'rollup-plugin-commonjs'
 import vue from 'rollup-plugin-vue'
 import resolve from '@rollup/plugin-node-resolve'
-import babel from 'rollup-plugin-babel'
+import minify from 'rollup-plugin-babel-minify'
 import css from 'rollup-plugin-css-porter'
-
-const extensions = [".ts", ".js"]
 
 export default {
   input: 'src/main.js',
@@ -14,7 +12,7 @@ export default {
     globals: {
       'moment': 'moment',
       'vuedraggable': 'vuedraggable',
-      'xlsx': 'XLSX'
+      'xlsx': 'xlsx'
     }
   },
   plugins: [
@@ -28,9 +26,7 @@ export default {
         moduleDirectory: 'node_modules'
       }
     }),
-    babel({
-      extensions
-    }),
+    minify(),
     css()
   ],
   external: [
