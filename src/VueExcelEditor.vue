@@ -1395,38 +1395,46 @@ export default {
       if (e) e.stopPropagation()
       this.pageTop = 0
       this.calVScroll()
-      setTimeout(() => {
-        this.$refs.vScrollButton.classList.add('focus')
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
-      })
+      if (this.$refs.vScrollButton) {
+        setTimeout(() => {
+          this.$refs.vScrollButton.classList.add('focus')
+          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        })
+      }
     },
     lastPage (e) {
       if (e) e.stopPropagation()
       this.pageTop = this.table.length - this.pageSize < 0 ? 0 : this.table.length - this.pageSize
       this.calVScroll()
-      setTimeout(() => {
-        this.$refs.vScrollButton.classList.add('focus')
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
-      })
+      if (this.$refs.vScrollButton) {
+        setTimeout(() => {
+          this.$refs.vScrollButton.classList.add('focus')
+          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        })
+      }
     },
     prevPage (e) {
       if (e) e.stopPropagation()
       this.pageTop = this.pageTop < this.pageSize ? 0 : this.pageTop - this.pageSize
       this.calVScroll()
-      setTimeout(() => {
-        this.$refs.vScrollButton.classList.add('focus')
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
-      })
+      if (this.$refs.vScrollButton) {
+        setTimeout(() => {
+          this.$refs.vScrollButton.classList.add('focus')
+          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        })
+      }
     },
     nextPage (e) {
       if (e) e.stopPropagation()
       if (this.pageTop + this.pageSize < this.table.length)
         this.pageTop = Math.min(this.pageTop + this.pageSize, this.table.length - this.pageSize)
       this.calVScroll()
-      setTimeout(() => {
-        this.$refs.vScrollButton.classList.add('focus')
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
-      })
+      if (this.$refs.vScrollButton) {
+        setTimeout(() => {
+          this.$refs.vScrollButton.classList.add('focus')
+          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        })
+      }
     },
     rowLabelClick (e) {
       let target = e.target
@@ -1627,16 +1635,24 @@ export default {
       if (this.focused) {
         this.moveInputSquare(this.currentRowPos - 1, this.currentColPos)
         this.calVScroll()
-        this.$refs.vScrollButton.classList.add('focus')
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        if (this.$refs.vScrollButton) {
+          setTimeout(() => {
+            this.$refs.vScrollButton.classList.add('focus')
+            this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+          })
+        }
       }
     },
     moveSouth () {
       if (this.focused && this.currentRowPos < this.table.length) {
         const done = this.moveInputSquare(this.currentRowPos + 1, this.currentColPos)
         this.calVScroll()
-        this.$refs.vScrollButton.classList.add('focus')
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        if (this.$refs.vScrollButton) {
+          setTimeout(() => {
+            this.$refs.vScrollButton.classList.add('focus')
+            this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+          })
+        }
         return done
       }
       return false
