@@ -23,6 +23,7 @@
     "@rollup/plugin-node-resolve": "^7.0.0",
     "rollup": "^1.17.0",
     "rollup-plugin-babel-minify": "^9.1.1",
+    "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-css-porter": "^1.0.2",
     "rollup-plugin-vue": "^5.1.5",

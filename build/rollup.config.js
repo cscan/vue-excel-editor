@@ -3,6 +3,7 @@ import vue from 'rollup-plugin-vue'
 import resolve from '@rollup/plugin-node-resolve'
 import minify from 'rollup-plugin-babel-minify'
 import css from 'rollup-plugin-css-porter'
+import cleanup from 'rollup-plugin-cleanup'
 
 export default {
   input: 'src/main.js',
@@ -27,7 +28,8 @@ export default {
       }
     }),
     minify(),
-    css()
+    css(),
+    cleanup()
   ],
   external: [
     'vuedraggable',

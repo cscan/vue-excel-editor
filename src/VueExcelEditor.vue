@@ -1552,6 +1552,8 @@ export default {
     clearAllSelected () {
       // for (let i = 0; i < this.$refs.systable.children[2].children.length; i++)
       //  this.unSelectRecord(this.pageTop + i)
+      if (this.selectedCount > 0)
+        this.$emit('select', Object.keys(this.selected).map(rowPos => Number(rowPos)), false)
       this.selected = {}
       this.selectedCount = 0
     },
