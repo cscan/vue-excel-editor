@@ -238,7 +238,7 @@
              style="width:0; height: 0; opacity:0; z-index:-1"
              @change="doImport" />
 
-      <panel-filter ref="panelFilter" :m-filter-count="nFilterCount" :localized-label="localizedLabel" />
+      <panel-filter ref="panelFilter" :n-filter-count="nFilterCount" :localized-label="localizedLabel" />
       <panel-setting ref="panelSetting" v-model="fields" :localized-label="localizedLabel" />
       <panel-find ref="panelFind" :localized-label="localizedLabel" />
     </div>
@@ -288,7 +288,7 @@ export default {
     noNumCol: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     newRecord: {type: Function, default: null},     // return the new record from caller if provided
-    nFilterCount: {type: Number, default: 200},     // show top n values in filter dialog
+    nFilterCount: {type: Number, default: 1000},    // show top n values in filter dialog
     height: {type: String, default: ''},
     width: {type: String, default: '100%'},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
@@ -319,6 +319,7 @@ export default {
           sortDescending: 'Sort Descending',
           near: '≒ Near',
           exactMatch: '= Exact Match',
+          notMatch: '≠ Not Match',
           greaterThan: '&gt; Greater Than',
           greaterThanOrEqualTo: '≥ Greater Than or Equal To',
           lessThan: '&lt; Less Than',
@@ -600,6 +601,7 @@ export default {
           result = this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
           break
       }
+      if (isNaN(result)) result = ''
       return field.toText(result)
     },
     calTable () {
@@ -620,6 +622,9 @@ export default {
             case this.columnFilter[k].startsWith('<='):
               filter[k] = {type: 1, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
               if (this.fields[k].type === 'number') filter[k].value = Number(filter[k].value)
+              break
+            case this.columnFilter[k].startsWith('<>'):
+              filter[k] = {type: 9, value: this.columnFilter[k].slice(2).trim().toUpperCase()}
               break
             case this.columnFilter[k].startsWith('<'):
               filter[k] = {type: 2, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
@@ -695,6 +700,9 @@ export default {
                 break
               case 8:
                 if (!new RegExp(filter[k].value, 'i').test(content[k])) return false
+                break
+              case 9:
+                if (`${content[k]}` === `${filter[k].value}`) return false
                 break
             }
           }
@@ -1293,9 +1301,10 @@ export default {
       if (typeof s === 'undefined') s = this.inputFind
       else this.inputFind = s
       s = s.toUpperCase()
-      for(let r = this.currentRowPos + this.pageTop; r < this.table.length; r++) {
+      const row = Math.max(0, this.currentRowPos)
+      for(let r = row + this.pageTop; r < this.table.length; r++) {
         const rec = this.table[r]
-        for(let c = (r === this.currentRowPos + this.pageTop ? this.currentColPos + 1: 0); c < this.fields.length; c++) {
+        for(let c = (r === row + this.pageTop ? this.currentColPos + 1: 0); c < this.fields.length; c++) {
           const field = this.fields[c].name
           if (typeof rec[field] !== 'undefined' && String(rec[field]).toUpperCase().indexOf(s) >= 0) {
             this.pageTop = this.findPageTop(r)
@@ -1308,9 +1317,9 @@ export default {
           }
         }
       }
-      for(let r = 0; r <= this.currentRowPos + this.pageTop; r++) {
+      for(let r = 0; r <= row + this.pageTop; r++) {
         const rec = this.table[r]
-        for(let c = 0; c < (r === this.currentRowPos + this.pageTop ? this.currentColPos : this.fields.length); c++) {
+        for(let c = 0; c < (r === row + this.pageTop ? this.currentColPos : this.fields.length); c++) {
           const field = this.fields[c].name
           if (typeof rec[field] !== 'undefined' && String(rec[field]).toUpperCase().indexOf(s) >= 0) {
             this.pageTop = this.findPageTop(r)
@@ -1577,6 +1586,9 @@ export default {
       const oldKeys = this.getKeys(tableRow)
       tableRow[field.name] = content
 
+      if (field.change)
+        field.change(recPos, field.name, content, tableRow, field)
+
       setTimeout(() => {
         const transaction = {
           $id: tableRow.$id,
@@ -1584,7 +1596,7 @@ export default {
           oldKeys: oldKeys,
           name: field.name,
           field: field,
-          oldVal: oldVal,
+          oldVal: typeof oldVal !== 'undefined' ? oldVal : '',
           newVal: content,
           err: ''
         }

@@ -249,7 +249,7 @@ In your HTML call it likes
 Developer may override the default values through localized-label prop
 ```html
 <template>
-    <vue-excel-editor v-model="jsondata" localized-label="myLabels">
+    <vue-excel-editor v-model="jsondata" :localized-label="myLabels">
     ...
     </vue-excel-editor>
 </template>
@@ -278,6 +278,7 @@ data: {
         sortDescending: 'Sort Descending',
         near: '≒ Near',
         exactMatch: '= Exact Match',
+        notMatch: '≠ Not Match',
         greaterThan: '&gt; Greater Than',
         greaterThanOrEqualTo: '≥ Greater Than or Equal To',
         lessThan: '&lt; Less Than',

@@ -27,6 +27,9 @@
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('=')">
                 <span v-html="localizedLabel.exactMatch" />
               </div>
+              <div class="panel-dropdown-item" @click.prevent="setFilterCondition('<>')">
+                <span v-html="localizedLabel.notMatch" />
+              </div>
               <div class="panel-dropdown-item" @click.prevent="setFilterCondition('>')">
                 <span v-html="localizedLabel.greaterThan" />
               </div>
@@ -82,7 +85,7 @@
 <script>
 export default {
   props: {
-    nFilterCount: {type: Number, default: 200},     // show top n values in filter dialog
+    nFilterCount: {type: Number, default: 1000},     // show top n values in filter dialog
     localizedLabel: {
       type: Object,
       default () {
@@ -92,6 +95,7 @@ export default {
           sortDescending: 'Sort Descending',
           near: '≒ Near',
           exactMatch: '= Exact Match',
+          notMatch: '≠ Not Match',
           greaterThan: '&gt; Greater Than',
           greaterThanOrEqualTo: '≥ Greater Than or Equal To',
           lessThan: '&lt; Less Than',
@@ -128,6 +132,8 @@ export default {
           return '≤'
         case '>=':
           return '≥'
+        case '<>':
+          return '≠'
         default:
           return this.inputFilterCondition
       }
@@ -233,7 +239,6 @@ input:focus, button:focus {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 28rem;
   max-width: 75vh;
   height: fit-content;
   max-height: 80vh;
@@ -382,6 +387,7 @@ div.panel-title span, button.panel-button span {
   padding: 10px 10px;
   font-size: 0.88rem;
   cursor: pointer;
+  white-space: nowrap;
 }
 .panel-list-item:hover {
   background-color: lightskyblue;

@@ -20,6 +20,7 @@ export default {
 
     keyField: {type: Boolean, default: false},
     sticky: {type: Boolean, default: false},
+    change: {type: Function, default: null},
 
     allowKeys: {type: Array, default () {return null}},
     mandatory: {type: Boolean, default: false},
@@ -150,6 +151,7 @@ export default {
       type: this.type,
       width: this.width,
       validate: validate,
+      change: this.change,
 
       keyField: this.keyField,
       sticky: this.sticky,
