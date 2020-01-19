@@ -274,6 +274,7 @@ data: {
         exportExcel: 'Export Excel',
         importExcel: 'Import Excel',
         back: 'Back',
+        reset: 'Default',
         sortingAndFiltering: 'Sorting And Filtering',
         sortAscending: 'Sort Ascending',
         sortDescending: 'Sort Descending',
