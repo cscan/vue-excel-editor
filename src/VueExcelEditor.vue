@@ -18,7 +18,7 @@
               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
           <colgroup>
             <col style="width:40px">
-            <col v-for="(item, p) in fields" :key="p" :style="{width: item.width}">
+            <col v-for="(item, p) in fields" v-show="!item.invisible" :key="p" :style="{width: item.width}">
             <col v-if="vScroller.buttonHeight < vScroller.height" style="width:12px">
           </colgroup>
           <thead class="center-text">
@@ -656,6 +656,7 @@ export default {
           })
           for (let i = 0; i < filterColumnList.length; i++) {
             const k = filterColumnList[i]
+            if (this.fields[k].keyField && content[k].startsWith('§')) return true
             switch (filter[k].type) {
               case 0:
                 if (`${content[k]}` !== `${filter[k].value}`) return false
