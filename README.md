@@ -134,26 +134,26 @@ In your template
 ## Methods List
 
 #### Component: vue-excel-editor
-| Name               | Arguments            | Description |
-| :---               | :---                 | :---        |
-| firstPage          |                      | Move to the first page |
-| lastPage           |                      | Move to the last page |
-| prevPage           |                      | Move to the previous page |
-| nextPage           |                      | Move to the next page |
-| moveNorth          |                      | Move the cursor cell to upper cell |
-| moveSouth          |                      | Move the cursor cell to lower cell |
-| moveWest           |                      | Move the cursor cell to previous cell |
-| moveEast           |                      | Move the cursor cell to next cell |
-| doFind             | text                 | Find the specified text in whole table and locate the cursor cell |
-| doFindNext         |                      | Contnue the last find |
-| sort               | n, pos               | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
-| selectRecord       | row                  | Select the row |
-| unSelectRecord     | row                  | UnSelect the row |
-| clearAllSelected   |                      | Unselect all selected rows |
-| getSelectedRecords |                      | Get an array of the selected rows |
-| exportTable        | format, selectedOnly | export the filtered table as xlsx/csv |
-| importTable        | callback             | import the specified formatted xlsx |
-| undoTransaction    |                      | Undo the last update |
+| Name               | Arguments                      | Description |
+| :---               | :---                           | :---        |
+| firstPage          |                                | Move to the first page |
+| lastPage           |                                | Move to the last page |
+| prevPage           |                                | Move to the previous page |
+| nextPage           |                                | Move to the next page |
+| moveNorth          |                                | Move the cursor cell to upper cell |
+| moveSouth          |                                | Move the cursor cell to lower cell |
+| moveWest           |                                | Move the cursor cell to previous cell |
+| moveEast           |                                | Move the cursor cell to next cell |
+| doFind             | text                           | Find the specified text in whole table and locate the cursor cell |
+| doFindNext         |                                | Contnue the last find |
+| sort               | n, pos                         | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
+| selectRecord       | row                            | Select the row |
+| unSelectRecord     | row                            | UnSelect the row |
+| clearAllSelected   |                                | Unselect all selected rows |
+| getSelectedRecords |                                | Get an array of the selected rows |
+| exportTable        | format, selectedOnly, filename | export the filtered table as xlsx/csv |
+| importTable        | callback                       | import the specified formatted xlsx |
+| undoTransaction    |                                | Undo the last update |
 
 ## Variable List
 

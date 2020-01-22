@@ -1428,19 +1428,22 @@ export default {
         fileReader.readAsBinaryString(file)
       }, 500)      
     },
-    exportTable (format, selectedOnly) {
+    exportTable (format, selectedOnly, filename) {
       this.processing = true
       setTimeout(() => {
         const wb = XLSX.utils.book_new()
         let ws1 = null
+        let data = this.table
         if (selectedOnly)
-          ws1 = XLSX.utils.json_to_sheet(this.table.filter((rec, i) => this.selected[i]), {
-            header: this.fields.map(field => field.name)
-          })
-        else
-          ws1 = XLSX.utils.json_to_sheet(this.table, {
-            header: this.fields.map(field => field.name)
-          })
+          data = this.table.filter((rec, i) => this.selected[i])
+        const mapped = data.map(rec => {
+          const conv = {}
+          this.fields.forEach(field => conv[field.name] = rec[field.name])
+          return conv
+        })
+        ws1 = XLSX.utils.json_to_sheet(mapped, {
+          header: this.fields.map(field => field.name)
+        })
         const labels = Array.from(this.labelTr.children).slice(1).map(t => t.children[0].innerText)
         XLSX.utils.sheet_add_aoa(ws1, [labels], {origin: 0})
         ws1['!cols'] = Array.from(this.labelTr.children).slice(1).map((t) => {
@@ -1451,10 +1454,12 @@ export default {
         XLSX.utils.book_append_sheet(wb, ws1, 'Sheet1')
         switch (format) {
           case 'excel':
-            XLSX.writeFile(wb, 'export.xlsx')
+            filename = (filename || 'export') + (!filename.endsWith('.xlsx') ? '.xlsx': '')
+            XLSX.writeFile(wb, filename + '.xlsx')
             break
           case 'csv':
-            XLSX.writeFile(wb, 'export.csv')
+            filename = (filename || 'export') + (!filename.endsWith('.csv') ? '.csv': '')
+            XLSX.writeFile(wb, filename + '.csv')
             break
         }
         this.processing = false
