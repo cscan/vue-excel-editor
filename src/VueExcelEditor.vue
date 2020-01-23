@@ -1452,16 +1452,16 @@ export default {
           }
         })
         XLSX.utils.book_append_sheet(wb, ws1, 'Sheet1')
+        filename = filename || 'export'
         switch (format) {
           case 'excel':
-            filename = (filename || 'export') + (!filename.endsWith('.xlsx') ? '.xlsx': '')
-            XLSX.writeFile(wb, filename + '.xlsx')
+            if (!filename.endsWith('.xlsx')) filename = filename + '.xlsx'
             break
           case 'csv':
-            filename = (filename || 'export') + (!filename.endsWith('.csv') ? '.csv': '')
-            XLSX.writeFile(wb, filename + '.csv')
+            if (!filename.endsWith('.csv')) filename = filename + '.csv'
             break
         }
+        XLSX.writeFile(wb, filename)
         this.processing = false
       }, 500)
     },
