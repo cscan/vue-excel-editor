@@ -819,15 +819,16 @@ export default {
       }
     },
     vsbMouseUp () {
-        window.removeEventListener('mousemove', this.vsbMouseMove)
-        window.removeEventListener('mouseup', this.vsbMouseUp)
-        this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'))
-        this.vScroller.mouseY = 0
-        if (!this.noPaging) {
-          const ratio = this.vScroller.buttonTop / (this.vScroller.height - this.vScroller.buttonHeight)
-          this.pageTop = Math.round((this.table.length - this.pageSize) * ratio)
-        }
-        this.vScroller.runner = ''
+      window.removeEventListener('mousemove', this.vsbMouseMove)
+      window.removeEventListener('mouseup', this.vsbMouseUp)
+      this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'))
+      this.vScroller.mouseY = 0
+      if (!this.noPaging) {
+        const ratio = this.vScroller.buttonTop / (this.vScroller.height - this.vScroller.buttonHeight)
+        this.pageTop = Math.round((this.table.length - this.pageSize) * ratio)
+      }
+      this.vScroller.runner = ''
+      this.$forceUpdate()
     },
     vsbMouseMove (e) {
       if (e.buttons === 0)
@@ -880,6 +881,7 @@ export default {
         window.removeEventListener('mouseup', this.sbMouseUp)
         this.lazy(() => this.$refs.hScroll.classList.remove('focus'))
         this.hScroller.mouseX = 0
+        this.$forceUpdate()
     },
     sbMouseMove (e) {
       if (e.buttons === 0)
@@ -1238,6 +1240,7 @@ export default {
           })
         this.sortPos = colPos
         this.sortDir = n
+        this.$forceUpdate()
         this.processing = false
       }, 0)
     },
