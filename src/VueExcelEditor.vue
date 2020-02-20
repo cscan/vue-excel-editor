@@ -124,7 +124,7 @@
                       'summary-column2': field.summary
                     }"
                     :style="renderColumnCellStyle(field)"
-                    :key="`f${p}`">{{ renderSummary(field) }}</td>
+                    :key="`f${p}`">{{ summary[field.name] }}</td>
               </template>
             </tr>
           </tfoot>
@@ -356,7 +356,7 @@ export default {
   data () {
     const pageSize = this.noPaging ? 999999 : 20
     const dataset = {
-      version: '1.1',
+      version: '1.2',
       tableContent: null,           // Table parent
       systable: null,               // TABLE dom node
       colgroupTr: null,             // colgroup TR dom node
@@ -419,6 +419,7 @@ export default {
 
       table: [],
       summaryRow: false,
+      summary: {},
       showFilteredOnly: true,
       showSelectedOnly: false
     }
@@ -526,6 +527,7 @@ export default {
       this.labelTr.children[0].style.height = this.labelTr.offsetHeight + 'px'
       this.calCellTop2 = this.labelTr.offsetHeight
       this.refreshPageSize()
+      this.tableContent.scrollTo(0, this.tableContent.scrollTop)
       this.calStickyLeft()
     }, 200)
 
@@ -574,6 +576,7 @@ export default {
     resetColumn () {
       this.fields = []
       this.$slots.default.forEach(col => col.componentInstance? col.componentInstance.init() : 0)
+      this.tableContent.scrollTo(0, this.tableContent.scrollTop)
       this.calStickyLeft()
     },
     registerColumn (field) {
@@ -703,11 +706,12 @@ export default {
         this.table = this.table.filter((rec, i) => this.selected[i])
         this.reviseSelectedAfterTableChange()
       }
+      this.calSummary()
     },
     calStickyLeft () {
       let left = 0, n = 0
       this.leftMost = -1
-      this.tableContent.scrollTo(0, this.tableContent.scrollTop)
+      // this.tableContent.scrollTo(0, this.tableContent.scrollTop)
       Array.from(this.labelTr.children).forEach(th => {
         left += th.offsetWidth
         const field = this.fields[n++]
@@ -723,30 +727,31 @@ export default {
       if (field.left) result = Object.assign(result, {left: field.left})
       return result
     },
-    renderSummary (field) {
-      if (!field.summary) return ''
-      const i = field.name
-      let result = ''
-      switch(field.summary) {
-        case 'sum':
-          result = this.table.reduce((a, b) => (a + Number(b[i] ? b[i] : 0)), 0)
-          result = Number(Math.round(result + 'e+5') + 'e-5')  // solve the infinite .9 issue of javascript
-          break
-        case 'avg':
-          result = this.table.reduce((a, b) => (a + Number(b[i] ? b[i] : 0)), 0) / this.table.length
-          result = Number(Math.round(result + 'e+5') + 'e-5')  // solve the infinite .9 issue of javascript
-          break
-        case 'max':
-          result = this.table.reduce((a, b) => (a > b[i] ? a : b[i]), Number.MIN_VALUE)
-          break
-        case 'min':
-          result = this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
-          break
-      }
-      if (isNaN(result)) result = ''
-      return field.toText(result)
+    calSummary () {
+      this.fields.forEach(field => {
+        if (!field.summary) return ''
+        const i = field.name
+        let result = ''
+        switch(field.summary) {
+          case 'sum':
+            result = this.table.reduce((a, b) => (a + Number(b[i] ? b[i] : 0)), 0)
+            result = Number(Math.round(result + 'e+5') + 'e-5')  // solve the infinite .9 issue of javascript
+            break
+          case 'avg':
+            result = this.table.reduce((a, b) => (a + Number(b[i] ? b[i] : 0)), 0) / this.table.length
+            result = Number(Math.round(result + 'e+5') + 'e-5')  // solve the infinite .9 issue of javascript
+            break
+          case 'max':
+            result = this.table.reduce((a, b) => (a > b[i] ? a : b[i]), Number.MIN_VALUE)
+            break
+          case 'min':
+            result = this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
+            break
+        }
+        if (isNaN(result)) result = ''
+        this.summary[i] = field.toText(result)
+      })
     },
-
     getKeys (rec) {
       if (!rec) rec = this.currentRecord
       const key = this.fields.filter(field => field.keyField).map(field => rec[field.name])
@@ -1147,7 +1152,7 @@ export default {
       if (!this.sep || !this.sep.curCol) return
       const diffX = e.pageX - this.sep.pageX
       this.sep.curCol.style.width = (this.sep.curColWidth + diffX) + 'px'
-      this.lazy(this.calStickyLeft)
+      this.lazy(this.calStickyLeft, 200)
     },
     colSepMouseUp (e) {
       e.preventDefault()
