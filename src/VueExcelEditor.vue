@@ -692,8 +692,6 @@ export default {
                   if (!content[k].startsWith(filter[k].value)) return false
                   break
                 case 8:
-                  // eslint-disable-next-line
-                  console.log(filter[k].value, content[k], !new RegExp(filter[k].value, 'i').test(content[k]))
                   if (!new RegExp(filter[k].value, 'i').test(content[k])) return false
                   break
                 case 9:
@@ -1474,7 +1472,12 @@ export default {
             if (!filename.endsWith('.csv')) filename = filename + '.csv'
             break
         }
-        XLSX.writeFile(wb, filename, {compression: 'DEFLATE'})
+        XLSX.writeFile(wb, filename, {
+          compression: 'DEFLATE',
+          compressionOptions: {
+            level: 6
+          }
+        })
         this.processing = false
       }, 500)
     },
