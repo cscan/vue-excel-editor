@@ -637,11 +637,11 @@ export default {
             case this.columnFilter[k].startsWith('*') && !this.columnFilter[k].slice(1).includes('*'):
               filter[k] = {type: 6, value: this.columnFilter[k].slice(1).trim().toUpperCase()}
               break
-            case this.columnFilter[k].endsWith('*') && !this.columnFilter[k].slice(0, -1).includes('*'):
-              filter[k] = {type: 7, value: this.columnFilter[k].slice(0, -1).trim().toUpperCase()}
-              break
             case this.columnFilter[k].startsWith('~'):
               filter[k] = {type: 8, value: this.columnFilter[k].slice(1).trim()}
+              break
+            case this.columnFilter[k].endsWith('*') && !this.columnFilter[k].slice(0, -1).includes('*'):
+              filter[k] = {type: 7, value: this.columnFilter[k].slice(0, -1).trim().toUpperCase()}
               break
             case this.columnFilter[k].includes('*') || this.columnFilter[k].includes('?'):
               filter[k] = {type: 8, value: '^' + this.columnFilter[k].replace(/\*/g, '.*').replace(/\?/g, '.').trim() + '$'}
@@ -651,54 +651,59 @@ export default {
               break
           }
         })
-        this.table = this.value.filter((record) => {
-          const content = {}
-          filterColumnList.forEach((k) => {
-            const val = record[this.fields[k].name]
-            content[k] = typeof val === 'undefined' ? '' : String(val).toUpperCase()
-          })
-          for (let i = 0; i < filterColumnList.length; i++) {
-            const k = filterColumnList[i]
-            if (this.fields[k].keyField && content[k].startsWith('§')) return true
-            switch (filter[k].type) {
-              case 0:
-                if (`${content[k]}` !== `${filter[k].value}`) return false
-                break
-              case 1:
-                if (this.fields[k].type === 'number') content[k] = Number(content[k])
-                if (filter[k].value < content[k]) return false
-                break
-              case 2:
-                if (this.fields[k].type === 'number') content[k] = Number(content[k])
-                if (filter[k].value <= content[k]) return false
-                break
-              case 3:
-                if (this.fields[k].type === 'number') content[k] = Number(content[k])
-                if (filter[k].value > content[k]) return false
-                break
-              case 4:
-                if (this.fields[k].type === 'number') content[k] = Number(content[k])
-                if (filter[k].value >= content[k]) return false
-                break
-              case 5:
-                if (!content[k].includes(filter[k].value)) return false
-                break
-              case 6:
-                if (!content[k].endsWith(filter[k].value)) return false
-                break
-              case 7:
-                if (!content[k].startsWith(filter[k].value)) return false
-                break
-              case 8:
-                if (!new RegExp(filter[k].value, 'i').test(content[k])) return false
-                break
-              case 9:
-                if (`${content[k]}` === `${filter[k].value}`) return false
-                break
+        if (filterColumnList.length === 0)
+          this.table = this.value
+        else {
+          this.table = this.value.filter((record) => {
+            const content = {}
+            filterColumnList.forEach((k) => {
+              const val = record[this.fields[k].name]
+              if (this.fields[k].type === 'number' && filter[k].type <= 4)
+                content[k] = val
+              else
+                content[k] = typeof val === 'undefined' || val === null ? '' : String(val).toUpperCase()
+            })
+            for (let i = 0; i < filterColumnList.length; i++) {
+              const k = filterColumnList[i]
+              if (this.fields[k].keyField && content[k].startsWith('§')) return true
+              switch (filter[k].type) {
+                case 0:
+                  if (`${content[k]}` !== `${filter[k].value}`) return false
+                  break
+                case 1:
+                  if (filter[k].value < content[k]) return false
+                  break
+                case 2:
+                  if (filter[k].value <= content[k]) return false
+                  break
+                case 3:
+                  if (filter[k].value > content[k]) return false
+                  break
+                case 4:
+                  if (filter[k].value >= content[k]) return false
+                  break
+                case 5:
+                  if (!content[k].includes(filter[k].value)) return false
+                  break
+                case 6:
+                  if (!content[k].endsWith(filter[k].value)) return false
+                  break
+                case 7:
+                  if (!content[k].startsWith(filter[k].value)) return false
+                  break
+                case 8:
+                  // eslint-disable-next-line
+                  console.log(filter[k].value, content[k], !new RegExp(filter[k].value, 'i').test(content[k]))
+                  if (!new RegExp(filter[k].value, 'i').test(content[k])) return false
+                  break
+                case 9:
+                  if (`${content[k]}` === `${filter[k].value}`) return false
+                  break
+              }
             }
-          }
-          return true
-        })
+            return true
+          })
+        }
       }
 
       this.reviseSelectedAfterTableChange()
@@ -1469,7 +1474,7 @@ export default {
             if (!filename.endsWith('.csv')) filename = filename + '.csv'
             break
         }
-        XLSX.writeFile(wb, filename)
+        XLSX.writeFile(wb, filename, {compression: 'DEFLATE'})
         this.processing = false
       }, 500)
     },
