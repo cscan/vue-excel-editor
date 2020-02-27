@@ -1362,7 +1362,13 @@ export default {
             const data = e.target.result
             const wb = XLSX.read(data, {type: 'binary', cellDates: true, cellStyle: false})
             const sheet = wb.SheetNames[0]
-            const importData = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheet])
+            let importData = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheet])
+            importData = importData.map((rec) => {
+              Object.keys(rec).forEach(k => {
+                if (typeof rec[k] === 'string') rec[k] = rec[k].replace(/[ \r\n\t]+$/g, '')
+              })
+              return rec
+            })
             const keyStart = new Date().getTime()
             if (importData.length === 0) throw new Error('VueExcelEditor: ' + this.localizedLabel.noRecordIsRead)
             if (this.fields
@@ -1390,7 +1396,7 @@ export default {
                   if (typeof val === 'undefined') val = line[field.label]
                   if (typeof val === 'undefined') val = null
                   else {
-                    if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected)
+                    if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected + ': ' + field.name)
                     if (field.validate) {
                       let err
                       if ((err = field.validate(val)))
