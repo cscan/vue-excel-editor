@@ -42,11 +42,11 @@ export default {
         }
         switch (this.type) {
           case 'datetick':
-            return moment(text, 'YY-MM-DD').valueOf()
+            return moment(text, 'YYYY-MM-DD').valueOf()
           case 'datetimetick':
-            return moment(text, 'YY-MM-DD HH:mm').valueOf()
+            return moment(text, 'YYYY-MM-DD HH:mm').valueOf()
           case 'datetimesectick':
-            return moment(text, 'YY-MM-DD HH:mm:ss').valueOf()
+            return moment(text, 'YYYY-MM-DD HH:mm:ss').valueOf()
           case 'check10':
           case 'checkYN':
           case 'checkTF':
@@ -63,12 +63,14 @@ export default {
         if (this.keyField && val && val.startsWith('§')) return ''
 
         switch (this.type) {
+          case 'date':
+            return val? moment(val).format('YYYY-MM-DD'): ''
           case 'datetick':
-            return moment(Number(val)).format('YY-MM-DD')
+            return moment(Number(val)).format('YYYY-MM-DD')
           case 'datetimetick':
-            return moment(Number(val)).format('YY-MM-DD HH:mm')
+            return moment(Number(val)).format('YYYY-MM-DD HH:mm')
           case 'datetimesectick':
-            return moment(Number(val)).format('YY-MM-DD HH:mm:ss')
+            return moment(Number(val)).format('YYYY-MM-DD HH:mm:ss')
           default:
             return val
         }
