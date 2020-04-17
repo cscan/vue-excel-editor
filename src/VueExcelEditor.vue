@@ -764,6 +764,16 @@ export default {
 
     /* *** Customization **************************************************************************************
      */
+    setFilter(name, filterText) {
+      const ref = this.$refs[`filter-${name}`][0]
+      ref.$el.textContent = filterText
+      ref.$emit('input', filterText)
+    },
+    
+    clearFilter(name) {
+      return this.setFilter(name, '')
+    },
+
     columnSuppress () {
       if (this.table.length === 0) return
       const cols = {}
