@@ -762,6 +762,45 @@ export default {
       return [rec.$id]
     },
 
+    /* *** Customization **************************************************************************************
+     */
+    columnSuppress () {
+      if (this.table.length === 0) return
+      const cols = {}
+      this.table.forEach((row) => {
+        Object.keys(row).forEach((field) => {
+          if (row[field]) cols[field] = 1
+        })
+      })
+      const showCols = Object.keys(cols)
+      this.fields.forEach((field) => {
+        if (!showCols.includes(field.name))
+          field.invisible = true
+      })
+      this.refresh()
+    },
+
+    /* Still evaluating */
+    columnAutoWidth (name) {
+      if (this.table.length === 0) return
+      let doFields = this.fields
+      if (name) doFields = [this.fields.find(f => f.name === name)]
+
+      const cols = {}
+      this.table.forEach((row) => {
+        doFields.forEach((field) => {
+          if (row[field.name] && (!cols[field.name] || cols[field.name] < row[field.name].length))
+            cols[field.name] = row[field.name].length
+        })
+      })
+      doFields.forEach((field) => {
+        let width = cols[field.name] * 12
+        if (width > 450) width = 450
+        field.width = width + 'px'
+      })
+      this.refresh()
+    },
+
     /* *** Date Picker *********************************************************************************
      */
     showDatePickerDiv () {
