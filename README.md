@@ -151,9 +151,12 @@ In your template
 | unSelectRecord     | row                            | UnSelect the row |
 | clearAllSelected   |                                | Unselect all selected rows |
 | getSelectedRecords |                                | Get an array of the selected rows |
-| exportTable        | format, selectedOnly, filename | export the filtered table as xlsx/csv |
-| importTable        | callback                       | import the specified formatted xlsx |
+| exportTable        | format, selectedOnly, filename | Export the filtered table as xlsx/csv |
+| importTable        | callback                       | Import the specified formatted xlsx |
 | undoTransaction    |                                | Undo the last update |
+| setFilter          | name, text                     | Set the filter text on column name |
+| clearFilter        | name                           | Clear the filter text on column name |
+| columnSuppress     |                                | Hide the column if all values are null or empty |
 
 ## Variable List
 
@@ -170,6 +173,18 @@ In your template
 
 ## Example
 
+```html
+<template>
+    <vue-excel-editor v-model="jsondata" filter-row>
+        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" />
+        <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
+        <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" />
+        <vue-excel-column field="gender" label="Gender"        type="select" width="50px" :options="['F','M','U']" />
+        <vue-excel-column field="age"    label="Age"           type="number" width="70px" />
+        <vue-excel-column field="birth"  label="Date Of Birth" type="date"   width="80px" />
+    </vue-excel-editor>
+</template>
+```
 ```js
 export default {
     name: 'app',
@@ -181,34 +196,54 @@ export default {
             {user: 'ag', name: 'Mary George', phone: '852-1234-5684', gender: 'F', age: 22, birth: '2002-08-01'},
             {user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
         ]
-    },
-    methods: {
-        validPhoneNum (content) {
-            if (content === '') return 'Mandatory field'
-            if (!/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(content)) return 'Invalid Phone Number'
-            return ''
-        }
     }
 }
 ```
 
-## Work with redis for saving
+### Work with redis for saving
 
 ```html
-<vue-excel-editor v-model="jsondata" @update="save">
+<vue-excel-editor v-model="jsondata" @update="onSave">
 ...
 </vue-excel-editor>
 ```
 ```js
 methods: {
-    save (records) {
+    onSave (records) {
       records = records.map(rec => ['hset', rec.keys.join(), rec.name, rec.newVal])
       redis.multi(records).exec()
     }
 }
 ```
 
-In your HTML call it likes
+### Remember the grid setting
+The grid setting such as column width can be saved in the localStorage of client browser
+```html
+<template>
+    <vue-excel-editor v-model="jsondata" remember>
+    ...
+    </vue-excel-editor>
+</template>
+```
+
+### Do something when user select the rows
+The selected rows will be passed to the provided trigger method
+```html
+<template>
+    <vue-excel-editor v-model="jsondata" @select="onSelect">
+    ...
+    </vue-excel-editor>
+</template>
+```
+```js
+methods: {
+    onSelect (selectedRows) {
+      console.log(selectedRows)
+    }
+}
+```
+
+### Other Features
 
 ```html
 <template>
@@ -222,6 +257,7 @@ In your HTML call it likes
     </vue-excel-editor>
 </template>
 ```
+
 #### Filter + Footer Rows
 ![Filter + Footer Rows](https://i.ibb.co/0CtB6Hg/footerfilter.png "Filter + Footer Rows")
 
@@ -241,9 +277,32 @@ In your HTML call it likes
 ![Select](https://i.ibb.co/GxJGtrv/select.png "Select")
 
 #### Validation
+```js
+methods: {
+    validPhoneNum (content) {
+        if (content === '') return 'Mandatory field'
+        if (!/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(content)) return 'Invalid Phone Number'
+        return ''
+    }
+}
+```
+
 ![Validation](https://i.ibb.co/tzbKmMt/validate.png "Validation")
 
 #### Summary
+```html
+<template>
+    <vue-excel-editor v-model="jsondata" no-paging autocomplete filter-row>
+        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly key-field sticky />
+        <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
+        <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
+        <vue-excel-column field="gender" label="Gender"        type="select" width="50px" :options="['F','M','U']" />
+        <vue-excel-column field="age"    label="Age"           type="number" width="70px" summary="sum" />
+        <vue-excel-column field="birth"  label="Date Of Birth" type="date"   width="80px" summary="min" />
+    </vue-excel-editor>
+</template>
+```
+
 ![Summary](https://i.ibb.co/0B26s9Q/summary.png "Summary")
 
 ## Localization
