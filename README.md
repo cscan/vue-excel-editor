@@ -277,6 +277,9 @@ methods: {
 ![Select](https://i.ibb.co/GxJGtrv/select.png "Select")
 
 #### Validation
+```html
+<vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
+```
 ```js
 methods: {
     validPhoneNum (content) {
@@ -291,19 +294,13 @@ methods: {
 
 #### Summary
 ```html
-<template>
-    <vue-excel-editor v-model="jsondata" no-paging autocomplete filter-row>
-        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly key-field sticky />
-        <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
-        <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
-        <vue-excel-column field="gender" label="Gender"        type="select" width="50px" :options="['F','M','U']" />
-        <vue-excel-column field="age"    label="Age"           type="number" width="70px" summary="sum" />
-        <vue-excel-column field="birth"  label="Date Of Birth" type="date"   width="80px" summary="min" />
-    </vue-excel-editor>
-</template>
+<vue-excel-column field="age"    label="Age"           type="number" width="70px" summary="sum" />
+<vue-excel-column field="birth"  label="Date Of Birth" type="date"   width="80px" summary="min" />
 ```
 
 ![Summary](https://i.ibb.co/0B26s9Q/summary.png "Summary")
+
+"sum", "min", "max", "avg" are supported.
 
 ## Localization
 Developer may override the default values through localized-label prop
