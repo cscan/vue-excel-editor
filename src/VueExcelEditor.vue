@@ -2250,6 +2250,9 @@ input:focus, input:active:focus, input.active:focus {
   position: sticky;
   bottom: 0;
   z-index: 4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background: #fffff2;
 }
 .systable tfoot .row-summary.sticky-column {
