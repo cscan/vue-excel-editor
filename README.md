@@ -58,55 +58,55 @@ In your template
 ## Props List
 
 #### Component: vue-excel-editor
-| Name                | Mandatory | Type     | Description |
-| :---                | :---      | :---     | :---        |
-| v-model             | Mandatory | Array    | Edited data in Array Of Object | 
-| page                | Optional  | Number   | Specific page size, default is auto-calculating by screen height |
-| no-paging           | Optional  | Boolean  | Disable paging feature, default is false |
-| no-num-col          | Optional  | Boolean  | No number column, default is false |
-| filter-row          | Optional  | Boolean  | Show fixed filter row, default is false |
-| no-footer           | Optional  | Boolean  | No footer row, default is false |
-| no-finding          | Optional  | Boolean  | Disable find key (ctrl-f) and finding dialog, default is false |
-| no-finding-next     | Optional  | Boolean  | Disable find-next key (ctrl-g), default is false |
-| free-select         | Optional  | Boolean  | Select multiple rows without pressing ctrl/meta key |
-| autocomplete        | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
-| readonly            | Optional  | Boolean  | Set all columns read only, default is false |
-| readonly-style      | Optional  | Object   | The style of the read-only cell |
-| height              | Optional  | String   | Define the exact height in px of the component, default is 'auto' |
-| width               | Optional  | String   | Define the maximum width in px of the component, default is '100%' |
-| row-style           | Optional  | Function | Conditional row formatting, default is null |
-| cell-style          | Optional  | Function | Conditional cell formatting, default is null |
-| header-label        | Optional  | Function | Func to return the label, parameter are the field label, field object |
-| record-label        | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
-| localized-label     | Optional  | Object   | Customize labels and messages for localization purpose |
-| n-filter-count      | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
-| remember            | Optional  | Boolean  | Remember the setting in localStorage, default is false |
+| Name            | Mandatory | Type     | Description |
+| :---            | :---      | :---     | :---        |
+| v-model         | Mandatory | Array    | Edited data in Array Of Object | 
+| page            | Optional  | Number   | Specific page size, default is auto-calculating by screen height |
+| no-paging       | Optional  | Boolean  | Disable paging feature, default is false |
+| no-num-col      | Optional  | Boolean  | No number column, default is false |
+| filter-row      | Optional  | Boolean  | Show fixed filter row, default is false |
+| no-footer       | Optional  | Boolean  | No footer row, default is false |
+| no-finding      | Optional  | Boolean  | Disable find key (ctrl-f) and finding dialog, default is false |
+| no-finding-next | Optional  | Boolean  | Disable find-next key (ctrl-g), default is false |
+| free-select     | Optional  | Boolean  | Select multiple rows without pressing ctrl/meta key |
+| autocomplete    | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
+| readonly        | Optional  | Boolean  | Set all columns read only, default is false |
+| readonly-style  | Optional  | Object   | The style of the read-only cell |
+| height          | Optional  | String   | Define the exact height in px of the component, default is 'auto' |
+| width           | Optional  | String   | Define the maximum width in px of the component, default is '100%' |
+| row-style       | Optional  | Function | Conditional row formatting, default is null |
+| cell-style      | Optional  | Function | Conditional cell formatting, default is null |
+| header-label    | Optional  | Function | Func to return the label, parameter are the field label, field object |
+| record-label    | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
+| localized-label | Optional  | Object   | Customize labels and messages for localization purpose |
+| n-filter-count  | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
+| remember        | Optional  | Boolean  | Remember the setting in localStorage, default is false |
 
 #### Component: vue-excel-column
-| Name                 | Mandatory | Type     | Description |
-| :---                 | :---      | :---     | :---        |
-| field                | Mandatory | String   | Field name, row object key |
-| label                | Optional  | String   | Header label, default is field name |
-| type                 | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
-| readonly             | Optional  | Boolean  | Read-only, default is parent prop: readonly |
-| init-style           | Optional  | Object   | Cell inital style in css |
-| sticky               | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
-| invisible            | Optional  | Boolean  | Column visibility, default is false |
-| width                | Optional  | String   | Specified column width, default is '100px' |
-| change               | Optional  | Function | Custom function to be triggered when the data of this column changed |
-| validate             | Optional  | Function | Custom function to validate and return the error message |
-| key-field            | Optional  | Boolean  | Specified the key field which is included in keys parameter in @update event |
-| allow-keys           | Optional  | Array    | Array of char which allow to input |
-| mandatory            | Optional  | String   | If specified, it is showed as error when it modified as blank, default is '' |
-| length-limit         | Optional  | Number   | Not allow to input when the content length reaches the limit |
-| autocomplete         | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
-| pos                  | Optional  | Number   | Specified column sequence |
-| text-transform       | Optional  | String   | Force the input to upppercase or lowercase when editing |
-| text-align           | Optional  | String   | Text alignment, default is 'left' |
-| options              | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
-| summary              | Optional  | String   | Summary: 'sum', 'avg', 'max', 'min'. Default is null |
-| to-text              | Optional  | Function | The custom conversion function from object value to edit-text |
-| to-value             | Optional  | Function | The custom conversion function from edit-text to object value |
+| Name           | Mandatory | Type     | Description |
+| :---           | :---      | :---     | :---        |
+| field          | Mandatory | String   | Field name, row object key |
+| label          | Optional  | String   | Header label, default is field name |
+| type           | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| readonly       | Optional  | Boolean  | Read-only, default is parent prop: readonly |
+| init-style     | Optional  | Object   | Cell inital style in css |
+| sticky         | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
+| invisible      | Optional  | Boolean  | Column visibility, default is false |
+| width          | Optional  | String   | Specified column width, default is '100px' |
+| change         | Optional  | Function | Custom function to be triggered when the data of this column changed |
+| validate       | Optional  | Function | Custom function to validate and return the error message |
+| key-field      | Optional  | Boolean  | Specified the key field which is included in keys parameter in @update event |
+| allow-keys     | Optional  | Array    | Array of char which allow to input |
+| mandatory      | Optional  | String   | If specified, it is showed as error when it modified as blank, default is '' |
+| length-limit   | Optional  | Number   | Not allow to input when the content length reaches the limit |
+| autocomplete   | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
+| pos            | Optional  | Number   | Specified column sequence |
+| text-transform | Optional  | String   | Force the input to upppercase or lowercase when editing |
+| text-align     | Optional  | String   | Text alignment, default is 'left' |
+| options        | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
+| summary        | Optional  | String   | Summary: 'sum', 'avg', 'max', 'min'. Default is null |
+| to-text        | Optional  | Function | The custom conversion function from object value to edit-text |
+| to-value       | Optional  | Function | The custom conversion function from edit-text to object value |
 
 ## Hot Key List
 
@@ -134,42 +134,44 @@ In your template
 ## Methods List
 
 #### Component: vue-excel-editor
-| Name               | Arguments                      | Description |
-| :---               | :---                           | :---        |
-| firstPage          |                                | Move to the first page |
-| lastPage           |                                | Move to the last page |
-| prevPage           |                                | Move to the previous page |
-| nextPage           |                                | Move to the next page |
-| moveNorth          |                                | Move the cursor cell to upper cell |
-| moveSouth          |                                | Move the cursor cell to lower cell |
-| moveWest           |                                | Move the cursor cell to previous cell |
-| moveEast           |                                | Move the cursor cell to next cell |
-| doFind             | text                           | Find the specified text in whole table and locate the cursor cell |
-| doFindNext         |                                | Contnue the last find |
-| sort               | n, pos                         | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
-| selectRecord       | row                            | Select the row |
-| unSelectRecord     | row                            | UnSelect the row |
-| clearAllSelected   |                                | Unselect all selected rows |
-| getSelectedRecords |                                | Get an array of the selected rows |
-| exportTable        | format, selectedOnly, filename | Export the filtered table as xlsx/csv |
-| importTable        | callback                       | Import the specified formatted xlsx |
-| undoTransaction    |                                | Undo the last update |
-| setFilter          | name, text                     | Set the filter text on column name |
-| clearFilter        | name                           | Clear the filter text on column name |
-| columnSuppress     |                                | Hide the column if all values are null or empty |
+| Name               | Arguments                     | Description |
+| :---               | :---                          | :---        |
+| firstPage          |                               | Move to the first page |
+| lastPage           |                               | Move to the last page |
+| prevPage           |                               | Move to the previous page |
+| nextPage           |                               | Move to the next page |
+| moveNorth          |                               | Move the cursor cell to upper cell |
+| moveSouth          |                               | Move the cursor cell to lower cell |
+| moveWest           |                               | Move the cursor cell to previous cell |
+| moveEast           |                               | Move the cursor cell to next cell |
+| doFind             | text                          | Find the specified text in whole table and locate the cursor cell |
+| doFindNext         |                               | Contnue the last find |
+| sort               | n, pos                        | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
+| selectRecord       | row                           | Select the row |
+| unSelectRecord     | row                           | UnSelect the row |
+| clearAllSelected   |                               | Unselect all selected rows |
+| getSelectedRecords |                               | Get an array of the selected rows |
+| exportTable        | format*, selectedOnly*, name* | Export the filtered table as xlsx/csv |
+| importTable        | callback*                     | Import the specified formatted xlsx |
+| undoTransaction    |                               | Undo the last update |
+| setFilter          | name, text                    | Set the filter text on column name |
+| clearFilter        | name*                         | Clear the filter text on column name |
+| columnSuppress     |                               | Hide the column if all values are null or empty |
+
+* = optional
 
 ## Variable List
 
 #### Component: vue-excel-editor
-| Name               | Type            | Description |
-| :---               | :---            | :---        |
-| fields             | Array of Object | It contains the column spec, each will create during mount, developer can still change the col spec via this after mounted |
-| filterColumn       | Object          | Contains the current filters, developer can access the filter string via this |
-| selected           | Object          | Contains all the selected rows, the key is row number and the value is internal $id |
-| selectedCount      | Number          | Number of rows are selected |
-| errmsg             | Object          | Contains all the validation error messages, the key is internal $id plus field name |
-| redo               | Array of array  | The buffer of undo, it will be removed after undo or table changed |
-| pageTop            | Number          | The top row number of the current page |
+| Name          | Type            | Description |
+| :---          | :---            | :---        |
+| fields        | Array of Object | It contains the column spec, each will create during mount, developer can still change the col spec via this after mounted |
+| filterColumn  | Object          | Contains the current filters, developer can access the filter string via this |
+| selected      | Object          | Contains all the selected rows, the key is row number and the value is internal $id |
+| selectedCount | Number          | Number of rows are selected |
+| errmsg        | Object          | Contains all the validation error messages, the key is internal $id plus field name |
+| redo          | Array of array  | The buffer of undo, it will be removed after undo or table changed |
+| pageTop       | Number          | The top row number of the current page |
 
 ## Example
 
@@ -192,9 +194,9 @@ export default {
         jsondata: [
             {user: 'kc', name: 'Kenneth Cheng', phone: '852-1234-5678', gender: 'M', age: 25, birth: '1997-07-01'},
             {user: 'sm', name: 'Simon Minolta', phone: '852-1234-5682', gender: 'M', age: 20, birth: '1999-11-12'},
-            {user: 'ra', name: 'Raymond Atom', phone: '852-1234-5683', gender: 'M', age: 18, birth: '2000-06-11'},
-            {user: 'ag', name: 'Mary George', phone: '852-1234-5684', gender: 'F', age: 22, birth: '2002-08-01'},
-            {user: 'kl', name: 'Kenny Linus', phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
+            {user: 'ra', name: 'Raymond Atom',  phone: '852-1234-5683', gender: 'M', age: 18, birth: '2000-06-11'},
+            {user: 'ag', name: 'Mary George',   phone: '852-1234-5684', gender: 'F', age: 22, birth: '2002-08-01'},
+            {user: 'kl', name: 'Kenny Linus',   phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
         ]
     }
 }
@@ -278,7 +280,7 @@ methods: {
 
 #### Validation
 ```html
-<vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
+<vue-excel-column field="phone" label="Contact" type="string" width="130px" :validate="validPhoneNum" />
 ```
 ```js
 methods: {
@@ -294,8 +296,8 @@ methods: {
 
 #### Summary
 ```html
-<vue-excel-column field="age"    label="Age"           type="number" width="70px" summary="sum" />
-<vue-excel-column field="birth"  label="Date Of Birth" type="date"   width="80px" summary="min" />
+<vue-excel-column field="age"   label="Age"           type="number" width="70px" summary="sum" />
+<vue-excel-column field="birth" label="Date Of Birth" type="date"   width="80px" summary="min" />
 ```
 
 ![Summary](https://i.ibb.co/0B26s9Q/summary.png "Summary")

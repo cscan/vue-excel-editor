@@ -771,7 +771,8 @@ export default {
     },
     
     clearFilter(name) {
-      return this.setFilter(name, '')
+      if (!name) this.columnFilter = {}
+      else this.setFilter(name, '')
     },
 
     columnSuppress () {
@@ -1520,11 +1521,16 @@ export default {
         XLSX.utils.book_append_sheet(wb, ws1, 'Sheet1')
         filename = filename || 'export'
         switch (format) {
-          case 'excel':
-            if (!filename.endsWith('.xlsx')) filename = filename + '.xlsx'
-            break
           case 'csv':
             if (!filename.endsWith('.csv')) filename = filename + '.csv'
+            break
+          case 'xls':
+            if (!filename.endsWith('.xls')) filename = filename + '.xls'
+            break
+          case 'xlsx':
+          case 'excel':
+          default:
+            if (!filename.endsWith('.xlsx')) filename = filename + '.xlsx'
             break
         }
         XLSX.writeFile(wb, filename, {
