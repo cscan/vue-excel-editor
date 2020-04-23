@@ -53,7 +53,7 @@ In your template
 ```
 
 ## Outlook
-![Simple Outlook](https://i.ibb.co/F6W7Xpg/simple.png "VueExcelEditor")
+![Simple Outlook](https://i.imgur.com/tkDIaY5.png "VueExcelEditor")
 
 ## Props List
 
@@ -261,22 +261,22 @@ methods: {
 ```
 
 #### Filter + Footer Rows
-![Filter + Footer Rows](https://i.ibb.co/0CtB6Hg/footerfilter.png "Filter + Footer Rows")
+![Filter + Footer Rows](https://i.imgur.com/K4ezNQs.png "Filter + Footer Rows")
 
 #### Filtering
-![Filtering](https://i.ibb.co/VDB7jDd/filtering.png "Filtering")
+![Filtering](https://i.imgur.com/r377VYs.png "Filtering")
 
 #### Sorting
-![Sorting](https://i.ibb.co/ggtJxYm/sorting.png "Sorting")
+![Sorting](https://i.imgur.com/1ELgJ0e.png "Sorting")
 
 #### Options
-![Options](https://i.ibb.co/GQ6rKBM/options.png "Options")
+![Options](https://i.imgur.com/EI4ytW2.png "Options")
 
 #### Autocomplete
-![Autocomplete](https://i.ibb.co/7VRtFhT/autocomplete.png "Autocomplete")
+![Autocomplete](https://i.imgur.com/U2fxWWr.png "Autocomplete")
 
 #### Select
-![Select](https://i.ibb.co/GxJGtrv/select.png "Select")
+![Select](http://i.imgur.com/Xg3O1XV.png "Select")
 
 #### Validation
 ```html
@@ -292,7 +292,7 @@ methods: {
 }
 ```
 
-![Validation](https://i.ibb.co/tzbKmMt/validate.png "Validation")
+![Validation](https://i.imgur.com/PALDkax.png "Validation")
 
 #### Summary
 ```html
@@ -300,7 +300,7 @@ methods: {
 <vue-excel-column field="birth" label="Date Of Birth" type="date"   width="80px" summary="min" />
 ```
 
-![Summary](https://i.ibb.co/0B26s9Q/summary.png "Summary")
+![Summary](https://i.imgur.com/lPnDC57.png "Summary")
 
 "sum", "min", "max", "avg" are supported.
 
