@@ -185,19 +185,24 @@ export default {
       this.inputFilterCondition = ''
       this.sortedUniqueValueList = []
       this.$refs.inputFilter.value = ''
-      this.show = true
-      this.columnFilterRef.$el.textContent = ''
-      this.columnFilterRef.$emit('input', '')
-      setTimeout(() => (this.$refs.inputFilter.focus()))
+      if (this.columnFilterRef.$el.textContent != '') {
+        this.columnFilterRef.$el.textContent = ''
+        this.columnFilterRef.$emit('input', '')
+        this.$parent.calTable()
+      }
+      setTimeout(() => {
+        this.show = true
+        setTimeout(() => (this.$refs.inputFilter.focus()))
 
-      const hash = {}
-      const fieldName = this.$parent.fields[ref.colPos].name
-      this.$parent.table.forEach(record => (hash[record[fieldName]] = true))
-      const keys = Object.keys(hash)
-      keys.sort()
-      if (keys.length > 0 && keys[0] === '') keys[0] = ' '
-      this.sortedUniqueValueList = keys
-      setTimeout(() => this.freezePanelSizeAfterShown())
+        const hash = {}
+        const fieldName = this.$parent.fields[ref.colPos].name
+        this.$parent.table.forEach(record => (hash[record[fieldName]] = true))
+        const keys = Object.keys(hash)
+        keys.sort()
+        if (keys.length > 0 && keys[0] === '') keys[0] = ' '
+        this.sortedUniqueValueList = keys
+        setTimeout(() => this.freezePanelSizeAfterShown())
+      })
     },
     hidePanel () {
       this.show = false

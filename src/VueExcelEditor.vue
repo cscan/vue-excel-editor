@@ -655,6 +655,14 @@ export default {
           this.table = this.value
         else {
           this.table = this.value.filter((record) => {
+
+            // Assume new record contains § in any of the key fields
+            const isNew = this.fields.filter((field) => {
+              return field.keyField && record[field.name] && record[field.name].startsWith('§')
+            }).length > 0
+
+            if (isNew) return true // Always show new record in filter mode
+
             const content = {}
             filterColumnList.forEach((k) => {
               const val = record[this.fields[k].name]
@@ -663,9 +671,10 @@ export default {
               else
                 content[k] = typeof val === 'undefined' || val === null ? '' : String(val).toUpperCase()
             })
+
             for (let i = 0; i < filterColumnList.length; i++) {
               const k = filterColumnList[i]
-              if (this.fields[k].keyField && content[k].startsWith('§')) return true
+              // if (this.fields[k].keyField && content[k].startsWith('§')) return true
               switch (filter[k].type) {
                 case 0:
                   if (`${content[k]}` !== `${filter[k].value}`) return false
