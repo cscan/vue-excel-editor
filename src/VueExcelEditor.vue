@@ -469,14 +469,16 @@ export default {
   },
   watch: {
     value () {
-      // detect a loading process, refresh something
-      // this.redo = []
-      // this.errmsg = {}
-      this.lazy(this.refresh)
+      this.lazy(() => {
+        this.refresh()
+        if (this.pageTop > this.table.length)
+          this.lastPage()
+      })
     },
     columnFilterString () {
       this.processing = true
       setTimeout(() => {
+        this.pageTop = 0
         this.refresh()
         this.processing = false
       }, 0)
@@ -589,7 +591,7 @@ export default {
       this.colHash = this.hashCode(this.version + JSON.stringify(this.fields))
     },
     refresh () {
-      this.pageTop = 0
+      // this.pageTop = 0
       this.prevSelect = -1
       this.calTable()
       this.refreshPageSize()
@@ -915,7 +917,7 @@ export default {
           const rec = this.table[recPos]
           this.vScroller.runner = recPos + '<br>' + this.fields
             .filter((field, i) => field.keyField || field.sticky || this.sortPos === i)
-            .map(field => rec[field.name])
+            .map(field => field.label + ': ' + rec[field.name])
             .join('<br>')
           this.$forceUpdate()
         }
@@ -2240,6 +2242,8 @@ input:focus, input:active:focus, input.active:focus {
   cursor: e-resize !important;
   text-overflow: inherit !important;
   text-align: center;
+  padding-left: 0;
+  padding-right: 0;
   overflow: hidden;
   z-index: 5;
 }
