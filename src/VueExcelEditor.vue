@@ -227,7 +227,6 @@
           </template>
         </span>
         <span style="position: absolute; right: 6px">
-          <!--span v-html="localizedLabel.footerRight(Object.keys(selected).length, table.length, value.length)" /-->
           <a :class="{disabled: !showSelectedOnly && selectedCount <= 1}" @mousedown="toggleSelectView">
             <span v-html="localizedLabel.footerRight.selected" />
             <span :style="{color: selectedCount>0 ? 'red': 'inherit'}">{{ selectedCount }}</span>
@@ -235,12 +234,12 @@
           &nbsp;|&nbsp;
           <a :class="{disabled: columnFilterString === '{}'}" @mousedown="toggleFilterView">
             <span v-html="localizedLabel.footerRight.filtered" />
-            <span :style="{color: table.length !== value.length ? 'red': 'inherit'}">{{ table.length }}</span>
+            <span :style="{color: table.length !== filteredValue.length ? 'red': 'inherit'}">{{ table.length }}</span>
           </a>
           &nbsp;|&nbsp;
           <a :class="{disabled: true}">
             <span v-html="localizedLabel.footerRight.loaded" />
-            <span>{{ value.length }}</span>
+            <span>{{ filteredValue.length }}</span>
           </a>
         </span>
       </div>
@@ -424,6 +423,7 @@ export default {
       inputDateTime: '',
 
       table: [],
+      filteredValue: [],
       summaryRow: false,
       summary: {},
       showFilteredOnly: true,
@@ -446,7 +446,7 @@ export default {
       return this.table.slice(this.pageTop, this.pageTop + this.pageSize)
     },
     pageBottom () {
-      if (this.value.length === 0) return 0
+      if (this.filteredValue.length === 0) return 0
       else return this.pageTop + this.pageSize > this.table.length ? this.table.length : this.pageTop + this.pageSize
     },
     setting: {
@@ -659,14 +659,11 @@ export default {
               break
           }
         })
+        this.filteredValue = this.value.filter(record => this.recordFilter(record))
         if (filterColumnList.length === 0)
-          this.table = this.value.filter((record) => {
-            return this.recordFilter(record)
-          })
+          this.table = this.filteredValue
         else {
-          this.table = this.value.filter((record) => {
-            if (!this.recordFilter(record)) return false
-
+          this.table = this.filteredValue.filter((record) => {
             // Assume new record contains § in any of the key fields
             const isNew = this.fields.filter((field) => {
               return field.keyField && record[field.name] && record[field.name].startsWith('§')
