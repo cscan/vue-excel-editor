@@ -53,7 +53,7 @@ In your template
 ```
 
 ## Outlook
-![Simple Outlook](https://i.imgur.com/tkDIaY5.png "VueExcelEditor")
+![Simple Outlook](https://i.imgur.com/bFOA5Lv.png "VueExcelEditor")
 
 ## Props List
 
@@ -192,11 +192,11 @@ export default {
     name: 'app',
     data: {
         jsondata: [
-            {user: 'kc', name: 'Kenneth Cheng', phone: '852-1234-5678', gender: 'M', age: 25, birth: '1997-07-01'},
-            {user: 'sm', name: 'Simon Minolta', phone: '852-1234-5682', gender: 'M', age: 20, birth: '1999-11-12'},
-            {user: 'ra', name: 'Raymond Atom',  phone: '852-1234-5683', gender: 'M', age: 18, birth: '2000-06-11'},
-            {user: 'ag', name: 'Mary George',   phone: '852-1234-5684', gender: 'F', age: 22, birth: '2002-08-01'},
-            {user: 'kl', name: 'Kenny Linus',   phone: '852-1234-5685', gender: 'M', age: 29, birth: '1990-09-01'}
+            {user: 'hc', name: 'Harry Cole',    phone: '1-415-2345678', gender: 'M', age: 25, birth: '1997-07-01'},
+            {user: 'sm', name: 'Simon Minolta', phone: '1-123-7675682', gender: 'M', age: 20, birth: '1999-11-12'},
+            {user: 'ra', name: 'Raymond Atom',  phone: '1-456-9981212', gender: 'M', age: 19, birth: '2000-06-11'},
+            {user: 'ag', name: 'Mary George',   phone: '1-556-1245684', gender: 'F', age: 22, birth: '2002-08-01'},
+            {user: 'kl', name: 'Kenny Linus',   phone: '1-891-2345685', gender: 'M', age: 29, birth: '1990-09-01'}
         ]
     }
 }
@@ -206,9 +206,11 @@ export default {
 
 ```html
 <vue-excel-editor v-model="jsondata" @update="onSave">
-...
+    <vue-excel-column field="user" label="User ID" type="string" width="80px" key-field />
+    ...
 </vue-excel-editor>
 ```
+Specified "key-field" is necessary, it will reflect in rec.keys in the following:
 ```js
 methods: {
     onSave (records) {
@@ -253,30 +255,32 @@ methods: {
         <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly key-field sticky />
         <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
         <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
-        <vue-excel-column field="gender" label="Gender"        type="select" width="50px" :options="['F','M','U']" />
+        <vue-excel-column field="gender" label="Gender"        type="select" width="50px"  :options="['F','M','U']" />
         <vue-excel-column field="age"    label="Age"           type="number" width="70px" />
         <vue-excel-column field="birth"  label="Date Of Birth" type="date"   width="80px" />
     </vue-excel-editor>
 </template>
 ```
+Specified "sticky" means the column does not move when horizontal scrolling
+
 
 #### Filter + Footer Rows
-![Filter + Footer Rows](https://i.imgur.com/K4ezNQs.png "Filter + Footer Rows")
+![Filter + Footer Rows](https://i.imgur.com/7xmbrnM.png "Filter + Footer Rows")
 
 #### Filtering
-![Filtering](https://i.imgur.com/r377VYs.png "Filtering")
+![Filtering](https://i.imgur.com/spjZN3M.png "Filtering")
 
 #### Sorting
-![Sorting](https://i.imgur.com/1ELgJ0e.png "Sorting")
+![Sorting](https://i.imgur.com/vGZpHkv.png "Sorting")
 
 #### Options
-![Options](https://i.imgur.com/EI4ytW2.png "Options")
+![Options](https://i.imgur.com/LGefJif.png "Options")
 
 #### Autocomplete
-![Autocomplete](https://i.imgur.com/U2fxWWr.png "Autocomplete")
+![Autocomplete](https://i.imgur.com/cUSUaUL.png "Autocomplete")
 
 #### Select
-![Select](http://i.imgur.com/Xg3O1XV.png "Select")
+![Select](https://i.imgur.com/x0Lkwf8.png "Select")
 
 #### Validation
 ```html
@@ -286,21 +290,21 @@ methods: {
 methods: {
     validPhoneNum (content) {
         if (content === '') return 'Mandatory field'
-        if (!/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(content)) return 'Invalid Phone Number'
+        if (!/^[0-9]{1}-[0-9]{3}-[0-9]{7}$/.test(content)) return 'Invalid Phone Number'
         return ''
     }
 }
 ```
+return empty string if there is no error
 
-![Validation](https://i.imgur.com/PALDkax.png "Validation")
+![Validation](https://i.imgur.com/VV6RQYw.png "Validation")
 
 #### Summary
 ```html
-<vue-excel-column field="age"   label="Age"           type="number" width="70px" summary="sum" />
-<vue-excel-column field="birth" label="Date Of Birth" type="date"   width="80px" summary="min" />
+<vue-excel-column field="age" label="Age" type="number" width="70px" summary="sum" />
 ```
 
-![Summary](https://i.imgur.com/lPnDC57.png "Summary")
+![Summary](https://i.imgur.com/tlZjilA.png "Summary")
 
 "sum", "min", "max", "avg" are supported.
 
