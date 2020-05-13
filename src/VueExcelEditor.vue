@@ -351,6 +351,12 @@ export default {
           missingKeyColumn: 'Missing key column'
         }
       }
+    },
+    recordFilter: {
+      type: Function,
+      default () {
+        return true
+      }
     }
   },
   data () {
@@ -654,9 +660,12 @@ export default {
           }
         })
         if (filterColumnList.length === 0)
-          this.table = this.value
+          this.table = this.value.filter((record) => {
+            return this.recordFilter(record)
+          })
         else {
           this.table = this.value.filter((record) => {
+            if (!this.recordFilter(record)) return false
 
             // Assume new record contains § in any of the key fields
             const isNew = this.fields.filter((field) => {
