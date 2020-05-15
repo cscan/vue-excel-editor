@@ -23,7 +23,7 @@ export default {
     change: {type: Function, default: null},
 
     allowKeys: {type: Array, default () {return null}},
-    mandatory: {type: Boolean, default: false},
+    mandatory: {type: String, default: ''},
     lengthLimit: {type: Number, default: 0},
     autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
