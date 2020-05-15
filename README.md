@@ -97,7 +97,7 @@ In your template
 | validate       | Optional  | Function | Custom function to validate and return the error message |
 | key-field      | Optional  | Boolean  | Specified the key field which is included in keys parameter in @update event |
 | allow-keys     | Optional  | Array    | Array of char which allow to input |
-| mandatory      | Optional  | String   | If specified, it is showed as error when it modified as blank, default is '' |
+| mandatory      | Optional  | Boolean  | If specified, it is showed as error when it modified as blank, default is '' |
 | length-limit   | Optional  | Number   | Not allow to input when the content length reaches the limit |
 | autocomplete   | Optional  | Boolean  | Allow autocomplete popup when editing, default is parent prop: autocomplete |
 | pos            | Optional  | Number   | Specified column sequence |
