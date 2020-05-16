@@ -82,7 +82,7 @@
                                 class="column-filter" />
             </tr>
           </thead>
-          <tbody @mousedown.exact="mouseDown">
+          <tbody @mousedown="mouseDown">
             <tr v-for="(record, rowPos) in pagingTable"
                 :key="rowPos"
                 :class="{select: typeof selected[pageTop + rowPos] !== 'undefined'}"
@@ -99,6 +99,7 @@
                     :class="{
                       readonly: item.readonly,
                       error: errmsg[`id-${record.$id}-${item.name}`],
+                      link: item.link,
                       select: item.options.length,
                       datepick: item.type == 'date',
                       'sticky-column': item.sticky
@@ -380,7 +381,7 @@ export default {
 
       rowIndex: {},                 // index of the record key to pos of [table] array
 
-      currentRecord: null,          // focusing TR dom node
+      currentRecord: null,          // focusing row content
       currentRowPos: 0,             // focusing array pos of [table] array
       currentColPos: 0,             // focusing pos of column/field
       currentField: null,           // focusing field object
@@ -513,6 +514,7 @@ export default {
     window.removeEventListener('resize', this.winResize)
     window.removeEventListener('paste', this.winPaste)
     window.removeEventListener('keydown', this.winKeydown)
+    window.removeEventListener('keyup', this.winKeyup)
     window.removeEventListener('scroll', this.winScroll)
   },
   mounted () {
@@ -542,6 +544,7 @@ export default {
     window.addEventListener('resize', this.winResize)
     window.addEventListener('paste', this.winPaste)
     window.addEventListener('keydown', this.winKeydown)
+    window.addEventListener('keyup', this.winKeyup)
     window.addEventListener('scroll', this.winScroll)
 
     if (this.remember) {
@@ -1015,7 +1018,11 @@ export default {
       this.inputCellWrite(text)
       e.preventDefault()
     },
+    winKeyup (e) {
+      if (!e.altKey) this.systable.classList.remove('alt')
+    },
     winKeydown (e) {
+      if (e.altKey) this.systable.classList.add('alt')
       if (!this.mousein && !this.focused) return
       if (e.ctrlKey || e.metaKey)
         switch (e.keyCode) {
@@ -1711,6 +1718,8 @@ export default {
         const colPos = Array.from(row.children).indexOf(e.target) - 1
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
         this.moveInputSquare(rowPos, colPos)
+        if (this.currentField.link && e.altKey)
+          setTimeout(() => this.currentField.link(this.currentCell.innerText, this.currentRecord, rowPos, colPos, this.currentField, this))
         if (e.target.offsetWidth - e.offsetX > 15) return
         if (e.target.classList.contains('select')) this.calAutocompleteList(true)
         if (e.target.classList.contains('datepick')) this.showDatePickerDiv()
@@ -1743,9 +1752,11 @@ export default {
     },
     mouseOver () {
       this.mousein = true
+      this.systable.classList.add('mouseover')
     },
     mouseOut () {
       this.mousein = false
+      this.systable.classList.remove('mouseover')
     },
 
     /* *** InputBox *****************************************************************************************
@@ -1807,6 +1818,7 @@ export default {
       this.currentRowPos = rowPos
       this.currentColPos = colPos
       this.currentCell = cell
+      this.currentRecord = this.table[this.pageTop + rowPos]
 
       // Off all editors
       if (this.showDatePicker) this.showDatePicker = false
@@ -2187,6 +2199,11 @@ input:focus, input:active:focus, input.active:focus {
   overflow-x: hidden;
   text-overflow: ellipsis;
   /* animation: fadein 0.2s; */
+}
+.systable.alt tbody td.link:hover {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer !important;
 }
 .systable tbody td.error {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAAGZJREFUOBGlzjsOgDAMA9CwcQSO0PtP3K64Qyugv8S2ZMXTUw5DstmFk8qWAuhEbzSzbQ+oWIPKULAPpGAdxGJDiMGmUBRbQhFsC3kxF+TB3NAOC0ErLAzNMAoaYTT0xyTojclQxR5H5B1HhuS+WAAAAABJRU5ErkJggg==');

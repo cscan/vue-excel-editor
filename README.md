@@ -105,6 +105,7 @@ In your template
 | text-align     | Optional  | String   | Text alignment, default is 'left' |
 | options        | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
 | summary        | Optional  | String   | Summary: 'sum', 'avg', 'max', 'min'. Default is null |
+| link           | Optional  | Function | The custom function to react alt-click the cell |
 | to-text        | Optional  | Function | The custom conversion function from object value to edit-text |
 | to-value       | Optional  | Function | The custom conversion function from edit-text to object value |
 
@@ -307,6 +308,21 @@ return empty string if there is no error
 ![Summary](https://i.imgur.com/tlZjilA.png "Summary")
 
 "sum", "min", "max", "avg" are supported.
+
+#### Link
+Actually this nice feature I was learnt from SAP UI feature - When user holds the alt-key and click on the cell, your provided column function will be triggered
+```html
+<vue-excel-column field="name" label="Name" type="string" width="150px" :link="routeToUserFunc" />
+```
+```js
+methods: {
+    // Hold Alt Key and click on the name, assume user wants to go to the function "User Profile"
+    routeToUserFunc (content, record) {
+        this.$router.push(`/user/${record.user}`)
+    }
+}
+```
+
 
 ## Localization
 Developer may override the default values through localized-label prop

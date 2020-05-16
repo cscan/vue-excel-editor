@@ -29,6 +29,7 @@ export default {
     pos: {type: Number, default: 0},
     options: {type: Array, default () {return []}},
     summary: {type: String, default: null},
+    link: {type: Function, default: null},
     toValue: {
       type: Function,
       default (text) {
@@ -173,6 +174,7 @@ export default {
         pos: Number(this.pos),
         options: this.options,
         summary: this.summary,
+        link: this.link,
         toValue: this.toValue,
         toText: this.toText,
         register: this.register
