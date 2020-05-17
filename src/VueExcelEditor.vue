@@ -738,9 +738,13 @@ export default {
       Array.from(this.labelTr.children).forEach(th => {
         left += th.offsetWidth
         const field = this.fields[n++]
-        if (field)
-          if (field.sticky) field.left = left + 'px'
+        if (field) {
+          if (field.sticky) {
+            field.left = left + 'px'
+            this.leftMost = -1 // Reset the leftMost, so it will equal to the next non-sticky col
+          }
           else if (this.leftMost === -1) this.leftMost = left
+        }
       })
       this.$forceUpdate()
     },
@@ -1670,8 +1674,8 @@ export default {
     moveWest () {
       if (this.focused && this.currentColPos > 0) {
         let goColPos = this.currentColPos - 1
-        while (this.fields[goColPos].invisible && goColPos >= 0) goColPos--
-        if (goColPos === -1) return
+        while (this.fields[goColPos].invisible && goColPos > 0) goColPos--
+        if (goColPos === -1 || this.fields[goColPos].invisible) return
         this.moveInputSquare(this.currentRowPos, goColPos)
       }
     },
@@ -1679,7 +1683,7 @@ export default {
       if (this.focused && this.currentColPos < this.fields.length - 1) {
         let goColPos = this.currentColPos + 1
         while (this.fields[goColPos].invisible && goColPos < this.fields.length - 1) goColPos++
-        if (goColPos === this.fields.length) return
+        if (goColPos === this.fields.length || this.fields[goColPos].invisible) return
         this.moveInputSquare(this.currentRowPos, goColPos)
       }
     },
