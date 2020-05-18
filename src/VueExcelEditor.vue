@@ -599,9 +599,45 @@ export default {
       if (field.summary) this.summaryRow = true
       this.colHash = this.hashCode(this.version + JSON.stringify(this.fields))
     },
+    autoRegisterAllColumns (rows) {
+      // If no field is defined, this function will help to create all fields based on provided row sample argument
+      const widths = rows.slice(0, 25)
+        .reduce((t, v) => Object.keys(v).map((s, i) => !t || v[s].length > t[i]? v[s].length: t[i]), 0)
+        .map(v => Math.min(Math.max(v * 8.2, 55), 250))
+
+      Object.keys(rows[0]).forEach((col, i) => {
+        if (col === '$id') return
+        this.registerColumn({
+          name: col,
+          label: col,
+          type: widths[i]? 'string': 'number',
+          width: (widths[i]? widths[i]: 75) + 'px',
+          validate: null,
+          change: null,
+          keyField: false,
+          sticky: false,
+          allowKeys: null,
+          mandatory: false,
+          lengthLimit: 0,
+          autocomplete: this.autocomplete,
+          initStyle: {textAlign: widths[i]? 'left': 'right'},
+          invisible: false,
+          readonly: this.readonly,
+          pos: 0,
+          options: [],
+          summary: null,
+          toValue: t => t,
+          toText: t => t,
+          register: null
+        })
+      })        
+    },
     refresh () {
       // this.pageTop = 0
       this.prevSelect = -1
+      if (this.fields.length === 0 && this.value.length && Object.keys(this.value)) {
+        this.autoRegisterAllColumns(this.value)
+      }
       this.calTable()
       this.refreshPageSize()
     },

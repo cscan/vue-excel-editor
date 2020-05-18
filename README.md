@@ -176,6 +176,7 @@ In your template
 
 ## Example
 
+An example to show 5x6 table:
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" filter-row>
@@ -188,6 +189,13 @@ In your template
     </vue-excel-editor>
 </template>
 ```
+You may also skip all the column definitions. The control will help you to "guess" the rest
+```html
+<template>
+    <vue-excel-editor v-model="jsondata" filter-row />
+</template>
+```
+
 ```js
 export default {
     name: 'app',
