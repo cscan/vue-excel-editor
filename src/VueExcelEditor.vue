@@ -1385,8 +1385,6 @@ export default {
         const height = this.height.replace(/px/,'') * 1 + this.systable.getBoundingClientRect().top - this.recordBody.getBoundingClientRect().top
         if (this.height && controlHeight > height) controlHeight = height
         this.pageSize = this.page || Math.floor(controlHeight / 24)
-        // eslint-disable-next-line
-        console.log(controlHeight, height, this.pageSize, this.page, window.innerHeight, this.recordBody.getBoundingClientRect().top, offset)
         // this.pageSize = this.page || Math.floor((this.systable.parentNode.style.height - this.recordBody.getBoundingClientRect().top - offset) / 24)
       }
       else if (this.height === 'auto') {
@@ -1479,9 +1477,15 @@ export default {
       })
       const id = this.tempKey()
       rec.$id = id
-      const rowPos = this.value.push(rec) - 1
+      this.value.push(rec)
+      const rowPos = this.table.push(rec) - 1
       if (selectAfterDone) this.selected[rowPos] = id
-      if (!noLastPage) this.lazy(this.lastPage, 100)
+      Object.keys(rec).forEach(name => {
+        const field = this.fields.find(f => f.name === name)
+        if (field) this.updateCell(rowPos, field, rec[name])
+      })
+      this.refresh()
+      if (!noLastPage) this.lazy(this.lastPage)
       return rec
     },
     importTable (cb) {
@@ -1721,8 +1725,6 @@ export default {
     },
     selectRecordById (id) {
       const rowPos = this.table.findIndex(v => v.$id === id)
-      // eslint-disable-next-line
-      console.log(id, rowPos)
       if (rowPos >= 0) this.selectRecord(rowPos)
     },
     unSelectRecord (rowPos) {
