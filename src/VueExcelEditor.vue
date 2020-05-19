@@ -1381,7 +1381,13 @@ export default {
       }
       if (!this.noPaging) {
         const offset = this.summaryRow ? 60 : 35
-        this.pageSize = this.page || Math.floor((window.innerHeight - this.recordBody.getBoundingClientRect().top - offset) / 24)
+        let controlHeight = window.innerHeight - this.recordBody.getBoundingClientRect().top - offset
+        const height = this.height.replace(/px/,'') * 1 + this.systable.getBoundingClientRect().top - this.recordBody.getBoundingClientRect().top
+        if (this.height && controlHeight > height) controlHeight = height
+        this.pageSize = this.page || Math.floor(controlHeight / 24)
+        // eslint-disable-next-line
+        console.log(controlHeight, height, this.pageSize, this.page, window.innerHeight, this.recordBody.getBoundingClientRect().top, offset)
+        // this.pageSize = this.page || Math.floor((this.systable.parentNode.style.height - this.recordBody.getBoundingClientRect().top - offset) / 24)
       }
       else if (this.height === 'auto') {
         let h = Math.floor((window.innerHeight - this.tableContent.getBoundingClientRect().top - 25))
@@ -2256,7 +2262,8 @@ input:focus, input:active:focus, input.active:focus {
   border: 0;
   border-collapse: separate;
   border-spacing: 0;
-  margin-bottom: 0;
+  margin-bottom: -1px;
+  border-bottom: 1px solid lightgray;
   /* margin-left: 40px; */
 }
 .systable .last-col {
