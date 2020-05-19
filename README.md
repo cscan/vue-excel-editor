@@ -148,10 +148,13 @@ In your template
 | doFind             | text                          | Find the specified text in whole table and locate the cursor cell |
 | doFindNext         |                               | Contnue the last find |
 | sort               | n, pos                        | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
+| newRecord          | rec*, select*, noFocus*       | Call this to new an empty record, return the rec pointer |
 | selectRecord       | row                           | Select the row |
+| selectRecordByKeys | keys                          | Select the row by keys hash |
+| selectRecordById   | id                            | Select the row by $id |
 | unSelectRecord     | row                           | UnSelect the row |
 | clearAllSelected   |                               | Unselect all selected rows |
-| getSelectedRecords |                               | Get an array of the selected rows |
+| getSelectedRecords |                               | Get an array of the selected row hash (key=rowPos, val=$id) |
 | exportTable        | format*, selectedOnly*, name* | Export the filtered table as xlsx/csv |
 | importTable        | callback*                     | Import the specified formatted xlsx |
 | undoTransaction    |                               | Undo the last update |
@@ -159,7 +162,7 @@ In your template
 | clearFilter        | name*                         | Clear the filter text on column name |
 | columnSuppress     |                               | Hide the column if all values are null or empty |
 
-* = optional
+"*" = optional
 
 ## Variable List
 

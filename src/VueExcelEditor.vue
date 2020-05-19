@@ -259,6 +259,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import VueExcelFilter from './VueExcelFilter.vue'
 import PanelFilter from './PanelFilter.vue'
 import PanelSetting from './PanelSetting.vue'
@@ -300,7 +301,7 @@ export default {
     noPaging: {type: Boolean, default: false},
     noNumCol: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
-    newRecord: {type: Function, default: null},     // return the new record from caller if provided
+    // newRecord: {type: Function, default: null},  // return the new record from caller if provided
     nFilterCount: {type: Number, default: 1000},    // show top n values in filter dialog
     height: {type: String, default: ''},
     width: {type: String, default: '100%'},
@@ -1458,6 +1459,25 @@ export default {
     settingClick () {
       this.$refs.panelSetting.showPanel()
     },
+
+    /* *** Import/Export ************************************************************************************
+     */
+    tempKey () {
+      return '§' + (new Date().getTime() + Math.random())
+    },
+    newRecord (rec, selectAfterDone, noLastPage) {
+      if (typeof rec === 'undefined') rec = {}
+      this.fields.filter(f => f.keyField).map(f => {
+        if (typeof rec[f.name] === 'undefined')
+          rec[f.name] = this.tempKey()
+      })
+      const id = this.tempKey()
+      rec.$id = id
+      const rowPos = this.value.push(rec) - 1
+      if (selectAfterDone) this.selected[rowPos] = id
+      if (!noLastPage) this.lazy(this.lastPage, 100)
+      return rec
+    },
     importTable (cb) {
       this.$refs.importFile.click()
       this.importCallback = cb
@@ -1465,6 +1485,7 @@ export default {
     doImport (e) {
       this.processing = true
       this.refresh()
+      this.clearAllSelected()
       setTimeout(() => {
         const files = e.target.files
         if (!files || files.length === 0) return
@@ -1494,16 +1515,29 @@ export default {
             let inserted = 0
             let updated = 0
             while (pass < 2) {
+              const keys = this.fields.filter(f => f.keyField)
               importData.forEach((line, i) => {
-                let rowPos = this.table.findIndex(v => {
-                  return this.fields
-                    .filter(f => f.keyField)
-                    .filter(f => v[f.name] !== line[f.name] && v[f.name] !== line[f.label]).length === 0
-                })
-                let rec = {
+
+                let rowPos = -1
+                if (keys.length) {
+                  // locate match record
+                  rowPos = this.table.findIndex(v =>
+                    keys.filter(f => 
+                      typeof v[f.name] !== 'undefined' 
+                      && (v[f.name] === line[f.name] || v[f.name] === line[f.label])).length === keys.length
+                  )
+
+                }
+
+                // if no match found, find an empty record
+                if (rowPos === -1)
+                  rowPos = this.table.findIndex(v => Object.keys(v).filter(f => !f.startsWith('$')).length === 0)
+
+                const rec = {
                   $id: typeof line.$id === 'undefined' ? keyStart + '-' + i : line.$id
                 }
 
+                // Raise exception if readonly not not pass validation
                 this.fields.forEach((field) => {
                   if (field.name.startsWith('$')) return
                   let val = line[field.name]
@@ -1519,18 +1553,21 @@ export default {
                   }
                   if (val !== null) rec[field.name] = val
                 })
+
+                // Do actual insert/update if 2nd pass
                 if (pass === 1) {
                   if (rowPos >= 0) {
                     updated++
+                    Object.keys(rec).forEach(name => {
+                      if (name.startsWith('$')) return
+                      this.updateCellByName(rowPos, name, rec[name])
+                    })
+                    this.selected[rowPos] = this.table[rowPos].$id
                   }
                   else {
-                    rowPos = this.table.push(rec) - 1
+                    this.newRecord(rec, true)
                     inserted++
                   }
-                  Object.keys(rec).forEach(name => {
-                    if (name.startsWith('$')) return
-                    this.updateCellByName(rowPos, name, rec[name])
-                  })
                 }
               })
               pass++
@@ -1670,6 +1707,17 @@ export default {
           this.$emit('select', buf, true)
         })
       }
+    },
+    selectRecordByKeys (keys) {
+      const rowPos = this.table.findIndex(v => 
+        this.fields.filter(f => f.keyField).filter(f => v[f.name] === keys[f.name]).length === keys.length)
+      if (rowPos >= 0) this.selectRecord(rowPos)
+    },
+    selectRecordById (id) {
+      const rowPos = this.table.findIndex(v => v.$id === id)
+      // eslint-disable-next-line
+      console.log(id, rowPos)
+      if (rowPos >= 0) this.selectRecord(rowPos)
     },
     unSelectRecord (rowPos) {
       if (typeof this.selected[rowPos] !== 'undefined') {
@@ -2075,9 +2123,11 @@ export default {
 
       if (this.lazyTimeout[hash]) clearTimeout(this.lazyTimeout[hash])
       this.lazyTimeout[hash] = setTimeout(() => {
-        p(this.lazyBuffer[hash])
-        delete this.lazyTimeout[hash]
-        delete this.lazyBuffer[hash]
+        Vue.nextTick(() => {
+          p(this.lazyBuffer[hash])
+          delete this.lazyTimeout[hash]
+          delete this.lazyBuffer[hash]
+        })
       }, delay)
     }
   }
