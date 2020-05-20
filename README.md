@@ -334,6 +334,23 @@ methods: {
 }
 ```
 
+### Text/Value conversion
+Sometimes displaying text and the store value will be different. In order to deal with this, you could use column proproties to-text and to-value.
+```html
+<vue-excel-column field="phone" label="Contact" type="string" width="130px" to-text="phoneToText" to-value="phoneToVal" />
+```
+```js
+methods: {
+    phoneToText (val) {
+        // convert number to hyphenated i.e. 14152345678 => 1-415-2345678
+        return val.replace(/^(.)(...)(.*)$/, '$1-$2-$3')
+    },
+    phoneToVal (text) {
+        // convert hyphenated text to number i.e. 1-415-2345678 => 14152345678
+        return text.replace(/-/g, '')
+    },
+}
+```
 
 ## Localization
 Developer may override the default values through localized-label prop
