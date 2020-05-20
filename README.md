@@ -126,7 +126,8 @@ In your template
 #### Component: vue-excel-editor
 | Name    | Argument                  | Description |
 | :---    | :---                      | :---        |
-| update  | Array Of Array            | Update Cell information |
+| update  | Array of array            | Update cell information |
+| delete  | Array of array            | Delete row information |
 | select  | Array of rows, select/not | Emit when rows are selected/unselected |
 | setting | setting                   | Emit when setting (column width, invisible state) is changed |
 
@@ -135,32 +136,34 @@ In your template
 ## Methods List
 
 #### Component: vue-excel-editor
-| Name               | Arguments                     | Description |
-| :---               | :---                          | :---        |
-| firstPage          |                               | Move to the first page |
-| lastPage           |                               | Move to the last page |
-| prevPage           |                               | Move to the previous page |
-| nextPage           |                               | Move to the next page |
-| moveNorth          |                               | Move the cursor cell to upper cell |
-| moveSouth          |                               | Move the cursor cell to lower cell |
-| moveWest           |                               | Move the cursor cell to previous cell |
-| moveEast           |                               | Move the cursor cell to next cell |
-| doFind             | text                          | Find the specified text in whole table and locate the cursor cell |
-| doFindNext         |                               | Contnue the last find |
-| sort               | n, pos                        | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
-| newRecord          | rec*, select*, noFocus*       | Call this to new an empty record, return the rec pointer |
-| selectRecord       | row                           | Select the row |
-| selectRecordByKeys | keys                          | Select the row by keys hash |
-| selectRecordById   | id                            | Select the row by $id |
-| unSelectRecord     | row                           | UnSelect the row |
-| clearAllSelected   |                               | Unselect all selected rows |
-| getSelectedRecords |                               | Get an array of the selected row hash (key=rowPos, val=$id) |
-| exportTable        | format*, selectedOnly*, name* | Export the filtered table as xlsx/csv |
-| importTable        | callback*                     | Import the specified formatted xlsx |
-| undoTransaction    |                               | Undo the last update |
-| setFilter          | name, text                    | Set the filter text on column name |
-| clearFilter        | name*                         | Clear the filter text on column name |
-| columnSuppress     |                               | Hide the column if all values are null or empty |
+| Name                  | Arguments                     | Description |
+| :---                  | :---                          | :---        |
+| firstPage             |                               | Move to the first page |
+| lastPage              |                               | Move to the last page |
+| prevPage              |                               | Move to the previous page |
+| nextPage              |                               | Move to the next page |
+| moveNorth             |                               | Move the cursor cell to upper cell |
+| moveSouth             |                               | Move the cursor cell to lower cell |
+| moveWest              |                               | Move the cursor cell to previous cell |
+| moveEast              |                               | Move the cursor cell to next cell |
+| doFind                | text                          | Find the specified text in whole table and locate the cursor cell |
+| doFindNext            |                               | Contnue the last find |
+| sort                  | n, pos                        | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
+| newRecord             | rec*, select*, noFocus*       | Call this to new an empty record, return the rec pointer |
+| deleteRecord          | rowpos                        | Delete the record in pos rowpos |
+| deleteSelectedRecords |                               | Delete all the selected records |
+| selectRecord          | row                           | Select the row |
+| selectRecordByKeys    | keys                          | Select the row by keys hash |
+| selectRecordById      | id                            | Select the row by $id |
+| unSelectRecord        | row                           | UnSelect the row |
+| clearAllSelected      |                               | Unselect all selected rows |
+| getSelectedRecords    |                               | Get an array of the selected row hash (key=rowPos, val=$id) |
+| exportTable           | format*, selectedOnly*, name* | Export the filtered table as xlsx/csv |
+| importTable           | callback*                     | Import the specified formatted xlsx |
+| undoTransaction       |                               | Undo the last update |
+| setFilter             | name, text                    | Set the filter text on column name |
+| clearFilter           | name*                         | Clear the filter text on column name |
+| columnSuppress        |                               | Hide the column if all values are null or empty |
 
 "*" = optional
 
@@ -215,9 +218,9 @@ export default {
 ```
 
 ### Work with redis for saving
-
+You may capture the @delete and @update event for saving purpose
 ```html
-<vue-excel-editor v-model="jsondata" @update="onSave">
+<vue-excel-editor v-model="jsondata" @delete="onDelete" @update="onUpdate">
     <vue-excel-column field="user" label="User ID" type="string" width="80px" key-field />
     ...
 </vue-excel-editor>
@@ -225,12 +228,52 @@ export default {
 Specified "key-field" is necessary, it will reflect in rec.keys in the following:
 ```js
 methods: {
-    onSave (records) {
+    onDelete (records) {
+      records = records.map(rec => ['del', rec.keys.join()])
+      redis.multi(records).exec()
+    },
+    onUpdate (records) {
       records = records.map(rec => ['hset', rec.keys.join(), rec.name, rec.newVal])
       redis.multi(records).exec()
     }
 }
 ```
+
+### New row
+Set the reference by ref="..."
+```html
+<vue-excel-editor ref="grid" v-model="jsondata">
+    <vue-excel-column field="user" label="User ID" type="string" width="80px" key-field />
+    ...
+</vue-excel-editor>
+```
+```js
+methods: {
+    newRecord () {
+        const rec = {
+            user: 'nm',
+            name: 'Norman Morris',
+            phone: '1-222-3333333',
+            gender: 'M',
+            age: 28,
+            birth: '1993-05-16'
+        }
+        // Call this to new record
+        this.$refs.grid.newRecord(rec)
+    }
+}
+```
+After the record created, a set of @update events will be fired. If you undo a newRecord transaction, component will generate a @delete event. In case you does not allow undo, you may skip this by append item in jsondata array directly.
+
+### Delete row
+```js
+methods: {
+    delRecord () {
+        this.$refs.grid.deleteRecord(0) // delete the 1st record: Harry Cole
+    }
+}
+```
+Please be noted that now the undo feature does not support delete record.
 
 ### Remember the grid setting
 The grid setting such as column width can be saved in the localStorage of client browser
@@ -241,6 +284,7 @@ The grid setting such as column width can be saved in the localStorage of client
     </vue-excel-editor>
 </template>
 ```
+You may also capture the @setting event to handle more specifics.
 
 ### Do something when user select the rows
 The selected rows will be passed to the provided trigger method

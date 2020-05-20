@@ -1466,28 +1466,6 @@ export default {
 
     /* *** Import/Export ************************************************************************************
      */
-    tempKey () {
-      return '§' + (new Date().getTime() + Math.random())
-    },
-    newRecord (rec, selectAfterDone, noLastPage) {
-      if (typeof rec === 'undefined') rec = {}
-      this.fields.filter(f => f.keyField).map(f => {
-        if (typeof rec[f.name] === 'undefined')
-          rec[f.name] = this.tempKey()
-      })
-      const id = this.tempKey()
-      rec.$id = id
-      this.value.push(rec)
-      const rowPos = this.table.push(rec) - 1
-      if (selectAfterDone) this.selected[rowPos] = id
-      Object.keys(rec).forEach(name => {
-        const field = this.fields.find(f => f.name === name)
-        if (field) this.updateCell(rowPos, field, rec[name])
-      })
-      this.refresh()
-      if (!noLastPage) this.lazy(this.lastPage)
-      return rec
-    },
     importTable (cb) {
       this.$refs.importFile.click()
       this.importCallback = cb
@@ -1659,11 +1637,13 @@ export default {
     getSelectedRecords () {
       return this.table.filter((rec, i) => this.selected[i])
     },
+    /*
     deleteSelectedRecords () {
       this.table = this.table.filter((rec, i) => typeof this.selected[i] === 'undefined')
       this.selected = {}
       this.selectedCount = 0
     },
+    */
     rowLabelClick (e) {
       let target = e.target
       while (target.tagName !== 'TD') target = target.parentNode
@@ -1991,9 +1971,71 @@ export default {
       if (e) e.preventDefault()
       if (this.redo.length === 0) return
       const transaction = this.redo.pop()
-      transaction.forEach((rec) => {
-        this.updateCell(this.rowIndex[rec.$id], rec.field, rec.oldVal, true)
+      transaction.every((t) => {
+        try {
+          if (t.type === 'd') {
+            // deleteRecord() transaction
+            this.newRecord(t.rec, false, true, true)
+          }
+          else if (t.field && t.field.keyField && t.oldKeys.includes(t.newVal)) {
+            // newRecord() transaction
+            const valueRowPos = this.value.findIndex(v => v.$id === t.$id)
+            if (valueRowPos >= 0) {
+              this.deleteRecord(valueRowPos, true)
+              return false
+            }
+          }
+          else
+            this.updateCell(this.rowIndex[t.$id], t.field, t.oldVal, true)
+
+          return true
+        }
+        catch(e) {
+          return false
+        }
       })
+    },
+    tempKey () {
+      return '§' + (new Date().getTime() + Math.random())
+    },
+    newRecord (rec, selectAfterDone, noLastPage, noredo) {
+      if (typeof rec === 'undefined') rec = {}
+      this.fields.filter(f => f.keyField).map(f => {
+        if (typeof rec[f.name] === 'undefined')
+          rec[f.name] = this.tempKey()
+      })
+      const id = rec.$id || this.tempKey()
+      rec.$id = id
+      this.value.push(rec)
+      const rowPos = this.table.push(rec) - 1
+      if (selectAfterDone) this.selected[rowPos] = id
+      Object.keys(rec).forEach(name => {
+        const field = this.fields.find(f => f.name === name)
+        if (field) this.updateCell(rowPos, field, rec[name], noredo)
+      })
+      this.refresh()
+      if (!noLastPage) this.lazy(this.lastPage)
+      return rec
+    },
+    deleteSelectedRecords () {
+      Object.values(this.selected).forEach((id) => {
+        const valueRowPos = this.value.findIndex(v => v.$id === id)
+        if (valueRowPos >= 0) this.deleteRecord(valueRowPos)
+      })
+      this.selected = {}
+      this.selectedCount = 0
+    },
+    deleteRecord (valueRowPos, noredo) {
+      const rec = this.value.splice(valueRowPos, 1)[0]
+      setTimeout(() => {
+        this.lazy(rec, (buf) => {
+          this.$emit('delete', buf)
+          if (!noredo) this.redo.push(buf.map(t => ({
+            type: 'd',
+            rec: t
+          })))
+        })
+      }, 100)
     },
     updateCellByColPos (recPos, colPos, content) {
       return this.updateCell(recPos, this.fields[colPos], content)
