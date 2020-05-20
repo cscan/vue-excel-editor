@@ -93,8 +93,8 @@ In your template
 | sticky         | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
 | invisible      | Optional  | Boolean  | Column visibility, default is false |
 | width          | Optional  | String   | Specified column width, default is '100px' |
-| change         | Optional  | Function | Custom function to be triggered when the data of this column changed |
-| validate       | Optional  | Function | Custom function to validate and return the error message |
+| change         | Optional  | Function | The function to be triggered when the data of this column changed |
+| validate       | Optional  | Function | The function to validate and return the error message |
 | key-field      | Optional  | Boolean  | Specified the key field which is included in keys parameter in @update event |
 | allow-keys     | Optional  | Array    | Array of char which allow to input |
 | mandatory      | Optional  | String   | If not empty, it is showed as error when it modified as blank, default is '' |
@@ -105,9 +105,9 @@ In your template
 | text-align     | Optional  | String   | Text alignment, default is 'left' |
 | options        | Optional  | Array    | Define the selectable options, if type != 'select, it works as autocomplete |
 | summary        | Optional  | String   | Summary: 'sum', 'avg', 'max', 'min'. Default is null |
-| link           | Optional  | Function | The custom function to react alt-click the cell |
-| to-text        | Optional  | Function | The custom conversion function from object value to edit-text |
-| to-value       | Optional  | Function | The custom conversion function from edit-text to object value |
+| link           | Optional  | Function | The function to react to the alt-click on cell text |
+| to-text        | Optional  | Function | The function to convert from object value to edit-text |
+| to-value       | Optional  | Function | The function to convert from edit-text to object value |
 
 ## Hot Key List
 
@@ -321,13 +321,13 @@ return empty string if there is no error
 "sum", "min", "max", "avg" are supported.
 
 #### Link
-Actually this nice feature I was learnt from SAP UI feature - When user holds the alt-key and click on the cell, your provided column function will be triggered
+Actually this nice feature I was learnt from SAP UI - When user holds the alt-key and let the mouse over the cell text, the text will become a link. When user clicks on the link, your custom function will be triggered.
 ```html
 <vue-excel-column field="name" label="Name" type="string" width="150px" :link="routeToUserFunc" />
 ```
 ```js
 methods: {
-    // Hold Alt Key and click on the name, assume user wants to go to the function "User Profile"
+    // Hold Alt Key and click on any name, program will route to the page "User Profile"
     routeToUserFunc (content, record) {
         this.$router.push(`/user/${record.user}`)
     }
