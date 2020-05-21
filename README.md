@@ -380,7 +380,7 @@ methods: {
 ### Text/Value conversion
 Sometimes displaying text and the store value will be different. In order to deal with this, you could use column proproties to-text and to-value.
 ```html
-<vue-excel-column field="phone" label="Contact" type="string" width="130px" to-text="phoneToText" to-value="phoneToVal" />
+<vue-excel-column field="phone" label="Contact" type="string" width="130px" :to-text="phoneToText" :to-value="phoneToVal" />
 ```
 ```js
 methods: {
@@ -395,7 +395,7 @@ methods: {
 }
 ```
 
-## Localization
+### Localization
 Developer may override the default values through localized-label prop
 ```html
 <template>
