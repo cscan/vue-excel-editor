@@ -1982,7 +1982,7 @@ export default {
             const valueRowPos = this.value.findIndex(v => v.$id === t.$id)
             if (valueRowPos >= 0) {
               this.deleteRecord(valueRowPos, true)
-              return false
+              // return false
             }
           }
           else

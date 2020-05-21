@@ -273,7 +273,6 @@ methods: {
     }
 }
 ```
-Please be noted that now the undo feature does not support delete record.
 
 ### Remember the grid setting
 The grid setting such as column width can be saved in the localStorage of client browser
