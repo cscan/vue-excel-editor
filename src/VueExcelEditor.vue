@@ -638,7 +638,7 @@ export default {
     refresh () {
       // this.pageTop = 0
       this.prevSelect = -1
-      if (this.fields.length === 0 && this.value.length && Object.keys(this.value)) {
+      if (this.fields.length === 0 && this.value.length && Object.keys(this.value[0])) {
         this.autoRegisterAllColumns(this.value)
       }
       this.calTable()
@@ -855,7 +855,7 @@ export default {
         if (!showCols.includes(field.name))
           field.invisible = true
       })
-      this.refresh()
+      // this.refresh()
     },
 
     /* Still evaluating */
@@ -876,7 +876,7 @@ export default {
         if (width > 450) width = 450
         field.width = width + 'px'
       })
-      this.refresh()
+      // this.refresh()
     },
 
     /* *** Date Picker *********************************************************************************
@@ -1171,9 +1171,14 @@ export default {
               }
               return
             }
-            else
-              if (this.autocompleteSelect !== -1)
-                this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
+            else if (this.autocompleteSelect !== -1 && this.autocompleteSelect < this.autocompleteInputs.length) {
+              this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
+            }
+            else {
+              this.inputBox.value = this.currentCell.innerText
+              this.inputBoxShow = 0
+              this.inputBoxChanged = false
+            }
             break
           case 27:  // Esc
             if (!this.focused) return
@@ -1200,16 +1205,16 @@ export default {
             if (!this.focused) return
             if (this.inputBoxShow) {
               this.inputBoxChanged = true
-              setTimeout(this.calAutocompleteList)
+              setTimeout(() => this.calAutocompleteList(true))
               return
             }
             if (this.currentField.readonly) return
             if (this.autocompleteInputs.length) return
-            if (this.currentField.type === 'select') this.calAutocompleteList(true)
-            else {
-              this.inputBox.value = ''
-              this.inputCellWrite('')
-            }
+            // if (this.currentField.type === 'select') this.calAutocompleteList(true)
+            // else {
+            this.inputBox.value = ''
+            this.inputCellWrite('')
+            // }
             break
           default:
             if (!this.focused) return
@@ -1220,7 +1225,10 @@ export default {
             if (this.currentField.lengthLimit && this.inputBox.value.length > this.currentField.lengthLimit) return e.preventDefault()
             if (!this.inputBoxShow) {
               if (this.currentField.type === 'select') {
-                this.calAutocompleteList(true)
+                setTimeout(() => this.calAutocompleteList(true))
+                this.inputBox.value = ''
+                this.inputBoxShow = 1
+                this.inputBox.focus()
                 return
               }
               if (this.currentField.type === 'date') {
@@ -1230,9 +1238,11 @@ export default {
               this.inputBox.value = ''
               this.inputBoxShow = 1
               this.inputBox.focus()
+              setTimeout(this.calAutocompleteList)
             }
+            else
+              setTimeout(() => this.calAutocompleteList(true))
             this.inputBoxChanged = true
-            setTimeout(this.calAutocompleteList)
             break
         }
       }
@@ -1478,7 +1488,7 @@ export default {
     },
     doImport (e) {
       this.processing = true
-      this.refresh()
+      // this.refresh()
       this.clearAllSelected()
       setTimeout(() => {
         const files = e.target.files
@@ -2001,9 +2011,6 @@ export default {
         }
       })
     },
-    tempKey () {
-      return new Date().getTime() % 1e8 - Math.random()
-    },
     newRecord (rec, selectAfterDone, noLastPage, noredo) {
       if (typeof rec === 'undefined') rec = {}
       this.fields.filter(f => f.keyField).map(f => {
@@ -2019,7 +2026,7 @@ export default {
         const field = this.fields.find(f => f.name === name)
         if (field) this.updateCell(rowPos, field, rec[name], noredo)
       })
-      this.refresh()
+      // this.refresh()
       if (!noLastPage) this.lazy(this.lastPage)
       return rec
     },
@@ -2101,7 +2108,7 @@ export default {
       if (!force && !this.currentField.autocomplete) return
       if (force || (this.inputBoxChanged && this.inputBox.value.length > 0)) {
         if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
-        this.recalAutoCompleteList = setTimeout(() => {
+        const doList = () => {
           if (!force) {
             if (!this.focused || !this.inputBoxShow || !this.inputBoxChanged || !this.inputBox.value.length) {
               this.autocompleteInputs = []
@@ -2110,35 +2117,48 @@ export default {
           }
           const field = this.currentField
           const name = field.name
-          const value = force ? '' : this.inputBox.value
+          const value = this.inputBox.value.toUpperCase()
           let list
           if (field.options.length > 0) {
             list = this.currentField.options
+            list.sort()
+            this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
           }
           else {
             list = []
-            for(let i=0; i<this.table.length; i++) {
-              const rec = this.table[i]
-              if (typeof rec[name] !== 'undefined' && rec[name].startsWith(value) && list.indexOf(rec[name]) === -1)
+            for(let i=0; i<this.value.length; i++) {
+              const rec = this.value[i]
+              if (typeof rec[name] !== 'undefined' && rec[name].toUpperCase().startsWith(value) && list.indexOf(rec[name]) === -1)
                 list.push(rec[name])
               if (list.length >= 10) break
             }
             list.sort()
+            this.autocompleteSelect = 0
           }
-          this.autocompleteSelect = -1
           this.autocompleteInputs = list
           const rect = this.currentCell.getBoundingClientRect()
-          this.$refs.autocomplete.style.top = rect.bottom + 'px'
-          this.$refs.autocomplete.style.left = rect.left + 'px'
-          this.$refs.autocomplete.style.minWidth = rect.width + 'px'
           this.lazy(() => {
+            this.$refs.autocomplete.style.minWidth = rect.width + 'px'
             const r = this.$refs.autocomplete.getBoundingClientRect()
-            if (r.bottom > window.innerHeight)
+            if (rect.bottom + r.height > window.innerHeight) {
+              // show at top
+              this.autocompleteInputs.reverse()
+              this.autocompleteSelect = this.autocompleteInputs.length - this.autocompleteSelect - 1
               this.$refs.autocomplete.style.top = (rect.top - r.height) + 'px'
-            if (r.right > window.innerWidth)
+            }
+            else {
+              this.$refs.autocomplete.style.top = rect.bottom + 'px'
+            }
+            if (rect.left + r.width > window.innerWidth)
               this.$refs.autocomplete.style.top = (window.innerWidth - r.width) + 'px'
+            else
+              this.$refs.autocomplete.style.left = rect.left + 'px'
           })
-        }, force ? 0 : 700)
+        }
+        if (force)
+          doList()
+        else 
+          this.recalAutoCompleteList = setTimeout(doList, 700)
       }
     },
     inputAutocompleteText (text, e) {
@@ -2154,6 +2174,9 @@ export default {
 
     /* *** Helper ****************************************************************************************
      */
+    tempKey () {
+      return new Date().getTime() % 1e8 - Math.random()
+    },
     hashCode (s) {
       return s.split('').reduce((a, b) => {
         return a = ((a << 5) - a) + b.charCodeAt(0) | 0
