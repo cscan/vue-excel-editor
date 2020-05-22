@@ -892,7 +892,7 @@ export default {
         if (r.bottom > window.innerHeight)
           this.$refs.dpContainer.style.top = (cellRect.top - r.height) + 'px'
         if (r.right > window.innerWidth)
-          this.$refs.dpContainer.style.top = (window.innerWidth - r.width) + 'px'
+          this.$refs.dpContainer.style.left = (window.innerWidth - r.width) + 'px'
       })
     },
     datepickerClick () {
@@ -1082,7 +1082,7 @@ export default {
             e.preventDefault()
             break
           case 67: // c
-            this.inputBox.value = this.currentCell.innerText
+            this.inputBox.value = this.currentCell.textContent
             this.inputBox.focus()
             this.inputBox.select()
             document.execCommand('copy')
@@ -1175,7 +1175,7 @@ export default {
               this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
             }
             else {
-              this.inputBox.value = this.currentCell.innerText
+              this.inputBox.value = this.currentCell.textContent
               this.inputBoxShow = 0
               this.inputBoxChanged = false
             }
@@ -1187,7 +1187,7 @@ export default {
             this.autocompleteSelect = -1
             if (this.inputBoxShow) {
               e.preventDefault()
-              this.inputBox.value = this.currentCell.innerText
+              this.inputBox.value = this.currentCell.textContent
               this.inputBoxShow = 0
               this.inputBoxChanged = false
             }
@@ -1221,6 +1221,10 @@ export default {
             if (this.currentField.readonly) return
             if (e.altKey) return
             if (e.key !== 'Process' && e.key.length > 1) return
+            if (!this.inputBoxShow && this.currentField.type === 'date') {
+              this.showDatePickerDiv()
+              return
+            }
             if (this.currentField.allowKeys && this.currentField.allowKeys.indexOf(e.key.toUpperCase()) === -1) return e.preventDefault()
             if (this.currentField.lengthLimit && this.inputBox.value.length > this.currentField.lengthLimit) return e.preventDefault()
             if (!this.inputBoxShow) {
@@ -1230,10 +1234,6 @@ export default {
                 this.inputBox.value = ''
                 this.inputBoxShow = 1
                 this.inputBox.focus()
-                return
-              }
-              if (this.currentField.type === 'date') {
-                this.showDatePickerDiv()
                 return
               }
               this.inputBox.value = ''
@@ -1812,9 +1812,9 @@ export default {
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
         this.moveInputSquare(rowPos, colPos)
         if (this.currentField.link && e.altKey)
-          setTimeout(() => this.currentField.link(this.currentCell.innerText, this.currentRecord, rowPos, colPos, this.currentField, this))
+          setTimeout(() => this.currentField.link(this.currentCell.textContent, this.currentRecord, rowPos, colPos, this.currentField, this))
         if (e.target.offsetWidth - e.offsetX > 15) return
-        this.inputBox.value = this.currentCell.innerText
+        this.inputBox.value = this.currentCell.textContent
         if (e.target.classList.contains('select')) this.calAutocompleteList(true)
         if (e.target.classList.contains('datepick')) this.showDatePickerDiv()
       }
@@ -1924,6 +1924,7 @@ export default {
 
       // set the label markers
       if (this.currentRowPos >= 0 && this.currentRowPos < this.pagingTable.length) {
+        this.inputBox.value = this.currentCell.textContent
         this.inputBox.focus()
         this.focused = true
         row.children[0].classList.add('focus')
@@ -1933,7 +1934,7 @@ export default {
     },
     inputSquareClick () {
       if (!this.currentField.readonly && !this.inputBoxShow && this.currentField.type !== 'select') {
-        this.inputBox.value = this.currentCell.innerText
+        this.inputBox.value = this.currentCell.textContent
         this.inputBoxShow = 1
         this.inputBox.focus()
         this.inputBoxChanged = false
@@ -2378,10 +2379,10 @@ input:focus, input:active:focus, input.active:focus {
   cursor: pointer !important;
 }
 .systable tbody td.error {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAAGZJREFUOBGlzjsOgDAMA9CwcQSO0PtP3K64Qyugv8S2ZMXTUw5DstmFk8qWAuhEbzSzbQ+oWIPKULAPpGAdxGJDiMGmUBRbQhFsC3kxF+TB3NAOC0ErLAzNMAoaYTT0xyTojclQxR5H5B1HhuS+WAAAAABJRU5ErkJggg==');
-  background-repeat: no-repeat;
-  background-size: 8px 8px;
-  background-position: right 0px top 0px;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAAGZJREFUOBGlzjsOgDAMA9CwcQSO0PtP3K64Qyugv8S2ZMXTUw5DstmFk8qWAuhEbzSzbQ+oWIPKULAPpGAdxGJDiMGmUBRbQhFsC3kxF+TB3NAOC0ErLAzNMAoaYTT0xyTojclQxR5H5B1HhuS+WAAAAABJRU5ErkJggg==') !important;
+  background-repeat: no-repeat !important;
+  background-size: 8px 8px !important;
+  background-position: right 0px top 0px !important;
 }
 .systable tbody tr:not(:last-child) td {
   border-bottom: 1px solid lightgray;
