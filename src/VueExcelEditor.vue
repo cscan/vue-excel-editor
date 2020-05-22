@@ -426,6 +426,7 @@ export default {
 
       table: [],
       filteredValue: [],
+      lastFilterTime: 0,
       summaryRow: false,
       summary: {},
       showFilteredOnly: true,
@@ -484,6 +485,7 @@ export default {
       })
     },
     columnFilterString () {
+      this.lastFilterTime = new Date().getTime() % 1e8
       this.processing = true
       setTimeout(() => {
         this.pageTop = 0
@@ -644,9 +646,9 @@ export default {
     },
     calTable () {
       // add unique key to each row if no key is provided
-      let seed = new Date().getTime() - 1578101000000
+      let seed = new Date().getTime() % 1e8
       this.value.forEach((rec,i) => {
-        if (!rec.$id) rec.$id = seed + '-' + i
+        if (!rec.$id) rec.$id = seed - i/1e7
       })
 
       if (this.showFilteredOnly === false) {
@@ -704,12 +706,17 @@ export default {
           this.table = this.filteredValue
         else {
           this.table = this.filteredValue.filter((record) => {
+
+            // Record is created after the filter time
+            if (record.$id > this.lastFilterTime) return true
+
             // Assume new record contains § in any of the key fields
+            /*
             const isNew = this.fields.filter((field) => {
               return field.keyField && record[field.name] && record[field.name].startsWith('§')
             }).length > 0
-
             if (isNew) return true // Always show new record in filter mode
+            */
 
             const content = {}
             filterColumnList.forEach((k) => {
@@ -722,7 +729,6 @@ export default {
 
             for (let i = 0; i < filterColumnList.length; i++) {
               const k = filterColumnList[i]
-              // if (this.fields[k].keyField && content[k].startsWith('§')) return true
               switch (filter[k].type) {
                 case 0:
                   if (`${content[k]}` !== `${filter[k].value}`) return false
@@ -1492,7 +1498,7 @@ export default {
               })
               return rec
             })
-            const keyStart = new Date().getTime()
+            const keyStart = new Date().getTime() % 1e8
             if (importData.length === 0) throw new Error('VueExcelEditor: ' + this.localizedLabel.noRecordIsRead)
             if (this.fields
               .filter(f => f.keyField)
@@ -1522,7 +1528,7 @@ export default {
                   rowPos = this.table.findIndex(v => Object.keys(v).filter(f => !f.startsWith('$')).length === 0)
 
                 const rec = {
-                  $id: typeof line.$id === 'undefined' ? keyStart + '-' + i : line.$id
+                  $id: typeof line.$id === 'undefined' ? keyStart - i/1e7 : line.$id
                 }
 
                 // Raise exception if readonly not not pass validation
@@ -1996,13 +2002,13 @@ export default {
       })
     },
     tempKey () {
-      return '§' + (new Date().getTime() + Math.random())
+      return new Date().getTime() % 1e8 - Math.random()
     },
     newRecord (rec, selectAfterDone, noLastPage, noredo) {
       if (typeof rec === 'undefined') rec = {}
       this.fields.filter(f => f.keyField).map(f => {
         if (typeof rec[f.name] === 'undefined')
-          rec[f.name] = this.tempKey()
+          rec[f.name] = '§' + this.tempKey()
       })
       const id = rec.$id || this.tempKey()
       rec.$id = id
