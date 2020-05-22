@@ -1226,6 +1226,7 @@ export default {
             if (!this.inputBoxShow) {
               if (this.currentField.type === 'select') {
                 setTimeout(() => this.calAutocompleteList(true))
+                if (e.keyCode === 32) return e.preventDefault()
                 this.inputBox.value = ''
                 this.inputBoxShow = 1
                 this.inputBox.focus()
@@ -1813,6 +1814,7 @@ export default {
         if (this.currentField.link && e.altKey)
           setTimeout(() => this.currentField.link(this.currentCell.innerText, this.currentRecord, rowPos, colPos, this.currentField, this))
         if (e.target.offsetWidth - e.offsetX > 15) return
+        this.inputBox.value = this.currentCell.innerText
         if (e.target.classList.contains('select')) this.calAutocompleteList(true)
         if (e.target.classList.contains('datepick')) this.showDatePickerDiv()
       }
