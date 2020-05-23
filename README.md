@@ -146,6 +146,10 @@ In your template
 | moveSouth             |                               | Move the cursor cell to lower cell |
 | moveWest              |                               | Move the cursor cell to previous cell |
 | moveEast              |                               | Move the cursor cell to next cell |
+| moveToNorthWest       |                               | Move the cursor cell to 1st row 1st col |
+| moveToNorthEast       |                               | Move the cursor cell to 1st row last col |
+| moveToSouthWest       |                               | Move the cursor cell to last row 1st col |
+| moveToSouthEast       |                               | Move the cursor cell to last row last col |
 | doFind                | text                          | Find the specified text in whole table and locate the cursor cell |
 | doFindNext            |                               | Contnue the last find |
 | sort                  | n, pos                        | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
@@ -164,6 +168,7 @@ In your template
 | setFilter             | name, text                    | Set the filter text on column name |
 | clearFilter           | name*                         | Clear the filter text on column name |
 | columnSuppress        |                               | Hide the column if all values are null or empty |
+| calSummary            |                               | Calculate the summary of all columns |
 
 "*" = optional
 
@@ -328,16 +333,25 @@ Specified "sticky" means the column does not move when horizontal scrolling
 #### Sorting
 ![Sorting](https://i.imgur.com/vGZpHkv.png "Sorting")
 
-#### Options
-![Options](https://i.imgur.com/LGefJif.png "Options")
-
 #### Autocomplete
+When user enters text in cell and hold 1 second, component will show 10 matched occurences for user to chosen.
 ![Autocomplete](https://i.imgur.com/cUSUaUL.png "Autocomplete")
 
+#### Options
+Work likes Autocomplete, but the list is provided and fixed.
+![Options](https://i.imgur.com/LGefJif.png "Options")
+
 #### Select
+Click the row label to select the row. Component supports Excel-select which using Shift key and Ctrl key (Meta for OSX) to select multiple rows. You may also intereset in the free-select prop to select the row without holding the shift key.
+
 ![Select](https://i.imgur.com/x0Lkwf8.png "Select")
 
-#### Validation
+#### Multi-Update Feature
+When user update any cell during selecting multiple rows, all cells of that column of selected rows will be updated.
+
+![Multi-Update](https://i.imgur.com/iFSPxDQ.png "Multi-Update")
+
+### Validation
 ```html
 <vue-excel-column field="phone" label="Contact" type="string" width="130px" :validate="validPhoneNum" />
 ```
@@ -346,24 +360,25 @@ methods: {
     validPhoneNum (content) {
         if (content === '') return 'Mandatory field'
         if (!/^[0-9]{1}-[0-9]{3}-[0-9]{7}$/.test(content)) return 'Invalid Phone Number'
-        return ''
+        return '' // return empty string if there is no error
     }
 }
 ```
-return empty string if there is no error
 
 ![Validation](https://i.imgur.com/VV6RQYw.png "Validation")
 
-#### Summary
+### Summary
 ```html
 <vue-excel-column field="age" label="Age" type="number" width="70px" summary="sum" />
 ```
 
 ![Summary](https://i.imgur.com/tlZjilA.png "Summary")
 
-"sum", "min", "max", "avg" are supported.
+Summary prop supports "sum", "min", "max" and "avg".
 
-#### Link
+USe this with cares. Now the summary will only calculate if number of records changed (i.e. New, delete, filter). If user change the numbers in cell, it does not recalculate automatically. You may trigger the calculation manually by calling calSummary method.
+
+### Link
 Actually this nice feature I was learnt from SAP UI - When user holds the alt-key and let the mouse over the cell text, the text will become a link. When user clicks on the link, your custom function will be triggered.
 ```html
 <vue-excel-column field="name" label="Name" type="string" width="150px" :link="routeToUserFunc" />

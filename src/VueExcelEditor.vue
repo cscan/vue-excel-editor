@@ -1758,7 +1758,27 @@ export default {
      */
     moveTo (rowPos, colPos) {
       colPos = colPos || 0
-      this.moveInputSquare(rowPos, colPos)
+      this.moveInputSquare(rowPos - this.pageTop, colPos)
+      this.focused = true
+      setTimeout(() => this.inputBox.focus())
+    },
+    moveToNorthWest() {
+      return this.moveTo(0, 0)
+    },
+    moveToNorthEast () {
+      let goColPos = this.fields.length - 1
+      while (this.fields[goColPos].invisible && goColPos > 0) goColPos--
+      return this.moveTo(0, goColPos)
+    },
+    moveToSouthWest () {
+      let goRowPos = this.table.length - 1
+      return this.moveTo(goRowPos, 0)
+    },
+    moveToSouthEast () {
+      let goRowPos = this.table.length - 1
+      let goColPos = this.fields.length - 1
+      while (this.fields[goColPos].invisible && goColPos > 0) goColPos--
+      return this.moveTo(goRowPos, goColPos)
     },
     moveWest () {
       if (this.focused && this.currentColPos > 0) {
@@ -2030,7 +2050,10 @@ export default {
         if (field) this.updateCell(rowPos, field, rec[name], noredo)
       })
       // this.refresh()
-      if (!noLastPage) this.lazy(this.lastPage)
+      if (!noLastPage) this.lazy(() => {
+        this.lastPage()
+        this.moveToSouthWest()
+      })
       return rec
     },
     deleteSelectedRecords () {
@@ -2353,7 +2376,7 @@ input:focus, input:active:focus, input.active:focus {
   text-align: left;
 }
 .systable tr.select td {
-  background-color: darkgrey !important;
+  background-color: #bbb !important;
 }
 .systable th, .systable td {
   vertical-align: bottom;
