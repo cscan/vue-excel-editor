@@ -4,32 +4,36 @@ Vue2 plugin for displaying and editing the array-of-object in Excel style. It su
 
 - Excel-like UI
 - Real 2-way data binding
-- Column Filtering
-- Column Sorting
+- Column filtering
+- Column sorting
+- Export to Excel/CSV
 - Pagination
 - Row selection
 - Update the cells in all selected rows
-- Key support: up, down, left, right, page-up, page-down, tab, esc
-- Ctrl/meta Key support: Ctrl-A, Ctrl-C, Ctrl-V, Ctrl-Z, Ctrl-F, Ctrl-G, Ctrl-L
-- Column Valiation
-- Cell Error Tooltip
-- Custom Column Header
-- Readonly Column
-- Column Visibility
-- Column Sequence
-- Column Width Adjustment
-- Undo
+- Edit key support: up, down, left, right, page-up, page-down, tab, del, bs, enter, esc
+- Ctrl/meta key support: Ctrl-A, Ctrl-C, Ctrl-V, Ctrl-Z, Ctrl-F, Ctrl-G, Ctrl-L
+- Column valiation
+- Cell error tooltip
+- Custom column header
+- Custom Row style
+- Readonly column
+- Column visibility
+- Column sequence
+- Column width adjustment
+- Undo update
 - Copy & Paste
-- Mass Import Excel Data
+- Mass import Excel data
 
 ## Getting started
 
 Get the package:
+
 ```bash
 npm install vue-excel-editor
 ```
 
 Register VueExcelEditor in your app entrypoint:
+
 ```js
 import Vue from 'vue'
 import VueExcelEditor from 'vue-excel-editor'
@@ -38,6 +42,7 @@ Vue.use(VueExcelEditor)
 ```
 
 In your template
+
 ```html
 <template>
     <vue-excel-editor v-model="jsondata">
@@ -53,11 +58,13 @@ In your template
 ```
 
 ## Outlook
+
 ![Simple Outlook](https://i.imgur.com/bFOA5Lv.png "VueExcelEditor")
 
 ## Props List
 
-#### Component: vue-excel-editor
+### Component: vue-excel-editor
+
 | Name            | Mandatory | Type     | Description |
 | :---            | :---      | :---     | :---        |
 | v-model         | Mandatory | Array    | Edited data in Array Of Object | 
@@ -82,12 +89,13 @@ In your template
 | n-filter-count  | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
 | remember        | Optional  | Boolean  | Remember the setting in localStorage, default is false |
 
-#### Component: vue-excel-column
+### Component: vue-excel-column
+
 | Name           | Mandatory | Type     | Description |
 | :---           | :---      | :---     | :---        |
 | field          | Mandatory | String   | Field name, row object key |
 | label          | Optional  | String   | Header label, default is field name |
-| type           | Optional  | String   | Column type: 'string'(default), 'number', 'select', 'check10', 'checkYN', 'checkTF', 'date', 'datetime', 'datetimesec', 'datetick', 'datetimetick', 'datetimesectick' |
+| type           | Optional  | String   | The column type |
 | readonly       | Optional  | Boolean  | Read-only, default is parent prop: readonly |
 | init-style     | Optional  | Object   | Cell inital style in css |
 | sticky         | Optional  | Boolean  | Fixed column at left of the table, no response on horizontal scrolling |
@@ -109,85 +117,110 @@ In your template
 | to-text        | Optional  | Function | The function to convert from object value to edit-text |
 | to-value       | Optional  | Function | The function to convert from edit-text to object value |
 
+#### Column type
+| Type            | Value               | Display text        | Justify | Validation         | Allow Keys   | Allow Null |
+| :---            | :---                | :---                | :---    | :---               | :--          | :--: |
+| string          | string              | string              | left    | none               | all          | Y |
+| number          | numeric             | numberic            | right   | none               | -.0123456789 | Y |
+| select          | string              | string              | left    | value with options | all          | Y |
+| check10         | 1 or 0              | 1 or 0              | center  | none               | 1 or 0       | Y |
+| checkYN         | Y or N              | Y or N              | center  | none               | ynYN         | Y |
+| checkTF         | T or F              | T of F              | center  | none               | tfTF         | Y |
+| date            | yyyy-mm-dd          | yyyy-mm-dd          | left    | valid date         | none         | Y |
+| datetime        | yyyy-mm-dd hh:mn    | yyyy-mm-dd hh:mn    | left    | valid datetime     | none         | Y |
+| datetimesec     | yyyy-mm-dd hh:mn:ss | yyyy-mm-dd hh:mn:ss | left    | valid datetimesec  | none         | Y |
+| datetick        | unix timestamp      | yyyy-mm-dd          | left    | valid date         | none         | Y |
+| datetimetick    | unix timestamp      | yyyy-mm-dd hh:mn    | left    | valid datetime     | none         | Y |
+| datetimesectick | unix timestamp      | yyyy-mm-dd hh:mn:ss | left    | valid datetimesec  | none         | Y |
+
 ## Hot Key List
 
-| Name        | Condition    | Description |
-| :---        | :---         | :---        |
-| Ctrl/Meta A | Table Focus  | Select all rows |
-| Ctrl/Meta C | Cell Focus   | Select the cell text to clipboard |
-| Ctrl/Meta V | Cell Focus   | Place the clipboard text to cell |
-| Ctrl/Meta Z | Table Focus  | Undo the last update |
-| Ctrl/Meta F | Table Focus  | Popup the "Find" dialog |
-| Ctrl/Meta G | After "Find" | Continue to find the text |
-| Ctrl/Meta L | Cell Focus   | Force to show autocomplete list, or the option list for "select" typed column |
+| Name        | Condition   | Description |
+| :---        | :---        | :---        |
+| Ctrl/Meta A | Table Focus | Select all rows |
+| Ctrl/Meta C | Cell Focus  | Select the cell text to clipboard |
+| Ctrl/Meta V | Cell Focus  | Place the clipboard text to cell |
+| Ctrl/Meta Z | Table Focus | Undo the last update |
+| Ctrl/Meta F | Table Focus | Popup the "Find" dialog |
+| Ctrl/Meta G | After Find  | Continue to find the text |
+| Ctrl/Meta L | Cell Focus  | Force to show autocomplete list, or the option list for "select" typed column |
 
 ## Events List
 
-#### Component: vue-excel-editor
-| Name    | Argument                  | Description |
-| :---    | :---                      | :---        |
-| update  | Array of array            | Update cell information |
-| delete  | Array of array            | Delete row information |
-| select  | Array of rows, select/not | Emit when rows are selected/unselected |
-| setting | setting                   | Emit when setting (column width, invisible state) is changed |
+### Component: vue-excel-editor
 
-(TBD)
+| Name    | Argument | Description |
+| :---    | :---     | :---        |
+| update  | AOA      | Update cell information |
+| delete  | AOA      | Delete row information |
+| select  | AOO      | Emit when rows are selected/unselected |
+| setting | setting  | Emit when setting (column width, invisible state) is changed |
+
+AOA = Array of Array, i.e.e [[...], [...]]
+AOO = Array of Object, i.e. [{...}, {...}]
 
 ## Methods List
 
-#### Component: vue-excel-editor
-| Name                  | Arguments                     | Description |
-| :---                  | :---                          | :---        |
-| firstPage             |                               | Move to the first page |
-| lastPage              |                               | Move to the last page |
-| prevPage              |                               | Move to the previous page |
-| nextPage              |                               | Move to the next page |
-| moveNorth             |                               | Move the cursor cell to upper cell |
-| moveSouth             |                               | Move the cursor cell to lower cell |
-| moveWest              |                               | Move the cursor cell to previous cell |
-| moveEast              |                               | Move the cursor cell to next cell |
-| moveToNorthWest       |                               | Move the cursor cell to 1st row 1st col |
-| moveToNorthEast       |                               | Move the cursor cell to 1st row last col |
-| moveToSouthWest       |                               | Move the cursor cell to last row 1st col |
-| moveToSouthEast       |                               | Move the cursor cell to last row last col |
-| doFind                | text                          | Find the specified text in whole table and locate the cursor cell |
-| doFindNext            |                               | Contnue the last find |
-| sort                  | n, pos                        | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
-| newRecord             | rec*, select*, noFocus*       | Call this to new an empty record, return the rec pointer |
-| deleteRecord          | rowpos                        | Delete the record in pos rowpos |
-| deleteSelectedRecords |                               | Delete all the selected records |
-| selectRecord          | row                           | Select the row |
-| selectRecordByKeys    | keys                          | Select the row by keys hash |
-| selectRecordById      | id                            | Select the row by $id |
-| unSelectRecord        | row                           | UnSelect the row |
-| clearAllSelected      |                               | Unselect all selected rows |
-| getSelectedRecords    |                               | Get an array of the selected row hash (key=rowPos, val=$id) |
-| exportTable           | format*, selectedOnly*, name* | Export the filtered table as xlsx/csv |
-| importTable           | callback*                     | Import the specified formatted xlsx |
-| undoTransaction       |                               | Undo the last update |
-| setFilter             | name, text                    | Set the filter text on column name |
-| clearFilter           | name*                         | Clear the filter text on column name |
-| columnSuppress        |                               | Hide the column if all values are null or empty |
-| calSummary            |                               | Calculate the summary of all columns |
+### Component: vue-excel-editor
 
-"*" = optional
+| Name                  | Arguments  | Description |
+| :---                  | :---       | :---        |
+| firstPage             |            | Move to the first page |
+| lastPage              |            | Move to the last page |
+| prevPage              |            | Move to the previous page |
+| nextPage              |            | Move to the next page |
+| moveNorth             |            | Move the cursor cell to upper cell |
+| moveSouth             |            | Move the cursor cell to lower cell |
+| moveWest              |            | Move the cursor cell to previous cell |
+| moveEast              |            | Move the cursor cell to next cell |
+| moveTo                | row, col*  | Move the cursor cell to cell(row, col) |
+| moveToNorthWest       |            | Move the cursor cell to 1st row 1st col |
+| moveToNorthEast       |            | Move the cursor cell to 1st row last col |
+| moveToSouthWest       |            | Move the cursor cell to last row 1st col |
+| moveToSouthEast       |            | Move the cursor cell to last row last col |
+| doFind                | text       | Find the specified text in whole table and locate the cursor cell |
+| doFindNext            |            | Contnue the last find |
+| sort                  | n, pos     | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
+| newRecord             | rec*       | Call this to new an empty record, return the rec pointer |
+| deleteRecord          | rowpos     | Delete the record in pos rowpos |
+| deleteSelectedRecords |            | Delete all the selected records |
+| selectRecord          | row        | Select the row |
+| selectRecordByKeys    | keys       | Select the row by keys hash |
+| selectRecordById      | id         | Select the row by $id |
+| unSelectRecord        | row        | UnSelect the row |
+| clearAllSelected      |            | Unselect all selected rows |
+| getSelectedRecords    |            | Get an array of the selected row hash |
+| exportTable           | fmt*       | Export the filtered table as xlsx/csv |
+| importTable           | callback*  | Import the specified formatted xlsx |
+| undoTransaction       |            | Undo the last update |
+| setFilter             | name, text | Set the filter text on column name |
+| clearFilter           | name*      | Clear the filter text on column name |
+| columnSuppress        |            | Hide the column if all values are null or empty |
+| calSummary            |            | Calculate the summary of all columns |
+
+&#42; = optional argument
 
 ## Variable List
 
 #### Component: vue-excel-editor
-| Name          | Type            | Description |
-| :---          | :---            | :---        |
-| fields        | Array of Object | It contains the column spec, each will create during mount, developer can still change the col spec via this after mounted |
-| filterColumn  | Object          | Contains the current filters, developer can access the filter string via this |
-| selected      | Object          | Contains all the selected rows, the key is row number and the value is internal $id |
-| selectedCount | Number          | Number of rows are selected |
-| errmsg        | Object          | Contains all the validation error messages, the key is internal $id plus field name |
-| redo          | Array of array  | The buffer of undo, it will be removed after undo or table changed |
-| pageTop       | Number          | The top row number of the current page |
+
+| Name          | Type   | Description |
+| :---          | :---   | :---        |
+| fields        | AOO    | It contains the column spec create when mount |
+| filterColumn  | Object | Contains the current filters, developer can access the filter string via this |
+| selected      | Object | Contains all the selected rows, the key is row number and the value is internal $id |
+| selectedCount | Number | Number of rows are selected |
+| errmsg        | Object | Contains all the validation error messages, the key is internal $id plus field name |
+| redo          | AOA    | The buffer of undo, it will be removed after undo or table changed |
+| pageTop       | Number | The top row number of the current page |
+
+AOA = Array of Array, i.e.e [[...], [...]]
+AOO = Array of Object, i.e. [{...}, {...}]
 
 ## Example
 
 An example to show 5x6 table:
+
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" filter-row>
@@ -200,7 +233,9 @@ An example to show 5x6 table:
     </vue-excel-editor>
 </template>
 ```
+
 You may also skip all the column definitions. The control will help you to "guess" the rest
+
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" filter-row />
@@ -223,14 +258,18 @@ export default {
 ```
 
 ### Work with redis for saving
-You may capture the @delete and @update event for saving purpose
+
+You may capture the @delete and @update event for saving purpose.
+
 ```html
 <vue-excel-editor v-model="jsondata" @delete="onDelete" @update="onUpdate">
     <vue-excel-column field="user" label="User ID" type="string" width="80px" key-field />
     ...
 </vue-excel-editor>
 ```
+
 Specified "key-field" is necessary, it will reflect in rec.keys in the following:
+
 ```js
 methods: {
     onDelete (records) {
@@ -245,13 +284,16 @@ methods: {
 ```
 
 ### New row
+
 Set the reference by ref="..."
+
 ```html
 <vue-excel-editor ref="grid" v-model="jsondata">
     <vue-excel-column field="user" label="User ID" type="string" width="80px" key-field />
     ...
 </vue-excel-editor>
 ```
+
 ```js
 methods: {
     newRecord () {
@@ -268,9 +310,11 @@ methods: {
     }
 }
 ```
+
 After the record created, a set of @update events will be fired. If you undo a newRecord transaction, component will generate a @delete event. In case you does not allow undo, you may skip this by append item in jsondata array directly.
 
 ### Delete row
+
 ```js
 methods: {
     delRecord () {
@@ -280,7 +324,9 @@ methods: {
 ```
 
 ### Remember the grid setting
+
 The grid setting such as column width can be saved in the localStorage of client browser
+
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" remember>
@@ -288,10 +334,13 @@ The grid setting such as column width can be saved in the localStorage of client
     </vue-excel-editor>
 </template>
 ```
+
 You may also capture the @setting event to handle more specifics.
 
 ### Do something when user select the rows
+
 The selected rows will be passed to the provided trigger method
+
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" @select="onSelect">
@@ -299,6 +348,7 @@ The selected rows will be passed to the provided trigger method
     </vue-excel-editor>
 </template>
 ```
+
 ```js
 methods: {
     onSelect (selectedRows) {
@@ -321,12 +371,15 @@ methods: {
     </vue-excel-editor>
 </template>
 ```
+
 Specified "sticky" means the specified column is freeze when horizontal scrolling.
 
 #### Filter + Footer Rows
+
 ![Filter + Footer Rows](https://i.imgur.com/7xmbrnM.png "Filter + Footer Rows")
 
 #### Filtering
+
 The filtering fesature of this component is very strong. It suuports regular expression and windows wild card syntax.
 
 ![Filtering](https://i.imgur.com/spjZN3M.png "Filtering")
@@ -336,44 +389,51 @@ Component supports the prefx likes <, >, =, >=, <=, <>, ~ (regular expression) a
 | :---              | :---        |
 | >= 100            | The values are greater or equal to 100 |
 | < 0               | The values are smaller than 0 |
-| <>mary            | The values does not equal to MARY |
+| <>mary            | The values do not equal to MARY |
 | m*                | The values start with M |
-| *mon              | The values have mon suffix |
+| *mon              | The values have MON suffix |
 | po-18*5??         | The values start from PO-18 and the 3rd-last char is 5 |
-| ~.*TPX[ ]+CK      | The values has TPX and CK text and they have spaces in between |
-| ~.                | The values is not empty |
-| ~[ ]              | The values contains space |
-| ~^so&#124;ary$    | The values starts by SO or ends by ARY |
-| ~[ ]+$&#124;^[ ]+ | The values ends or starts by spaces |
+| ~.*TPX[ ]+CK      | The values have TPX and CK text and they have spaces in between |
+| ~.                | The values are not empty |
+| ~[ ]              | The values contain space |
+| ~^so&#124;ary$    | The values start by SO or end by ARY |
+| ~[ ]+$&#124;^[ ]+ | The values end or start by spaces |
 | ~^[^ ]*$          | The values have no space |
 
 Note that all filters are case-insensitive.
 
 #### Sorting
+
 ![Sorting](https://i.imgur.com/vGZpHkv.png "Sorting")
 
 #### Autocomplete
-When user enters text in cell and hold 1 second, component will show 10 matched occurences for user to chosen.
+
+When user enters text in cell and holds a second, component will show 10 matched occurences for user to choose.
 ![Autocomplete](https://i.imgur.com/cUSUaUL.png "Autocomplete")
 
 #### Options
-Work likes Autocomplete, but the list is provided and fixed.
+
+This works like Autocomplete, but the list is provided and fixed.
 ![Options](https://i.imgur.com/LGefJif.png "Options")
 
 #### Select
+
 Click the row label to select the row. Component supports Excel-style which using shift-click and ctrl-click (Meta for OSX) combination to select multiple rows. You may also intereset in the free-select prop to select the multiple rows without holding the shift key.
 
 ![Select](https://i.imgur.com/x0Lkwf8.png "Select")
 
-#### Multi-Update Feature
-When user update any cell during selecting multiple rows, all cells of that column of selected rows will be updated.
+#### Multi-Update
+
+When user updates any cell during selecting multiple rows, all cells of the same column of those selected rows will be updated.
 
 ![Multi-Update](https://i.imgur.com/iFSPxDQ.png "Multi-Update")
 
 ### Validation
+
 ```html
 <vue-excel-column field="phone" label="Contact" type="string" width="130px" :validate="validPhoneNum" />
 ```
+
 ```js
 methods: {
     validPhoneNum (content) {
@@ -387,6 +447,7 @@ methods: {
 ![Validation](https://i.imgur.com/VV6RQYw.png "Validation")
 
 ### Summary
+
 ```html
 <vue-excel-column field="age" label="Age" type="number" width="70px" summary="sum" />
 ```
@@ -395,13 +456,16 @@ methods: {
 
 Summary prop supports "sum", "min", "max" and "avg".
 
-USe this with cares. Now the summary will only calculate if number of records changed (i.e. New, delete, filter). If user change the numbers in cell, it does not recalculate automatically. You may trigger the calculation manually by calling calSummary method.
+Use this with care. The summary calculation eats resource, so it only calculates when the number of records changed (i.e. New, delete, filter). It does not recalculate if user changes the cell content. You may trigger the calculation manually by calling calSummary method by the @update event.
 
 ### Link
+
 Actually this nice feature I was learnt from SAP UI - When user holds the alt-key and let the mouse over the cell text, the text will become a link. When user clicks on the link, your custom function will be triggered.
+
 ```html
 <vue-excel-column field="name" label="Name" type="string" width="150px" :link="routeToUserFunc" />
 ```
+
 ```js
 methods: {
     // Hold Alt Key and click on any name, program will route to the page "User Profile"
@@ -412,10 +476,13 @@ methods: {
 ```
 
 ### Text/Value conversion
+
 Sometimes displaying text and the store value will be different. In order to deal with this, you could use column proproties to-text and to-value.
+
 ```html
 <vue-excel-column field="phone" label="Contact" type="string" width="130px" :to-text="phoneToText" :to-value="phoneToVal" />
 ```
+
 ```js
 methods: {
     phoneToText (val) {
@@ -430,7 +497,9 @@ methods: {
 ```
 
 ### Localization
+
 Developer may override the default values through localized-label prop.
+
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" :localized-label="myLabels">
@@ -439,7 +508,7 @@ Developer may override the default values through localized-label prop.
 </template>
 ```
 
-```javascript
+```js
 data: {
     myLabels = {
         footerLeft: (top, bottom, total) => `Record ${top} to ${bottom} of ${total}`,
@@ -483,10 +552,13 @@ data: {
 ```
 
 ## Compatibility
+
 Chrome 79+, FireFox 71+, Safari 13+
 
 ## License
+
 MIT
 
 ## Status
+
 This project is in an early stage of development. Any contribution is welcome. :D
