@@ -332,20 +332,20 @@ The filtering fesature of this component is very strong. It suuports regular exp
 ![Filtering](https://i.imgur.com/spjZN3M.png "Filtering")
 
 Component supports the prefx likes <, >, =, >=, <=, <>, ~ (regular expression) and wild-card * and ? symbol. Examples:
-| Example      | Description |
-| :---         | :---        |
-| >= 100       | The values are greater or equal to 100 |
-| < 0          | The values are smaller than 0 |
-| <>mary       | The values does not equal to MARY |
-| m*           | The values start with M |
-| *mon         | The values have mon suffix |
-| po-18*5??    | The values start from PO-18 and the 3rd-last char is 5 |
-| ~.*TPX[ ]+CK | The values has TPX and CK text and they have spaces in between |
-| ~.           | The values is not empty |
-| ~[ ]         | The values contains space |
-| ~^so|ary$    | The values starts by SO or ends by ARY |
-| ~[ ]+$|^[ ]+ | The values ends or starts by spaces |
-| ~^[^ ]*$     | The values have no space |
+| Example           | Description |
+| :---              | :---        |
+| >= 100            | The values are greater or equal to 100 |
+| < 0               | The values are smaller than 0 |
+| <>mary            | The values does not equal to MARY |
+| m*                | The values start with M |
+| *mon              | The values have mon suffix |
+| po-18*5??         | The values start from PO-18 and the 3rd-last char is 5 |
+| ~.*TPX[ ]+CK      | The values has TPX and CK text and they have spaces in between |
+| ~.                | The values is not empty |
+| ~[ ]              | The values contains space |
+| ~^so&#124;ary$    | The values starts by SO or ends by ARY |
+| ~[ ]+$&#124;^[ ]+ | The values ends or starts by spaces |
+| ~^[^ ]*$          | The values have no space |
 
 Note that all filters are case-insensitive.
 
