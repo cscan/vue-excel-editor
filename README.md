@@ -321,14 +321,33 @@ methods: {
     </vue-excel-editor>
 </template>
 ```
-Specified "sticky" means the column does not move when horizontal scrolling
-
+Specified "sticky" means the specified column is freeze when horizontal scrolling.
 
 #### Filter + Footer Rows
 ![Filter + Footer Rows](https://i.imgur.com/7xmbrnM.png "Filter + Footer Rows")
 
 #### Filtering
+The filtering fesature of this component is very strong. It suuports regular expression and windows wild card syntax.
+
 ![Filtering](https://i.imgur.com/spjZN3M.png "Filtering")
+
+Component supports the prefx likes <, >, =, >=, <=, <>, ~ (regular expression) and wild-card * and ? symbol. Examples:
+| Example      | Description |
+| :---         | :---        |
+| >= 100       | The values are greater or equal to 100 |
+| < 0          | The values are smaller than 0 |
+| <>mary       | The values does not equal to MARY |
+| m*           | The values start with M |
+| *mon         | The values have mon suffix |
+| po-18*5??    | The values start from PO-18 and the 3rd-last char is 5 |
+| ~.*TPX[ ]+CK | The values has TPX and CK text and they have spaces in between |
+| ~.           | The values is not empty |
+| ~[ ]         | The values contains space |
+| ~^so|ary$    | The values starts by SO or ends by ARY |
+| ~[ ]+$|^[ ]+ | The values ends or starts by spaces |
+| ~^[^ ]*$     | The values have no space |
+
+Note that all filters are case-insensitive.
 
 #### Sorting
 ![Sorting](https://i.imgur.com/vGZpHkv.png "Sorting")
@@ -342,7 +361,7 @@ Work likes Autocomplete, but the list is provided and fixed.
 ![Options](https://i.imgur.com/LGefJif.png "Options")
 
 #### Select
-Click the row label to select the row. Component supports Excel-select which using Shift key and Ctrl key (Meta for OSX) to select multiple rows. You may also intereset in the free-select prop to select the row without holding the shift key.
+Click the row label to select the row. Component supports Excel-style which using shift-click and ctrl-click (Meta for OSX) combination to select multiple rows. You may also intereset in the free-select prop to select the multiple rows without holding the shift key.
 
 ![Select](https://i.imgur.com/x0Lkwf8.png "Select")
 
@@ -411,7 +430,7 @@ methods: {
 ```
 
 ### Localization
-Developer may override the default values through localized-label prop
+Developer may override the default values through localized-label prop.
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" :localized-label="myLabels">
@@ -470,4 +489,4 @@ Chrome 79+, FireFox 71+, Safari 13+
 MIT
 
 ## Status
-This project is in an early stage of development. Any contribution is welcome :D
+This project is in an early stage of development. Any contribution is welcome. :D
