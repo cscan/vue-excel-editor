@@ -359,7 +359,7 @@ methods: {
 
 ### Do something when user change a cell content
 
-You could arhieve this by placing the method in change prop
+You could achieve this by placing the method in change prop
 
 ```html
 <vue-excel-column field="name" label="Name" type="string" width="150px" :change="onBeforeNameChange" />
@@ -511,7 +511,7 @@ Use this with care. The summary calculation eats resource, so it only calculates
 
 ### Link
 
-Actually this nice feature I was learnt from SAP UI - When user holds the alt-key and let the mouse over the cell text, the text will become a link. When user clicks on the link, your custom function will be triggered.
+Actually this nice feature I was learnt from SAP UI - When user holds the function key (Alt-key here) and move the mouse over the cell, the cell text will show as a link. If user clicks on it, your custom function will be triggered. The following shows how to route to user profile page by clicking on the name column cell.
 
 ```html
 <vue-excel-column field="name" label="Name" type="string" width="150px" :link="routeToUserFunc" />

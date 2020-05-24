@@ -797,10 +797,11 @@ export default {
       if (field.left) result = Object.assign(result, {left: field.left})
       return result
     },
-    calSummary () {
+    calSummary (name) {
       this.fields.forEach(field => {
-        if (!field.summary) return ''
+        if (!field.summary) return
         const i = field.name
+        if (name && name !== i) return
         let result = ''
         switch(field.summary) {
           case 'sum':
@@ -818,7 +819,7 @@ export default {
             result = this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
             break
         }
-        if (isNaN(result)) result = ''
+        if (isNaN(result)) return
         this.summary[i] = field.toText(result)
       })
     },
@@ -2145,6 +2146,9 @@ export default {
         }
         else delete this.errmsg[id]
 
+        if (field.summary)
+          this.calSummary(field.name)
+
         this.lazy(transaction, (buf) => {
           this.$emit('update', buf)
           if (!isUndo) this.redo.push(buf)
@@ -2190,7 +2194,6 @@ export default {
               if (list.length >= 10) break
             }
             list.sort()
-            this.autocompleteSelect = 0
           }
           this.autocompleteInputs = list
           const rect = this.currentCell.getBoundingClientRect()
