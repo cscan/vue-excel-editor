@@ -1763,7 +1763,9 @@ export default {
       setTimeout(() => this.inputBox.focus())
     },
     moveToNorthWest() {
-      return this.moveTo(0, 0)
+      let goColPos = 0
+      while (this.fields[goColPos].invisible && goColPos < this.fields.length - 1) goColPos++
+      return this.moveTo(0, goColPos)
     },
     moveToNorthEast () {
       let goColPos = this.fields.length - 1
@@ -1772,7 +1774,9 @@ export default {
     },
     moveToSouthWest () {
       let goRowPos = this.table.length - 1
-      return this.moveTo(goRowPos, 0)
+      let goColPos = 0
+      while (this.fields[goColPos].invisible && goColPos < this.fields.length - 1) goColPos++
+      return this.moveTo(goRowPos, goColPos)
     },
     moveToSouthEast () {
       let goRowPos = this.table.length - 1
