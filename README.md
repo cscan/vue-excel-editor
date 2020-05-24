@@ -357,6 +357,57 @@ methods: {
 }
 ```
 
+### Do something when user change a cell content
+
+You could arhieve this by placing the method in change prop
+
+```html
+<vue-excel-column field="name" label="Name" type="string" width="150px" :change="onBeforeNameChange" />
+<vue-excel-column field="phone" label="Contact" type="string" width="130px" :change="onBeforePhoneChange" />
+<vue-excel-column field="birth" label="Date Of Birth" type="date" width="80px" :change="onBeforeBirthChange" />
+```
+
+```js
+methods: {
+    onBeforeNameChange (...args) {
+        console.log(...args)  // show all the arguments: newVal, oldVal, oldRow, field
+    },
+    onBeforePhoneChange (newVal) {
+        // This example demonstrate how to ensure the uniqueness of the phone number
+        if (this.jsondata.findIndex(row => row.phone === newVal) >= 0)
+            return false  // return false to reject the update
+    },
+    onBeforeBirthChange (newVal, oldVal, row) {
+        row.age = moment().diff(newVal, 'years')  // calculate the age if birth is changed
+    }
+}
+```
+
+The change prop can work in async style.
+
+```html
+<vue-excel-column field="phone" label="Contact" type="string" width="130px" :change="onBeforePhoneChange" />
+```
+
+```js
+methods: {
+    async onBeforePhoneChange (newVal) {
+        return new Promise((done) => {
+            axios.post('checkPhoneNumber', {
+                    phone: newVal
+                })
+                .then(done)
+                .catch((e) => {
+                    console.error(e)
+                    done(false)
+                })
+        })
+    }
+}
+```
+
+ However, it is possible to make your webpage has performance issue. I suggest you allow to show the wrong content in grid but show the validation error.
+
 ### Other Features
 
 ```html

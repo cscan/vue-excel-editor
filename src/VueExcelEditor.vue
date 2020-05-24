@@ -1565,7 +1565,7 @@ export default {
                     updated++
                     Object.keys(rec).forEach(name => {
                       if (name.startsWith('$')) return
-                      this.updateCellByName(rowPos, name, rec[name])
+                      this.updateCell(rowPos, name, rec[name])
                     })
                     this.selected[rowPos] = this.table[rowPos].$id
                   }
@@ -1998,7 +1998,7 @@ export default {
       this.inputBoxShow = 0
       this.focused = false
       this.showDatePicker = false
-      if (this.currentRowPos !== -1) {
+      if (this.currentRowPos !== -1 && this.currentRowPos < this.recordBody.children.length) {
         this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
         this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
       }
@@ -2025,7 +2025,7 @@ export default {
             }
           }
           else
-            this.updateCell(this.rowIndex[t.$id], t.field, t.oldVal, true)
+            this.updateCell(t.$id, t.field.name, t.oldVal, true)
 
           return true
         }
@@ -2034,7 +2034,7 @@ export default {
         }
       })
     },
-    newRecord (rec, selectAfterDone, noLastPage, noredo) {
+    newRecord (rec, selectAfterDone, noLastPage, isUndo) {
       if (typeof rec === 'undefined') rec = {}
       this.fields.filter(f => f.keyField).map(f => {
         if (typeof rec[f.name] === 'undefined')
@@ -2047,7 +2047,7 @@ export default {
       if (selectAfterDone) this.selected[rowPos] = id
       Object.keys(rec).forEach(name => {
         const field = this.fields.find(f => f.name === name)
-        if (field) this.updateCell(rowPos, field, rec[name], noredo)
+        if (field) this.updateCell(rec, field, rec[name], isUndo)
       })
       // this.refresh()
       if (!noLastPage) this.lazy(() => {
@@ -2064,59 +2064,84 @@ export default {
       this.selected = {}
       this.selectedCount = 0
     },
-    deleteRecord (valueRowPos, noredo) {
+    deleteRecord (valueRowPos, isUndo) {
       const rec = this.value.splice(valueRowPos, 1)[0]
       setTimeout(() => {
         this.lazy(rec, (buf) => {
           this.$emit('delete', buf)
-          if (!noredo) this.redo.push(buf.map(t => ({
+          if (!isUndo) this.redo.push(buf.map(t => ({
             type: 'd',
             rec: t
           })))
         })
       }, 100)
     },
-    updateCellByColPos (recPos, colPos, content) {
-      return this.updateCell(recPos, this.fields[colPos], content)
-    },
-    updateCellByName (recPos, name, content) {
-      return this.updateCell(recPos, this.fields.find(f => f.name === name), content)
-    },
-    updateCell (recPos, field, content, restore) {
-      const tableRow = this.table[recPos]
-      const oldVal = tableRow[field.name]
-      const oldKeys = this.getKeys(tableRow)
-      tableRow[field.name] = content
+    async updateCell (row, field, newVal, isUndo) {
+      switch(row.constructor.name) {
+        case 'Number':
+          if (Number.isInteger(row))
+            row = this.table[row] // tablePos
+          else
+            row = this.value.find(r => r.$id === row) // id
+          break
+        case 'Object': // record object
+          break
+        default:
+          throw new Error('Invalid row argument')
+      }
+      switch(field.constructor.name) {
+        case 'String': // field name
+          field = this.fields.find(f => f.name === field)
+          break
+        case 'Number': // field pos
+          field = this.fields[field]
+          break
+        case 'Object': // field object
+          break
+        default:
+          throw new Error('Invalid field argument')
+      }
 
-      if (field.change)
-        field.change(recPos, field.name, content, tableRow, field)
+      const oldVal = row[field.name]
+      const oldKeys = this.getKeys(row)
+
+      if (field.change) {
+        if (field.change.constructor.name === 'AsyncFunction') {
+          if ((await field.change(newVal, oldVal, row, field)) === false) return
+        }
+        else
+          if (field.change(newVal, oldVal, row, field) === false) return
+      }
+
+      row[field.name] = newVal
 
       setTimeout(() => {
         const transaction = {
-          $id: tableRow.$id,
-          keys: this.getKeys(tableRow),
+          $id: row.$id,
+          keys: this.getKeys(row),
           oldKeys: oldKeys,
           name: field.name,
           field: field,
           oldVal: typeof oldVal !== 'undefined' ? oldVal : '',
-          newVal: content,
+          newVal: newVal,
           err: ''
         }
 
-        const id = `id-${tableRow.$id}-${field.name}`
-        if (field.validate !== null) transaction.err = field.validate(content)
-        if (field.mandatory && content === '')
+        const id = `id-${row.$id}-${field.name}`
+        if (field.validate !== null) transaction.err = field.validate(newVal)
+        if (field.mandatory && newVal === '')
           transaction.err += (transaction.err ? '\n' : '') + field.mandatory
 
-        if (transaction.err !== '') {
+        if (transaction.err) {
           this.errmsg[id] = transaction.err
-          this.systable.querySelector('td#'+id).classList.add('error')
+          const selector = this.systable.querySelector('td#'+id)
+          if (selector) selector.classList.add('error')
         }
         else delete this.errmsg[id]
 
         this.lazy(transaction, (buf) => {
           this.$emit('update', buf)
-          if (!restore) this.redo.push(buf)
+          if (!isUndo) this.redo.push(buf)
         }, 50)
       })
     },
