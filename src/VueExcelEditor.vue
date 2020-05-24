@@ -2087,7 +2087,7 @@ export default {
         case 'Object': // record object
           break
         default:
-          throw new Error('Invalid row argument')
+          throw new Error('Invalid row argument type')
       }
       switch(field.constructor.name) {
         case 'String': // field name
@@ -2099,8 +2099,10 @@ export default {
         case 'Object': // field object
           break
         default:
-          throw new Error('Invalid field argument')
+          throw new Error('Invalid field argument type')
       }
+      if (!field) throw new Error('Invalid field argument')
+      if (!row) return // No row is found
 
       const oldVal = row[field.name]
       const oldKeys = this.getKeys(row)
@@ -2148,7 +2150,7 @@ export default {
     updateSelectedRows (field, content) {
       this.processing = true
       setTimeout(() => {
-        Object.keys(this.selected).forEach(recPos => this.updateCell(recPos, field, content))
+        Object.keys(this.selected).forEach(recPos => this.updateCell(parseInt(recPos), field, content))
         this.processing = false
       }, 0)
     },
