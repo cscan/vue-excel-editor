@@ -88,6 +88,7 @@ In your template
 | localized-label | Optional  | Object   | Customize labels and messages for localization purpose |
 | n-filter-count  | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
 | remember        | Optional  | Boolean  | Remember the setting in localStorage, default is false |
+| enterToEast     | Optional  | Boolean  | Move the cell to right instead of bottom when hits enter |
 
 ### Component: vue-excel-column
 
@@ -444,6 +445,7 @@ Component supports the prefx likes <, >, =, >=, <=, <>, ~ (regular expression) a
 | mon*              | The values start by MON |
 | *mon              | The values end by MON |
 | mon               | The values contain MON |
+| =mon              | The values equal to MON |
 | =                 | The values are empty |
 | po-18*5??         | The values start from PO-18 and the 3rd-last char is 5 |
 | ~.*tpx[ ]+ck      | The values have TPX and CK text and they have spaces in between |

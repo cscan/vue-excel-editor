@@ -301,7 +301,7 @@ export default {
     noPaging: {type: Boolean, default: false},
     noNumCol: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
-    // newRecord: {type: Function, default: null},  // return the new record from caller if provided
+    enterToEast: {type: Boolean, default: false},   // default enter to south
     nFilterCount: {type: Number, default: 1000},    // show top n values in filter dialog
     height: {type: String, default: ''},
     width: {type: String, default: '100%'},
@@ -1160,17 +1160,10 @@ export default {
             if (!this.focused) return
             e.preventDefault()
             if (this.autocompleteInputs.length === 0 || this.autocompleteSelect === -1) {
-              if (!this.moveSouth(e)) {
-                if (this.inputBoxChanged) {
-                  this.inputCellWrite(this.inputBox.value)
-                  this.inputBoxChanged = false
-                }
-                this.inputBoxShow = 0
-                this.showDatePicker = false
-                this.autocompleteInputs = []
-                this.autocompleteSelect = -1
-              }
-              return
+              if (this.enterToEast)
+                this.moveEast(e)
+              else
+                this.moveSouth(e)
             }
             else if (this.autocompleteSelect !== -1 && this.autocompleteSelect < this.autocompleteInputs.length) {
               this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
@@ -1243,7 +1236,7 @@ export default {
               setTimeout(this.calAutocompleteList)
             }
             else
-              setTimeout(() => this.calAutocompleteList(true))
+              setTimeout(() => this.calAutocompleteList(this.autocompleteInputs.length))
             this.inputBoxChanged = true
             break
         }
@@ -1882,20 +1875,20 @@ export default {
      */
     moveInputSquare (rowPos, colPos) {
       if (colPos < 0) return false
-
-      const row = this.recordBody.children[rowPos]
+      const top = this.pageTop
+      let row = this.recordBody.children[rowPos]
       if (!row) {
         if (rowPos > this.currentRowPos) {
           // move the whole page down 1 record
           if (this.pageTop + this.pageSize < this.table.length)
             this.pageTop += 1
-          return false
+          row = this.recordBody.children[--rowPos]
         }
         else {
           // move the whole page up 1 record
           if (this.pageTop - 1 >= 0)
             this.pageTop -= 1
-          return false
+          row = this.recordBody.children[++rowPos]
         }
       }
 
@@ -1907,7 +1900,7 @@ export default {
       // Off the textarea when moving, write to value if changed
       if (this.inputBoxShow) this.inputBoxShow = 0
       if (this.inputBoxChanged) {
-        this.inputCellWrite(this.currentField.toValue(this.inputBox.value))
+        this.inputCellWrite(this.currentField.toValue(this.inputBox.value), this.currentColPos, top + this.currentRowPos)
         this.inputBoxChanged = false
       }
 
@@ -1937,7 +1930,7 @@ export default {
       this.currentRowPos = rowPos
       this.currentColPos = colPos
       this.currentCell = cell
-      this.currentRecord = this.table[this.pageTop + rowPos]
+      this.currentRecord = this.table[top + rowPos]
 
       // Off all editors
       if (this.showDatePicker) this.showDatePicker = false
@@ -2218,7 +2211,7 @@ export default {
         if (force)
           doList()
         else 
-          this.recalAutoCompleteList = setTimeout(doList, 700)
+          this.lazy(doList, 700)
       }
     },
     inputAutocompleteText (text, e) {
@@ -2443,6 +2436,9 @@ input:focus, input:active:focus, input.active:focus {
 }
 .systable tbody tr:not(:last-child) td {
   border-bottom: 1px solid lightgray;
+}
+.systable tbody tr:last-child td {
+  border-bottom: 1px solid transparent;
 }
 .systable td:not(:last-child) {
   border-right: 1px solid lightgray;
