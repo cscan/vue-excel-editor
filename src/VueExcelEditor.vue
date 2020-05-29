@@ -797,12 +797,26 @@ export default {
       if (field.left) result = Object.assign(result, {left: field.left})
       return result
     },
+    localeDate (d) {
+      if (typeof d === 'undefined') d = new Date()
+      const pad = n => n < 10 ? '0'+n : n;    
+      return d.getFullYear() + '-'
+            + pad(d.getMonth() + 1) + '-'
+            + pad(d.getDate()) + ' '
+            + pad(d.getHours()) + ':'
+            + pad(d.getMinutes()) + ':'
+            + pad(d.getSeconds())
+     },
     calSummary (name) {
       this.fields.forEach(field => {
         if (!field.summary) return
         const i = field.name
         if (name && name !== i) return
         let result = ''
+        const currentTick = new Date().getTime()
+        const currentDateTimeSec = this.localeDate()
+        const currentDateTime = currentDateTimeSec.slice(0, 19)
+        const currentDate = currentDateTimeSec.slice(0, 10)
         switch(field.summary) {
           case 'sum':
             result = this.table.reduce((a, b) => (a + Number(b[i] ? b[i] : 0)), 0)
@@ -818,8 +832,42 @@ export default {
           case 'min':
             result = this.table.reduce((a, b) => (a < b[i] ? a : b[i]), Number.MAX_VALUE)
             break
+          case 'count':
+            switch(field.type) {
+              case 'checkYN':
+                result = this.table.reduce((a, b) => (a + (b[i] === 'Y' ? 1 : 0)), 0)
+                break
+              case 'check10':
+                result = this.table.reduce((a, b) => (a + (b[i] === '1' ? 1 : 0)), 0)
+                break
+              case 'checkTF':
+                result = this.table.reduce((a, b) => (a + (b[i] === 'T' ? 1 : 0)), 0)
+                break
+              case 'date':
+                result = this.table.reduce((a, b) => (a + (b[i] >= currentDate ? 1 : 0)), 0)
+                this.summary[i] = result
+                return
+              case 'datetime':
+                result = this.table.reduce((a, b) => (a + (b[i] >= currentDateTime ? 1 : 0)), 0)
+                this.summary[i] = result
+                return
+              case 'datetimesec':
+                result = this.table.reduce((a, b) => (a + (b[i] >= currentDateTimeSec ? 1 : 0)), 0)
+                this.summary[i] = result
+                return
+              case 'datetick':
+              case 'datetimetick':
+              case 'datetimesectick':
+                result = this.table.reduce((a, b) => (a + (b[i] >= currentTick ? 1 : 0)), 0)
+                this.summary[i] = result
+                return
+              default:
+                result = this.table.reduce((a, b) => (a + (b[i]? 1 : 0)), 0)
+                break
+            }
+            break
         }
-        if (isNaN(result)) return
+        if (field.type === 'number' && isNaN(result)) return
         this.summary[i] = field.toText(result)
       })
     },

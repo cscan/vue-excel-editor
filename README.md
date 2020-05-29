@@ -157,7 +157,7 @@ In your template
 | select  | AOO      | Emit when rows are selected/unselected |
 | setting | setting  | Emit when setting (column width, invisible state) is changed |
 
-AOA = Array of Array, i.e.e [[...], [...]]  
+AOA = Array of Array, i.e. [[...], [...]]  
 AOO = Array of Object, i.e. [{...}, {...}]
 
 ## Methods List
@@ -215,7 +215,7 @@ AOO = Array of Object, i.e. [{...}, {...}]
 | redo          | AOA    | The buffer of undo, it will be removed after undo or table changed |
 | pageTop       | Number | The top row number of the current page |
 
-AOA = Array of Array, i.e.e [[...], [...]]  
+AOA = Array of Array, i.e. [[...], [...]]  
 AOO = Array of Object, i.e. [{...}, {...}]
 
 ## Example
@@ -509,8 +509,14 @@ methods: {
 
 ![Summary](https://i.imgur.com/tlZjilA.png "Summary")
 
-Summary prop supports "sum", "min", "max" and "avg".
-
+Summary prop supports "sum", "min", "max", "avg" and "count".  
+  
+Note that "count" will instruct the component to count the cell which hold the following condition  
+>0 for number-typed column  
+non-empty for string-typed column  
+"Y", "1" or "T" for check-typed column  
+at or late than this time for date/time-typed column  
+  
 Use this with care. The summary calculation eats resource, so it only calculates when the number of records changed (i.e. New, delete, filter). It does not recalculate if user changes the cell content. You may trigger the calculation manually by calling calSummary method by the @update event.
 
 ### Link
