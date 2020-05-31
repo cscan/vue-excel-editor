@@ -100,7 +100,7 @@
                       readonly: item.readonly,
                       error: errmsg[`id-${record.$id}-${item.name}`],
                       link: item.link,
-                      select: item.options.length,
+                      select: item.options,
                       datepick: item.type == 'date',
                       'sticky-column': item.sticky
                     }"
@@ -617,8 +617,10 @@ export default {
           width: (widths[i]? widths[i]: 75) + 'px',
           validate: null,
           change: null,
+          link: null,
           keyField: false,
           sticky: false,
+          tabStop: true,
           allowKeys: null,
           mandatory: false,
           lengthLimit: 0,
@@ -627,7 +629,7 @@ export default {
           invisible: false,
           readonly: this.readonly,
           pos: 0,
-          options: [],
+          options: null,
           summary: null,
           toValue: t => t,
           toText: t => t,
@@ -1183,6 +1185,21 @@ export default {
               this.autocompleteSelect = this.autocompleteInputs.length - 1
             break
           case 9:  // Tab
+            if (!this.focused) return
+            if (e.shiftKey) {
+              if (!this.moveWest(e)) {
+                if (this.moveNorth(e))
+                  this.moveToEast(e)
+              }
+            }
+            else {
+              if (!this.moveEast(e)) {
+                if (this.moveSouth(e))
+                  this.moveToWest(e)
+              }
+            }
+            e.preventDefault()
+            break
           case 39: // Right Arrow
             if (!this.focused) return
             if (!this.inputBoxShow) {
@@ -1267,7 +1284,13 @@ export default {
               this.showDatePickerDiv()
               return
             }
-            if (this.currentField.allowKeys && this.currentField.allowKeys.indexOf(e.key.toUpperCase()) === -1) return e.preventDefault()
+            if (this.currentField.allowKeys) {
+              if (this.currentField.allowKeys.constructor.name === 'Function') {
+                if (!this.currentField.allowKeys(e.key.toUpperCase())) return e.preventDefault()
+              }
+              else
+                if (this.currentField.allowKeys.indexOf(e.key.toUpperCase()) === -1) return e.preventDefault()
+            }
             if (this.currentField.lengthLimit && this.inputBox.value.length > this.currentField.lengthLimit) return e.preventDefault()
             if (!this.inputBoxShow) {
               if (this.currentField.type === 'select') {
@@ -1800,9 +1823,10 @@ export default {
      */
     moveTo (rowPos, colPos) {
       colPos = colPos || 0
-      this.moveInputSquare(rowPos - this.pageTop, colPos)
+      const done = this.moveInputSquare(rowPos - this.pageTop, colPos)
       this.focused = true
       setTimeout(() => this.inputBox.focus())
+      return done
     },
     moveToNorthWest() {
       let goColPos = 0
@@ -1826,25 +1850,39 @@ export default {
       while (this.fields[goColPos].invisible && goColPos > 0) goColPos--
       return this.moveTo(goRowPos, goColPos)
     },
+    moveToWest () {
+      let goRowPos = this.currentRowPos
+      let goColPos = 0
+      while (this.fields[goColPos].invisible && goColPos < this.fields.length - 1) goColPos++
+      return this.moveTo(goRowPos, goColPos)
+    },
+    moveToEast () {
+      let goRowPos = this.currentRowPos
+      let goColPos = this.fields.length - 1
+      while (this.fields[goColPos].invisible && goColPos > 0) goColPos--
+      return this.moveTo(goRowPos, goColPos)
+    },
     moveWest () {
       if (this.focused && this.currentColPos > 0) {
         let goColPos = this.currentColPos - 1
         while (this.fields[goColPos].invisible && goColPos > 0) goColPos--
-        if (goColPos === -1 || this.fields[goColPos].invisible) return
-        this.moveInputSquare(this.currentRowPos, goColPos)
+        if (goColPos === -1 || this.fields[goColPos].invisible) return false
+        return this.moveInputSquare(this.currentRowPos, goColPos)
       }
+      return false
     },
     moveEast () {
       if (this.focused && this.currentColPos < this.fields.length - 1) {
         let goColPos = this.currentColPos + 1
         while (this.fields[goColPos].invisible && goColPos < this.fields.length - 1) goColPos++
-        if (goColPos === this.fields.length || this.fields[goColPos].invisible) return
-        this.moveInputSquare(this.currentRowPos, goColPos)
+        if (goColPos === this.fields.length || this.fields[goColPos].invisible) return false
+        return this.moveInputSquare(this.currentRowPos, goColPos)
       }
+      return false
     },
     moveNorth () {
       if (this.focused) {
-        this.moveInputSquare(this.currentRowPos - 1, this.currentColPos)
+        const done = this.moveInputSquare(this.currentRowPos - 1, this.currentColPos)
         this.calVScroll()
         if (this.$refs.vScrollButton) {
           setTimeout(() => {
@@ -1852,7 +1890,9 @@ export default {
             this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
           })
         }
+        return done
       }
+      return false
     },
     moveSouth () {
       if (this.focused && this.currentRowPos < this.table.length) {
@@ -2010,14 +2050,14 @@ export default {
     inputBoxMouseMove (e) {
       let cursor = 'text'
       if (!this.currentField.readonly
-        && (this.currentField.options.length || this.currentField.type === 'date')
+        && (this.currentField.options || this.currentField.type === 'date')
         && e.target.offsetWidth - e.offsetX < 15)
         cursor = 'pointer'
       e.target.style.cursor = cursor
     },
     inputBoxMouseDown (e) {
       if (e.target.offsetWidth - e.offsetX > 15) return
-      if (this.currentField.options.length) {
+      if (this.currentField.options) {
         e.preventDefault()
         this.calAutocompleteList(true)
       }
@@ -2206,11 +2246,11 @@ export default {
 
     /* *** Autocomplete ****************************************************************************************
      */
-    calAutocompleteList (force) {
+    async calAutocompleteList (force) {
       if (!force && !this.currentField.autocomplete) return
       if (force || (this.inputBoxChanged && this.inputBox.value.length > 0)) {
         if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
-        const doList = () => {
+        const doList = async () => {
           if (!force) {
             if (!this.focused || !this.inputBoxShow || !this.inputBoxChanged || !this.inputBox.value.length) {
               this.autocompleteInputs = []
@@ -2221,10 +2261,22 @@ export default {
           const name = field.name
           const value = this.inputBox.value.toUpperCase()
           let list
-          if (field.options.length > 0) {
-            list = this.currentField.options
-            list.sort()
-            this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+          if (field.options) {
+            if (field.options.constructor.name === 'AsyncFunction') {
+              list = await this.currentField.options(this.currentRecord, value)
+              list.sort().splice(10)
+              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+            }
+            else if (field.options.constructor.name === 'Function') {
+              list = this.currentField.options(this.currentRecord, value)
+              list.sort().splice(10)
+              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+            }
+            else if (field.options.length > 0) {
+              list = this.currentField.options
+              list.sort()
+              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+            }
           }
           else {
             list = []
@@ -2255,10 +2307,11 @@ export default {
             else
               this.$refs.autocomplete.style.left = rect.left + 'px'
           })
+          return this.autocompleteSelect
         }
         if (force)
           doList()
-        else 
+        else
           this.lazy(doList, 700)
       }
     },

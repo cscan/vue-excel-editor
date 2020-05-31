@@ -10,26 +10,26 @@ export default {
     field: {type: String, default: ''},
     label: {type: String, default: null},
     type: {type: String, default: 'string'},
-    validate: {type: Function, default: null},
     initStyle: {type: Object, default () {return {}}},
     width: {type: String, default: '100px'},
     invisible: {type: Boolean, default: false},
     readonly: {type: Boolean, default: null},
     textTransform: {type: String, default: null}, // replace uppercase prop
     textAlign: {type: String, default: null},
-
     keyField: {type: Boolean, default: false},
     sticky: {type: Boolean, default: false},
-    change: {type: Function, default: null},
 
-    allowKeys: {type: Array, default () {return null}},
+    validate: {type: Function, default: null},
+    change: {type: Function, default: null},
+    link: {type: Function, default: null},
+
+    allowKeys: {type: [Array, Function], default () {return null}},
     mandatory: {type: String, default: ''},
     lengthLimit: {type: Number, default: 0},
     autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
-    options: {type: Array, default () {return []}},
+    options: {type: [Array, Function], default () {return null}},
     summary: {type: String, default: null},
-    link: {type: Function, default: null},
     toValue: {
       type: Function,
       default (text) {
@@ -161,8 +161,10 @@ export default {
         label: this.label === null ? this.field : this.label,
         type: this.type,
         width: this.width,
+
         validate: validate,
         change: this.change,
+        link: this.link,
 
         keyField: this.keyField,
         sticky: this.sticky,
@@ -177,7 +179,6 @@ export default {
         pos: Number(this.pos),
         options: this.options,
         summary: this.summary,
-        link: this.link,
         toValue: this.toValue,
         toText: this.toText,
         register: this.register
