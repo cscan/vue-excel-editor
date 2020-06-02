@@ -54,7 +54,9 @@
                 <div class="col-sep"
                     @mousedown="colSepMouseDown"
                     @mouseover="colSepMouseOver"
-                    @mouseout="colSepMouseOut" />
+                    @mouseout="colSepMouseOut">
+                  <div class="add-col-btn"> + </div>
+                </div>
               </th>
             </tr>
             <tr :class="{hide: !filterRow}">
@@ -310,6 +312,7 @@ export default {
     readonlyStyle: {type: Object, default () {return {}}},
     remember: {type: Boolean, default: false},
     register: {type: Function, default: null},
+    allowAddColumn: {type: Boolean, default: false},
     localizedLabel: {
       type: Object,
       default () {
@@ -596,6 +599,13 @@ export default {
     registerColumn (field) {
       let pos = this.fields.findIndex(item => item.pos > field.pos)
       if (pos === -1) pos = this.fields.length
+      this.fields.splice(pos, 0, field)
+      if (this.register) this.register(field, pos)
+      if (field.register) field.register(field, pos)
+      if (field.summary) this.summaryRow = true
+      this.colHash = this.hashCode(this.version + JSON.stringify(this.fields))
+    },
+    insertColumn (field, pos) {
       this.fields.splice(pos, 0, field)
       if (this.register) this.register(field, pos)
       if (field.register) field.register(field, pos)
@@ -1319,6 +1329,37 @@ export default {
     colSepMouseDown (e) {
       e.preventDefault()
       e.stopPropagation()
+      if (this.allowAddColumn && !e.target.classList.contains('col-sep')) {
+        e.target.style.display = 'none'
+        // Add column
+        const me = e.target.parentElement.parentElement
+        const pos = Array.from(me.parentElement.children).findIndex(td => td === me)
+        return this.insertColumn({
+          name: 'ABC',
+          label: 'ABC',
+          type: 'string',
+          width: '100px',
+          validate: null,
+          change: null,
+          link: null,
+          keyField: false,
+          sticky: false,
+          tabStop: true,
+          allowKeys: null,
+          mandatory: false,
+          lengthLimit: 0,
+          autocomplete: this.autocomplete,
+          initStyle: 'left',
+          invisible: false,
+          readonly: this.readonly,
+          pos: 0,
+          options: null,
+          summary: null,
+          toValue: t => t,
+          toText: t => t,
+          register: null
+        }, pos)
+      }
       this.focused = false
       const getStyleVal = (elm, css) => {
         window.getComputedStyle(elm, null).getPropertyValue(css)
@@ -1341,12 +1382,31 @@ export default {
       window.addEventListener('mouseup', this.colSepMouseUp)
     },
     colSepMouseOver (e) {
-      e.target.style.borderRight = '5px solid #cccccc'
-      e.target.style.height = this.systable.getBoundingClientRect().height + 'px'
+      if (e.target.classList.contains('col-sep')) {
+        e.target.style.borderRight = '5px solid #cccccc'
+        e.target.style.height = this.systable.getBoundingClientRect().height + 'px'
+        if (this.allowAddColumn)
+          e.target.children[0].style.display = 'block'
+      }
+      else {
+        // add-col-btn
+        if (this.addColBtnTimeout) clearTimeout(this.addColBtnTimeout)
+        if (this.allowAddColumn)
+          e.target.style.display = 'block'
+      }
     },
     colSepMouseOut (e) {
-      e.target.style.borderRight = ''
-      e.target.style.height = '100%'
+      if (e.target.classList.contains('col-sep')) {
+        e.target.style.borderRight = '5px solid transparent'
+        e.target.style.height = '100%'
+        this.addColBtnTimeout = setTimeout(() => {
+          e.target.children[0].style.display = 'none'
+        }, 500)
+      }
+      else {
+        // add-col-btn
+          e.target.style.display = 'none'
+      }
     },
     colSepMouseMove (e) {
       if (!this.sep || !this.sep.curCol) return
@@ -2758,10 +2818,28 @@ a:disabled {
   position: absolute;
   top: 0;
   right: 0;
+  border-right: 5px solid transparent;
   width: 5px;
   cursor: col-resize;
   height: 100%;
   z-index: 15;
+}
+.add-col-btn {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background-color: #2222;
+  z-index: 15;
+  border: solid 1px #2222;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+}
+.add-col-btn:hover {
+  background-color: #7777;
 }
 .sort-asc-sign {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAeUExURQAAAK+np6+qqq+rq62pqa+rq6+rq6+srK+rq6+rq2v5ERwAAAAJdFJOUwAgYHCAv8/f71KXockAAAAJcEhZcwAAFxEAABcRAcom8z8AAABNSURBVChT7clRAoAgCATRtTLq/hcuBEN0j9B8zoNV76j6s37hsh+a+NWknQ3l8pGTAk4KlAwIdVgoYKIREmUYaIaPVnBi0IjDS2cA8AC8JAq/VhDqzAAAAABJRU5ErkJggg==');
