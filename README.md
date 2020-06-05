@@ -314,7 +314,7 @@ methods: {
 }
 ```
 
-After the record created, a set of @update events will be fired. If you undo a newRecord transaction, component will generate a @delete event. In case you does not allow undo, you may skip this by append item in jsondata array directly.
+After the record created, a set of @update events will be fired. If you undo a newRecord transaction, component will generate the corresponding @delete events. In case you do not care about the undo, you may skip this by appending the new record in v-model variable (jsondata array) directly.
 
 ### Delete row
 
@@ -326,9 +326,11 @@ methods: {
 }
 ```
 
+The component will generate the corresponding @delete events. You may also interest in the deleteSelectedRecords() method.
+
 ### Remember the grid setting
 
-The grid setting such as column width can be saved in the localStorage of client browser
+The grid setting such as column width can be saved in the localStorage of client browser by specified "remember" prop:
 
 ```html
 <template>
@@ -395,28 +397,28 @@ The change prop can work in async style.
 ```js
 methods: {
     async onBeforePhoneChange (newVal) {
-        return new Promise((done) => {
+        return (await new Promise((done) => {
             axios.post('checkPhoneNumber', {
                     phone: newVal
                 })
-                .then(done)
+                .then(done(true))
                 .catch((e) => {
                     console.error(e)
                     done(false)
                 })
-        })
+        }))
     }
 }
 ```
 
- However, it is possible to make your webpage has performance issue. I suggest you allow to show the wrong content in grid but show the validation error.
+ However, it is possible to make your webpage has performance issue. I suggest you use validation prop which allow to show the wrong content in grid but show the validation error.
 
 ### Other Features
 
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" no-paging autocomplete filter-row>
-        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" readonly key-field sticky />
+        <vue-excel-column field="user"   label="User ID"       type="string" width="80px" key-field />
         <vue-excel-column field="name"   label="Name"          type="string" width="150px" />
         <vue-excel-column field="phone"  label="Contact"       type="string" width="130px" :validate="validPhoneNum" />
         <vue-excel-column field="gender" label="Gender"        type="select" width="50px"  :options="['F','M','U']" />
@@ -425,8 +427,6 @@ methods: {
     </vue-excel-editor>
 </template>
 ```
-
-Specified "sticky" means the specified column is freeze when horizontal scrolling.
 
 #### Filter + Footer Rows
 
@@ -484,6 +484,24 @@ Click the row label to select the row. Component supports Excel-style which usin
 When user updates any cell during selecting multiple rows, all cells of the same column of those selected rows will be updated.
 
 ![Multi-Update](https://i.imgur.com/iFSPxDQ.png "Multi-Update")
+
+#### Sticky column
+
+```html
+<vue-excel-column field="user" label="User ID" type="string" width="80px" key-field sticky />
+```
+
+Specified "sticky" means the specified column is freeze when horizontal scrolling. Most likely sticky columns are leftmost.
+
+#### Paging
+
+```html
+<vue-excel-editor v-model="jsondata" autocomplete filter-row>
+...
+</vue-excel-editor>
+```
+
+To gain better performance, I suggest you use paging by not specify "no-paging" prop. The component automatically calculate the page size once detecting the outer boundary resized. If you want to set the page size manually, try the prop "page". If more than 1 page is detected, the footer (horizontal scroll bar) will show the first/previous/next/last links for page navigation. You may customize these links by "localized-label" prop.
 
 ### Validation
 
