@@ -44,12 +44,11 @@
                   :class="{'sort-asc-sign': sortPos==p && sortDir==1,
                           'sort-des-sign': sortPos==p && sortDir==-1,
                           'sticky-column': item.sticky}"
-                  class="table-col-header"
                   :style="{left: item.left}"
                   @mousedown="headerClick($event, p)"
                   @contextmenu.prevent="$refs.panelFilter.showPanel($refs[`filter-${item.name}`][0])">
                 <div :class="{'filter-sign': columnFilter[p]}">
-                  <span v-html="headerLabel(item.label, item)"></span>
+                  <span :class="{'table-col-header': !noHeaderEdit}" v-html="headerLabel(item.label, item)"></span>
                 </div>
                 <div class="col-sep"
                     @mousedown="colSepMouseDown"
@@ -312,7 +311,9 @@ export default {
     readonlyStyle: {type: Object, default () {return {}}},
     remember: {type: Boolean, default: false},
     register: {type: Function, default: null},
-    allowAddColumn: {type: Boolean, default: false},
+    allowAddCol: {type: Boolean, default: false},
+    noHeaderEdit: {type: Boolean, default: false},
+    addCol: {type: Function, default: null},
     localizedLabel: {
       type: Object,
       default () {
@@ -467,8 +468,11 @@ export default {
           const newFields = setter.fields.map(local => {
             const current = this.fields.find(f => f.name === local.name)
             if (!current) valid = false
-            current.invisible = local.invisible
-            current.width = local.width
+            else {
+              if (typeof local.invisible !== 'undefined') current.invisible = local.invisible
+              if (typeof local.width !== 'undefined') current.width = local.width
+              if (typeof local.label !== 'undefined') current.label = local.label
+            }
             return current
           })
           if (valid) {
@@ -1329,14 +1333,15 @@ export default {
     colSepMouseDown (e) {
       e.preventDefault()
       e.stopPropagation()
-      if (this.allowAddColumn && !e.target.classList.contains('col-sep')) {
+      if (this.allowAddCol && !e.target.classList.contains('col-sep')) {
         e.target.style.display = 'none'
         // Add column
         const me = e.target.parentElement.parentElement
         const pos = Array.from(me.parentElement.children).findIndex(td => td === me)
-        return this.insertColumn({
-          name: 'ABC',
-          label: 'ABC',
+        const colname = 'COL-' + Math.random().toString().slice(2,6)
+        let colDef = {
+          name: colname,
+          label: colname,
           type: 'string',
           width: '100px',
           validate: null,
@@ -1358,7 +1363,9 @@ export default {
           toValue: t => t,
           toText: t => t,
           register: null
-        }, pos)
+        }
+        if (this.addColumn) colDef = this.addColumn(colDef)
+        this.insertColumn(colDef, pos)
       }
       this.focused = false
       const getStyleVal = (elm, css) => {
@@ -1385,13 +1392,13 @@ export default {
       if (e.target.classList.contains('col-sep')) {
         e.target.style.borderRight = '5px solid #cccccc'
         e.target.style.height = this.systable.getBoundingClientRect().height + 'px'
-        if (this.allowAddColumn)
+        if (this.allowAddCol)
           e.target.children[0].style.display = 'block'
       }
       else {
         // add-col-btn
         if (this.addColBtnTimeout) clearTimeout(this.addColBtnTimeout)
-        if (this.allowAddColumn)
+        if (this.allowAddCol)
           e.target.style.display = 'block'
       }
     },
@@ -1477,6 +1484,11 @@ export default {
     /* *** Sort *******************************************************************************************
      */
     headerClick (e, colPos) {
+      if(!this.noHeaderEdit && e.target.tagName === 'SPAN') {
+        e.target.contentEditable = true
+        e.target.addEventListener('focusout', this.completeHeaderChange)
+        return
+      }
       if (e.which === 1) {
         e.preventDefault()
         if (this.sortPos === colPos && this.sortDir > 0)
@@ -1484,6 +1496,11 @@ export default {
         else
           this.sort(1, colPos)
       }
+    },
+    completeHeaderChange (e) {
+      const th = e.target.parentElement.parentElement
+      const index = Array.from(th.parentElement.children).findIndex(v => v === th)
+      this.fields[index - 1].label = e.target.textContent
     },
     sort (n, pos) {
       this.processing = true
@@ -1594,7 +1611,8 @@ export default {
         return {
           name: field.name,
           invisible: field.invisible,
-          width: colWidth[i + 1]
+          width: colWidth[i + 1],
+          label: field.label
         }
       })
       return {
@@ -2254,11 +2272,9 @@ export default {
       const oldKeys = this.getKeys(row)
 
       if (field.change) {
-        if (field.change.constructor.name === 'AsyncFunction') {
-          if ((await field.change(newVal, oldVal, row, field)) === false) return
-        }
-        else
-          if (field.change(newVal, oldVal, row, field) === false) return
+        let result = field.change(newVal, oldVal, row, field)
+        if (result.constructor.name === 'Promise') result = await result
+        if (result === false) return
       }
 
       row[field.name] = newVal
@@ -2322,13 +2338,9 @@ export default {
           const value = this.inputBox.value.toUpperCase()
           let list
           if (field.options) {
-            if (field.options.constructor.name === 'AsyncFunction') {
-              list = await this.currentField.options(this.currentRecord, value)
-              list.sort().splice(10)
-              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
-            }
-            else if (field.options.constructor.name === 'Function') {
-              list = this.currentField.options(this.currentRecord, value)
+            if (field.options.constructor.name.endsWith('Function')) {
+              list = field.options(this.currentRecord, value)
+              if (list.consturctor.name === 'Promise') list = await list
               list.sort().splice(10)
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
             }
@@ -2342,7 +2354,7 @@ export default {
             list = []
             for(let i=0; i<this.value.length; i++) {
               const rec = this.value[i]
-              if (typeof rec[name] !== 'undefined' && rec[name].toUpperCase().startsWith(value) && list.indexOf(rec[name]) === -1)
+              if (typeof rec[name] !== 'undefined' && rec[name].toString().toUpperCase().startsWith(value) && list.indexOf(rec[name]) === -1)
                 list.push(rec[name])
               if (list.length >= 10) break
             }
@@ -2542,6 +2554,9 @@ input:focus, input:active:focus, input.active:focus {
 }
 .table-content::-webkit-scrollbar-thumb:hover {
   background: #9999;
+}
+.table-col-header {
+  cursor: text;
 }
 .systable {
   z-index: -1;

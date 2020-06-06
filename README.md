@@ -89,6 +89,8 @@ In your template
 | n-filter-count  | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
 | remember        | Optional  | Boolean  | Remember the setting in localStorage, default is false |
 | enterToEast     | Optional  | Boolean  | Move the cell to right instead of bottom when hits enter |
+| allow-add-col   | Optional  | Boolean  | Allow to show the add column button during column resize |
+| add-col         | Optional  | Function | Define the column definition when column is adding |
 
 ### Component: vue-excel-column
 
@@ -118,7 +120,7 @@ In your template
 | to-text        | Optional  | Function          | The function to convert from object value to edit-text |
 | to-value       | Optional  | Function          | The function to convert from edit-text to object value |
 
-@ - It can be async function
+@ - Function can return a promise
 
 #### Column type
 | Type            | Value               | Display text        | Justify | Validation         | Allow Keys   | Allow Null |
@@ -388,7 +390,7 @@ methods: {
 }
 ```
 
-The change prop can work in async style.
+The change function can return a promise.
 
 ```html
 <vue-excel-column field="phone" label="Contact" type="string" width="130px" :change="onBeforePhoneChange" />
@@ -396,8 +398,8 @@ The change prop can work in async style.
 
 ```js
 methods: {
-    async onBeforePhoneChange (newVal) {
-        return (await new Promise((done) => {
+    onBeforePhoneChange (newVal) {
+        return new Promise((done) => {
             axios.post('checkPhoneNumber', {
                     phone: newVal
                 })
@@ -406,7 +408,7 @@ methods: {
                     console.error(e)
                     done(false)
                 })
-        }))
+        })
     }
 }
 ```
