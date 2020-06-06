@@ -91,6 +91,7 @@ In your template
 | enterToEast     | Optional  | Boolean  | Move the cell to right instead of bottom when hits enter |
 | allow-add-col   | Optional  | Boolean  | Allow to show the add column button during column resize |
 | add-col         | Optional  | Function | Define the column definition when column is adding |
+| no-header-edit  | Optional  | Boolean  | Not allow header label editing |
 
 ### Component: vue-excel-column
 
@@ -413,7 +414,7 @@ methods: {
 }
 ```
 
- However, it is possible to make your webpage has performance issue. I suggest you use validation prop which allow to show the wrong content in grid but show the validation error.
+ However, it is possible to make your webpage has performance issue. I suggest you use validation prop to show the wrong content in grid with the validation error.
 
 ### Other Features
 
