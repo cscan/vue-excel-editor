@@ -1640,7 +1640,7 @@ export default {
         const file = files[0]
 
         const fileReader = new FileReader()
-        fileReader.onload = (e) => {
+        fileReader.onload = async (e) => {
           try {
             const data = e.target.result
             const wb = XLSX.read(data, {type: 'binary', cellDates: true, cellStyle: false})
@@ -1664,7 +1664,7 @@ export default {
             let updated = 0
             while (pass < 2) {
               const keys = this.fields.filter(f => f.keyField)
-              importData.forEach((line, i) => {
+              await Promise.all(importData.map(async (line, i) => {
 
                 let rowPos = -1
                 if (keys.length) {
@@ -1686,21 +1686,29 @@ export default {
                 }
 
                 // Raise exception if readonly not not pass validation
-                this.fields.forEach((field) => {
+                await Promise.all(this.fields.map(async (field) => {
                   if (field.name.startsWith('$')) return
                   let val = line[field.name]
                   if (typeof val === 'undefined') val = line[field.label]
                   if (typeof val === 'undefined') val = null
                   else {
                     if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected + ': ' + field.name)
+                    if (field.change) {
+                      let result = field.change(val, rec[field.name], rec, field)
+                      if (result.constructor.name === 'Promise') result = await result
+                      if (result === false)
+                        throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.columnHasValidationError(field.name, ''))
+                    }
                     if (field.validate) {
                       let err
                       if ((err = field.validate(val)))
-                        throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.columnHasValidationError(field.name, err))
+                        throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.columnHasValidationError(field.name, err))
                     }
                   }
                   if (val !== null) rec[field.name] = val
-                })
+                  else if (field.mandatory)
+                    throw new Error(`VueExcelEdutor: [row=${i+1}, val=${val}] ` + field.mandatory)
+                }))
 
                 // Do actual insert/update if 2nd pass
                 if (pass === 1) {
@@ -1717,7 +1725,7 @@ export default {
                     inserted++
                   }
                 }
-              })
+              }))
               pass++
             }
             if (pass === 2 && this.importCallback) {
