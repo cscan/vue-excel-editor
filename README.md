@@ -12,7 +12,7 @@ Vue2 plugin for displaying and editing the array-of-object in Excel style. It su
 - Update the cells in all selected rows
 - Edit key support: up, down, left, right, page-up, page-down, tab, del, bs, enter, esc
 - Ctrl/meta key support: Ctrl-A, Ctrl-C, Ctrl-V, Ctrl-Z, Ctrl-F, Ctrl-G, Ctrl-L
-- Column valiation
+- Column validation
 - Cell error tooltip
 - Custom column header
 - Custom Row style

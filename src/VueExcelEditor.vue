@@ -2401,7 +2401,7 @@ export default {
     /* *** Helper ****************************************************************************************
      */
     tempKey () {
-      return new Date().getTime() % 1e8 - Math.random()
+      return new Date().getTime() % 1e8 + '-' + Math.random().toString().slice(2, 7)
     },
     hashCode (s) {
       return s.split('').reduce((a, b) => {
