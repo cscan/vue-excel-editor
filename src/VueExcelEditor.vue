@@ -1694,8 +1694,7 @@ export default {
                   else {
                     if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected + ': ' + field.name)
                     if (field.change) {
-                      let result = field.change(val, rec[field.name], rec, field)
-                      if (result.constructor.name === 'Promise') result = await result
+                      let result = await field.change(val, rec[field.name], rec, field)
                       if (result === false)
                         throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.columnHasValidationError(field.name, ''))
                     }
@@ -2250,11 +2249,11 @@ export default {
     },
     async updateCell (row, field, newVal, isUndo) {
       switch(row.constructor.name) {
+        case 'String': // $id
+          row = this.value.find(r => r.$id === row) // id
+          break
         case 'Number':
-          if (Number.isInteger(row))
-            row = this.table[row] // tablePos
-          else
-            row = this.value.find(r => r.$id === row) // id
+          row = this.table[row] // tablePos
           break
         case 'Object': // record object
           break
@@ -2280,8 +2279,7 @@ export default {
       const oldKeys = this.getKeys(row)
 
       if (field.change) {
-        let result = field.change(newVal, oldVal, row, field)
-        if (result.constructor.name === 'Promise') result = await result
+        let result = await field.change(newVal, oldVal, row, field)
         if (result === false) return
       }
 
@@ -2347,8 +2345,7 @@ export default {
           let list
           if (field.options) {
             if (field.options.constructor.name.endsWith('Function')) {
-              list = field.options(this.currentRecord, value)
-              if (list.consturctor.name === 'Promise') list = await list
+              list = await field.options(this.currentRecord, value)
               list.sort().splice(10)
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
             }
