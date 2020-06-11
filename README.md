@@ -491,7 +491,7 @@ The options prop required to provide the mapping of the value and text.
 <vue-excel-column field="gender" label="Gender" type="map" width="50px" :options="{M:'Male','F':'Female','U':'Unknown'}" />
 ```
 
-![Map](https://i.imgur.com/OMz2Vmk.png "Map")
+![Map](https://i.imgur.com/rEoglm5.png "Map")
 
 
 #### Select
