@@ -52,6 +52,13 @@ export default {
           case 'checkYN':
           case 'checkTF':
             return text.toUpperCase()
+          case 'map':
+            if (this.options.constructor.name.endsWith('Function')) {
+              const list = this.options(text)
+              return Object.keys(list).find(k => list[k] === text)
+            }
+            else
+              return Object.keys(this.options).find(k => this.options[k] === text)
           default:
             return text
         }
@@ -72,6 +79,11 @@ export default {
             return moment(Number(val)).format('YYYY-MM-DD HH:mm')
           case 'datetimesectick':
             return moment(Number(val)).format('YYYY-MM-DD HH:mm:ss')
+          case 'map':
+            if (this.options.constructor.name.endsWith('Function'))
+              return this.options(val)[val]
+            else
+              return this.options[val]
           default:
             return val
         }
@@ -145,7 +157,12 @@ export default {
           allowKeys = allowKeys || ['T', 'F']
           lengthLimit = lengthLimit || 1
           break
+        case 'map':
+          if (this.options.constructor.name === 'AsyncFunction')
+            throw new Error('VueExcelColumn: Map does not support Async Function')
+          break
         case 'select':
+          break
         case 'string':
           break
         default:

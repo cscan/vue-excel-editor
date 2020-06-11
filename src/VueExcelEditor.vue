@@ -1283,8 +1283,6 @@ export default {
             }
             if (this.currentField.readonly) return
             if (this.autocompleteInputs.length) return
-            // if (this.currentField.type === 'select') this.calAutocompleteList(true)
-            // else {
             this.inputBox.value = ''
             this.inputCellWrite('')
             // }
@@ -1307,7 +1305,7 @@ export default {
             }
             if (this.currentField.lengthLimit && this.inputBox.value.length > this.currentField.lengthLimit) return e.preventDefault()
             if (!this.inputBoxShow) {
-              if (this.currentField.type === 'select') {
+              if (this.currentField.type === 'select' || this.currentField.type === 'map') {
                 setTimeout(() => this.calAutocompleteList(true))
                 if (e.keyCode === 32) return e.preventDefault()
                 this.inputBox.value = ''
@@ -2347,12 +2345,14 @@ export default {
           let list
           if (field.options) {
             if (field.options.constructor.name.endsWith('Function')) {
-              list = await field.options(this.currentRecord, value)
+              list = await field.options(value, this.currentRecord)
+              if (field.type === 'map') list = Object.values(list)
               list.sort().splice(10)
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
             }
             else if (field.options.length > 0) {
               list = this.currentField.options
+              if (field.type === 'map') list = Object.values(list)
               list.sort()
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
             }

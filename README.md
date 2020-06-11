@@ -115,7 +115,8 @@ In your template
 | pos            | Optional  | Number            | Specified column sequence |
 | text-transform | Optional  | String            | Force the input to upppercase or lowercase when editing |
 | text-align     | Optional  | String            | Text alignment, default is 'left' |
-| options        | Optional  | Array, Function@  | Define the selectable options, if type != 'select, it works as autocomplete |
+| options        | Optional  | Array, Function@  | For type = 'select', define the selectable options in array |
+| options        | Optional  | Object, Function  | For type = 'map', define the selectable options in hash |
 | summary        | Optional  | String            | Summary: 'sum', 'avg', 'max', 'min'. Default is null |
 | link           | Optional  | Function          | The function to react to the alt-click on cell text |
 | to-text        | Optional  | Function          | The function to convert from object value to edit-text |
@@ -128,7 +129,8 @@ In your template
 | :---            | :---                | :---                | :---    | :---               | :--          | :--: |
 | string          | string              | string              | left    | none               | all          | Y |
 | number          | numeric             | numberic            | right   | none               | -.0123456789 | Y |
-| select          | string              | string              | left    | value with options | all          | Y |
+| select          | array               | string              | left    | value with options | all          | Y |
+| map             | hash                | string              | left    | value with options | all          | Y |
 | check10         | 1 or 0              | 1 or 0              | center  | none               | 1 or 0       | Y |
 | checkYN         | Y or N              | Y or N              | center  | none               | ynYN         | Y |
 | checkTF         | T or F              | T of F              | center  | none               | tfTF         | Y |
@@ -473,8 +475,24 @@ When user enters text in cell and holds a second, component will show 10 matched
 
 #### Options
 
-This works like Autocomplete, but the list is provided and fixed.
+```html
+<vue-excel-column field="gender" label="Gender" type="select" width="50px" :options="['F','M','U']" />
+```
+
+Specified the type = "select" for Options column. This works like Autocomplete, but the list is provided and fixed.
 ![Options](https://i.imgur.com/LGefJif.png "Options")
+
+#### Map
+
+The "map" typed column is the same as "select" typed column, but the record value is not the same as the display text.
+The options prop required to provide the mapping of the value and text.
+
+```html
+<vue-excel-column field="gender" label="Gender" type="map" width="50px" :options="{M:'Male','F':'Female','U':'Unknown'}" />
+```
+
+![Map](https://i.imgur.com/OMz2Vmk.png "Map")
+
 
 #### Select
 
