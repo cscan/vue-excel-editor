@@ -664,7 +664,7 @@ export default {
       // add unique key to each row if no key is provided
       let seed = new Date().getTime() % 1e8
       this.value.forEach((rec,i) => {
-        if (!rec.$id) rec.$id = seed - i/1e7
+        if (!rec.$id) rec.$id = seed + '-' + i/1e7
       })
 
       if (this.showFilteredOnly === false) {
@@ -1680,7 +1680,7 @@ export default {
                   rowPos = this.table.findIndex(v => Object.keys(v).filter(f => !f.startsWith('$')).length === 0)
 
                 const rec = {
-                  $id: typeof line.$id === 'undefined' ? keyStart - i/1e7 : line.$id
+                  $id: typeof line.$id === 'undefined' ? keyStart + '-' + i/1e7 : line.$id
                 }
 
                 // Raise exception if readonly not not pass validation
