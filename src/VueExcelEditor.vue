@@ -2073,7 +2073,7 @@ export default {
       // Off the textarea when moving, write to value if changed
       if (this.inputBoxShow) this.inputBoxShow = 0
       if (this.inputBoxChanged) {
-        this.inputCellWrite(this.currentField.toValue(this.inputBox.value), this.currentColPos, top + this.currentRowPos)
+        this.inputCellWrite(this.inputBox.value, this.currentColPos, top + this.currentRowPos)
         this.inputBoxChanged = false
       }
 
@@ -2277,6 +2277,8 @@ export default {
 
       const oldVal = row[field.name]
       const oldKeys = this.getKeys(row)
+
+      newVal = field.toValue(newVal)
 
       if (field.change) {
         let result = await field.change(newVal, oldVal, row, field)
