@@ -74,11 +74,12 @@ export default {
           case 'date':
             return val? moment(val).format('YYYY-MM-DD'): ''
           case 'datetick':
-            return moment(Number(val)).format('YYYY-MM-DD')
+            return val? moment(Number(val)).format('YYYY-MM-DD'): ''
           case 'datetimetick':
-            return moment(Number(val)).format('YYYY-MM-DD HH:mm')
+            return val? moment(Number(val)).format('YYYY-MM-DD HH:mm'): ''
           case 'datetimesectick':
-            return moment(Number(val)).format('YYYY-MM-DD HH:mm:ss')
+            if (!val) return ''
+            return val? moment(Number(val)).format('YYYY-MM-DD HH:mm:ss'): ''
           case 'map':
             if (this.options.constructor.name.endsWith('Function'))
               return this.options(val)[val]

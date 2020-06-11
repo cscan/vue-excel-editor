@@ -2154,9 +2154,9 @@ export default {
       if (typeof colPos !== 'undefined') field = this.fields[colPos]
       if (typeof recPos === 'undefined') recPos = this.pageTop + this.currentRowPos
       if (typeof this.selected[recPos] !== 'undefined')
-        this.updateSelectedRows(field, setText)
+        this.updateSelectedRows(field, field.toValue(setText))
       else
-        this.updateCell(recPos, field, setText)
+        this.updateCell(recPos, field, field.toValue(setText))
     },
     inputBoxBlur () {
       if (this.$refs.dpContainer.querySelector(':hover')) return
@@ -2275,8 +2275,6 @@ export default {
 
       const oldVal = row[field.name]
       const oldKeys = this.getKeys(row)
-
-      newVal = field.toValue(newVal)
 
       if (field.change) {
         let result = await field.change(newVal, oldVal, row, field)
