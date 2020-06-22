@@ -1513,8 +1513,13 @@ export default {
             return 0
           })
         else
+          if(n===1)
           this.value.sort(function(a, b) {
             return ('' + a[fieldName]).localeCompare(b[fieldName])
+          })
+          if(n===-1)
+          this.value.sort(function(a, b) {
+            return -('' + a[fieldName]).localeCompare(b[fieldName])
           })
         this.sortPos = colPos
         this.sortDir = n
