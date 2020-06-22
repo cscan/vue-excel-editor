@@ -1513,10 +1513,8 @@ export default {
             return 0
           })
         else
-          this.value.sort((a, b) => {
-            if (a[fieldName] > b[fieldName]) return n
-            if (a[fieldName] < b[fieldName]) return -n
-            return 0
+          this.value.sort(function(a, b) {
+            return ('' + a[fieldName]).localeCompare(b[fieldName])
           })
         this.sortPos = colPos
         this.sortDir = n
