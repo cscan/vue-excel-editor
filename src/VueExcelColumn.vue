@@ -30,6 +30,7 @@ export default {
     pos: {type: Number, default: 0},
     options: {type: [Array, Function], default () {return null}},
     summary: {type: String, default: null},
+    sort: {type: Function, default: null},
     toValue: {
       type: Function,
       default (text) {
@@ -197,6 +198,7 @@ export default {
         pos: Number(this.pos),
         options: this.options,
         summary: this.summary,
+        sort: this.sort,
         toValue: this.toValue,
         toText: this.toText,
         register: this.register

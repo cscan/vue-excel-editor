@@ -645,6 +645,7 @@ export default {
           pos: 0,
           options: null,
           summary: null,
+          sort: null,
           toValue: t => t,
           toText: t => t,
           register: null
@@ -1503,21 +1504,25 @@ export default {
     sort (n, pos) {
       this.processing = true
       const colPos = typeof pos === 'undefined' ? this.columnFilterRef.colPos : pos
-      const fieldName = this.fields[colPos].name
-      const type = this.fields[colPos].type
+      const field = this.fields[colPos]
+      const name = field.name
       setTimeout(() => {
-        if (type === 'number')
-          this.value.sort((a, b) => {
-            if (Number(a[fieldName]) > Number(b[fieldName])) return n
-            if (Number(a[fieldName]) < Number(b[fieldName])) return -n
-            return 0
-          })
-        else
-          this.value.sort((a, b) => {
-            if (a[fieldName] > b[fieldName]) return n
-            if (a[fieldName] < b[fieldName]) return -n
-            return 0
-          })
+        let sorting = field.sort
+        if (sorting === null) {
+          if (field.type === 'number')
+            sorting = (a, b) => {
+              if (Number(a[name]) > Number(b[name])) return 1
+              if (Number(a[name]) < Number(b[name])) return -1
+              return 0
+            }
+          else
+              sorting = (a, b) => {
+                return String(a[name]).localeCompare(String(b[name]))
+              }
+        }
+        this.value.sort((a, b) => {
+          return sorting(a, b) * n
+        })
         this.sortPos = colPos
         this.sortDir = n
         this.$forceUpdate()
@@ -1698,7 +1703,7 @@ export default {
                     }
                     if (field.validate) {
                       let err
-                      if ((err = field.validate(val)))
+                      if ((err = field.validate(val, rec[field.name], rec, field)))
                         throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.columnHasValidationError(field.name, err))
                     }
                   }
@@ -2296,7 +2301,7 @@ export default {
         }
 
         const id = `id-${row.$id}-${field.name}`
-        if (field.validate !== null) transaction.err = field.validate(newVal)
+        if (field.validate !== null) transaction.err = field.validate(newVal, oldVal, row, field)
         if (field.mandatory && newVal === '')
           transaction.err += (transaction.err ? '\n' : '') + field.mandatory
 

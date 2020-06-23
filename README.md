@@ -118,6 +118,7 @@ In your template
 | options        | Optional  | Array, Function@  | For type = 'select', define the selectable options in array |
 | options        | Optional  | Object, Function  | For type = 'map', define the selectable options in hash |
 | summary        | Optional  | String            | Summary: 'sum', 'avg', 'max', 'min'. Default is null |
+| sort           | Optional  | Function          | The custom function for sorting the column |
 | link           | Optional  | Function          | The function to react to the alt-click on cell text |
 | to-text        | Optional  | Function          | The function to convert from object value to edit-text |
 | to-value       | Optional  | Function          | The function to convert from edit-text to object value |
@@ -467,6 +468,22 @@ Note that all filters are case-insensitive.
 #### Sorting
 
 ![Sorting](https://i.imgur.com/vGZpHkv.png "Sorting")
+
+It is possible to assign custom sorting function for specified column:
+
+```html
+<vue-excel-column field="birth" label="Date Of Birth" type="date" width="80px" :sort="sortingBirth" />
+```
+
+```js
+const moment = require('moment')
+
+methods: {
+    sortingBirth (a, b) {
+        return moment(a).diff(moment(b), 'days')
+    }
+}
+```
 
 #### Autocomplete
 
