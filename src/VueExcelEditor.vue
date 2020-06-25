@@ -430,7 +430,7 @@ export default {
 
       table: [],
       filteredValue: [],
-      lastFilterTime: 0,
+      lastFilterTime: '',
       summaryRow: false,
       summary: {},
       showFilteredOnly: true,
@@ -492,7 +492,7 @@ export default {
       })
     },
     columnFilterString () {
-      this.lastFilterTime = new Date().getTime() % 1e8
+      this.lastFilterTime = String(new Date().getTime() % 1e8)
       this.processing = true
       setTimeout(() => {
         this.pageTop = 0
@@ -663,9 +663,9 @@ export default {
     },
     calTable () {
       // add unique key to each row if no key is provided
-      let seed = new Date().getTime() % 1e8
+      let seed = String(new Date().getTime() % 1e8)
       this.value.forEach((rec,i) => {
-        if (!rec.$id) rec.$id = seed + '-' + i/1e7
+        if (!rec.$id) rec.$id = seed + '-' + ('000000' + i).slice(-7)
       })
 
       if (this.showFilteredOnly === false) {
@@ -1655,7 +1655,7 @@ export default {
               })
               return rec
             })
-            const keyStart = new Date().getTime() % 1e8
+            const keyStart = String(new Date().getTime() % 1e8)
             if (importData.length === 0) throw new Error('VueExcelEditor: ' + this.localizedLabel.noRecordIsRead)
             if (this.fields
               .filter(f => f.keyField)
@@ -1685,7 +1685,7 @@ export default {
                   rowPos = this.table.findIndex(v => Object.keys(v).filter(f => !f.startsWith('$')).length === 0)
 
                 const rec = {
-                  $id: typeof line.$id === 'undefined' ? keyStart + '-' + i/1e7 : line.$id
+                  $id: typeof line.$id === 'undefined' ? keyStart + '-' + ('000000' + i).slice(-7) : line.$id
                 }
 
                 // Raise exception if readonly not not pass validation
@@ -2411,7 +2411,7 @@ export default {
     /* *** Helper ****************************************************************************************
      */
     tempKey () {
-      return new Date().getTime() % 1e8 + '-' + Math.random().toString().slice(2, 7)
+      return (new Date().getTime() % 1e8) + '-' + Math.random().toString().slice(2, 7)
     },
     hashCode (s) {
       return s.split('').reduce((a, b) => {

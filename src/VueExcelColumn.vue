@@ -190,6 +190,7 @@ export default {
         allowKeys: allowKeys,
         mandatory: this.mandatory,
         lengthLimit: Number(lengthLimit),
+        textTransform: this.textTransform,
 
         autocomplete: this.autocomplete === null ? this.$parent.autocomplete : this.autocomplete,
         initStyle: style,
