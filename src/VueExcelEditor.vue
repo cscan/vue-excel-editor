@@ -2353,8 +2353,8 @@ export default {
               list.sort().splice(10)
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
             }
-            else if (field.options.length > 0) {
-              list = this.currentField.options
+            else if (Object.values(field.options).length > 0) {
+              list = field.options
               if (field.type === 'map') list = Object.values(list)
               list.sort()
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))

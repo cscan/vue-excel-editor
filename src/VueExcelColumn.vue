@@ -28,7 +28,7 @@ export default {
     lengthLimit: {type: Number, default: 0},
     autocomplete: {type: Boolean, default: null},
     pos: {type: Number, default: 0},
-    options: {type: [Array, Function], default () {return null}},
+    options: {type: [Array, Object, Function], default () {return null}},
     summary: {type: String, default: null},
     sort: {type: Function, default: null},
     toValue: {
