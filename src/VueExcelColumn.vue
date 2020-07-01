@@ -184,6 +184,7 @@ export default {
         validate: validate,
         change: this.change,
         link: this.link,
+        sort: this.sort,
 
         keyField: this.keyField,
         sticky: this.sticky,
@@ -199,7 +200,6 @@ export default {
         pos: Number(this.pos),
         options: this.options,
         summary: this.summary,
-        sort: this.sort,
         toValue: this.toValue,
         toText: this.toText,
         register: this.register

@@ -90,7 +90,7 @@ In your template
 | remember        | Optional  | Boolean  | Remember the setting in localStorage, default is false |
 | enterToEast     | Optional  | Boolean  | Move the cell to right instead of bottom when hits enter |
 | allow-add-col   | Optional  | Boolean  | Allow to show the add column button during column resize |
-| add-col         | Optional  | Function | Define the column definition when column is adding |
+| add-column      | Optional  | Function | Func to return the column definition when column is adding |
 | no-header-edit  | Optional  | Boolean  | Not allow header label editing |
 
 ### Component: vue-excel-column
@@ -129,7 +129,7 @@ In your template
 | Type            | Value               | Display text        | Justify | Validation         | Allow Keys   | Allow Null |
 | :---            | :---                | :---                | :---    | :---               | :--          | :--: |
 | string          | string              | string              | left    | none               | all          | Y |
-| number          | numeric             | numberic            | right   | none               | -.0123456789 | Y |
+| number          | numeric             | numeric             | right   | none               | -.0123456789 | Y |
 | select          | array               | string              | left    | value with options | all          | Y |
 | map             | hash                | string              | left    | value with options | all          | Y |
 | check10         | 1 or 0              | 1 or 0              | center  | none               | 1 or 0       | Y |
@@ -213,18 +213,23 @@ AOO = Array of Object, i.e. [{...}, {...}]
 
 #### Component: vue-excel-editor
 
-| Name          | Type   | Description |
-| :---          | :---   | :---        |
-| fields        | AOO    | It contains the column spec create when mount |
-| filterColumn  | Object | Contains the current filters, developer can access the filter string via this |
-| selected      | Object | Contains all the selected rows, the key is row number and the value is internal $id |
-| selectedCount | Number | Number of rows are selected |
-| errmsg        | Object | Contains all the validation error messages, the key is internal $id plus field name |
-| redo          | AOA    | The buffer of undo, it will be removed after undo or table changed |
-| pageTop       | Number | The top row number of the current page |
+| Name          | Type    | Description |
+| :---          | :---    | :---        |
+| processing    | Boolean | Component is busy or not |
+| pageTop       | Number  | The top row number of the current page |
+| pageSize      | Number  | The number of rows of each page |
+| fields        | AOO     | It contains the column spec create when mount |
+| filterColumn  | Object  | Contains the current filters, developer can access the filter string via this |
+| table         | AOO     | It contains the filtered records |
+| selected      | Object  | Contains all the selected rows, the key is row number and the value is internal $id |
+| selectedCount | Number  | Number of rows are selected |
+| errmsg        | Object  | Contains all the validation error messages, the key is internal $id plus field name |
+| redo          | AOA     | The buffer of undo, it will be removed after undo or table changed |
 
 AOA = Array of Array, i.e. [[...], [...]]  
 AOO = Array of Object, i.e. [{...}, {...}]
+
+I suppose you try to read them only. Do not try to modify any value of the above variables, unless you deeply walk through all the codes and know the consequences.
 
 ## Example
 
@@ -243,13 +248,15 @@ An example to show 5x6 table:
 </template>
 ```
 
-You may also skip all the column definitions. The control will help you to "guess" the rest
+Note that the component will read the vue-excel-column when it is created. You may also skip all the column definitions. The control will help you to "guess" the rest:
 
 ```html
 <template>
     <vue-excel-editor v-model="jsondata" filter-row />
 </template>
 ```
+
+The sample data contains 5 records:
 
 ```js
 export default {
@@ -348,9 +355,9 @@ The grid setting such as column width can be saved in the localStorage of client
 
 You may also capture the @setting event to handle more specifics.
 
-### Do something when user select the rows
+### Do something when user select/unselect the rows
 
-The selected rows will be passed to the provided trigger method
+The selected or unselected rows will be passed to the provided trigger method
 
 ```html
 <template>
@@ -364,6 +371,32 @@ The selected rows will be passed to the provided trigger method
 methods: {
     onSelect (selectedRows) {
       console.log(selectedRows)
+    }
+}
+```
+
+You may also want to watch the selected records count for displaying the action buttons. For example:
+
+```html
+<button v-show="showDeleteAction"> Delete </button>
+<button v-show="showSendEmailInvitationAction"> Invite </button>
+<button v-show="showSendBirthdayGreetingAction"> Greeting </button>
+```
+
+```js
+computed: {
+    showDeleteAction () {
+        return this.$refs.grid.selectedCount > 0  // Show if any records selected
+    },
+    showSendEmailInvitationAction () {
+        return this.$refs.grid.selectedCount === 1  // Show if single record is selected
+    },
+    showSendBirthdayGreetingAction () {
+        // Show only if any selected people birthday matched today
+        if (this.$refs.grid.selectedCount > 0) {
+            return this.$refs.grid.getSelectedRecords().filter(item => item.birth === today).length > 0
+        else
+            return false
     }
 }
 ```
@@ -436,31 +469,43 @@ methods: {
 
 #### Filter + Footer Rows
 
+Specified filter-row prop to show filter row
+
+```html
+<vue-excel-editor v-model="jsondata" filter-row>
+```
+
+If you don't want to show the footer, specified the no-footer prop
+
+```html
+<vue-excel-editor v-model="jsondata" no-footer filter-row>
+```
+
 ![Filter + Footer Rows](https://i.imgur.com/7xmbrnM.png "Filter + Footer Rows")
 
 #### Filtering
 
-The filtering fesature of this component is very strong. It suuports regular expression and windows wild card syntax.
+The filtering is one of the focusing features. It supports regular expression and windows wild card syntax.
 
 ![Filtering](https://i.imgur.com/spjZN3M.png "Filtering")
 
 Component supports the prefx likes <, >, =, >=, <=, <>, ~ (regular expression) and wild-card * and ? symbol. Examples:
 | Example           | Description |
 | :---              | :---        |
+| abc               | The values contain ABC |
+| abc*              | The values start by ABC |
+| *abc              | The values end by ABC |
+| =abc              | The values equal to ABC |
+| <>abc             | The values do not equal to ABC |
 | >= 100            | The values are greater or equal to 100 |
 | < 0               | The values are smaller than 0 |
-| <>mary            | The values do not equal to MARY |
-| mon*              | The values start by MON |
-| *mon              | The values end by MON |
-| mon               | The values contain MON |
-| =mon              | The values equal to MON |
-| =                 | The values are empty |
 | po-18*5??         | The values start from PO-18 and the 3rd-last char is 5 |
-| ~.*tpx[ ]+ck      | The values have TPX and CK text and they have spaces in between |
+| =                 | The values are empty |
 | ~.                | The values are not empty |
+| ~.*tpx[ ]+ck      | The values have TPX and CK text and they have spaces in between |
 | ~[ ]              | The values contain space |
 | ~^so&#124;ary$    | The values start by SO or end by ARY |
-| ~[ ]+$&#124;^[ ]+ | The values end or start by spaces |
+| ~[ ]+$&#124;^[ ]+ | The values start or end by spaces |
 | ~^[^ ]*$          | The values have no space |
 
 Note that all filters are case-insensitive.
@@ -570,16 +615,16 @@ methods: {
 Summary prop supports "sum", "min", "max", "avg" and "count".  
   
 Note that "count" will instruct the component to count the cell which hold the following condition  
->0 for number-typed column  
-non-empty for string-typed column  
-"Y", "1" or "T" for check-typed column  
-at or late than this time for date/time-typed column  
+Number: >0  
+String: non-empty  
+Check: "Y", "1" or "T"  
+DateTime: at or later than the current time  
   
-Use this with care. The summary calculation eats resource, so it only calculates when the number of records changed (i.e. New, delete, filter). It does not recalculate if user changes the cell content. You may trigger the calculation manually by calling calSummary method by the @update event.
+Use this with care. The summary calculation eats resource, so it only calculates when the number of records changed (i.e. New, delete, filter). It does not recalculate if user changes the cell content. You may trigger the calculation manually by calling calSummary method in the @update event.
 
 ### Link
 
-Actually this nice feature I was learnt from SAP UI - When user holds the function key (Alt-key here) and move the mouse over the cell, the cell text will show as a link. If user clicks on it, your custom function will be triggered. The following shows how to route to user profile page by clicking on the name column cell.
+This is a nice feature in enterprice application. Actually I was learnt from SAP UI. When user holds the function key (Alt-key here) and move the mouse over the cell content, the text will show as a link. If user clicks on the link, your custom function will be triggered. The following example shows how to route to user profile page by clicking on the name column cell.
 
 ```html
 <vue-excel-column field="name" label="Name" type="string" width="150px" :link="routeToUserFunc" />

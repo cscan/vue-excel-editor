@@ -313,7 +313,7 @@ export default {
     register: {type: Function, default: null},
     allowAddCol: {type: Boolean, default: false},
     noHeaderEdit: {type: Boolean, default: false},
-    addCol: {type: Function, default: null},
+    addColumn: {type: Function, default: null},
     localizedLabel: {
       type: Object,
       default () {
@@ -367,7 +367,7 @@ export default {
   data () {
     const pageSize = this.noPaging ? 999999 : 20
     const dataset = {
-      version: '1.2',
+      version: '1.3',
       tableContent: null,           // Table parent
       systable: null,               // TABLE dom node
       colgroupTr: null,             // colgroup TR dom node
@@ -609,7 +609,42 @@ export default {
       if (field.summary) this.summaryRow = true
       this.colHash = this.hashCode(this.version + JSON.stringify(this.fields))
     },
-    insertColumn (field, pos) {
+    insertColumn (pos) {
+      const colname = 'COL-' + Math.random().toString().slice(2,6)
+      let colDef = {
+        name: colname,
+        label: colname,
+        type: 'string',
+        width: '100px',
+
+        validate: null,
+        change: null,
+        link: null,
+        sort: null,
+
+        keyField: false,
+        sticky: false,
+        // tabStop: true,
+        allowKeys: null,
+        mandatory: false,
+        lengthLimit: 0,
+
+        autocomplete: this.autocomplete,
+        textTransform: null,
+        initStyle: 'left',
+        invisible: false,
+        readonly: this.readonly,
+        pos: 0,
+        options: null,
+        summary: null,
+        toValue: t => t,
+        toText: t => t,
+        register: null
+      }
+      if (this.addColumn) colDef = this.addColumn(colDef)
+      this.newColumn(colDef, pos)      
+    },
+    newColumn (field, pos) {
       this.fields.splice(pos, 0, field)
       if (this.register) this.register(field, pos)
       if (field.register) field.register(field, pos)
@@ -1334,37 +1369,9 @@ export default {
       e.stopPropagation()
       if (this.allowAddCol && !e.target.classList.contains('col-sep')) {
         e.target.style.display = 'none'
-        // Add column
         const me = e.target.parentElement.parentElement
         const pos = Array.from(me.parentElement.children).findIndex(td => td === me)
-        const colname = 'COL-' + Math.random().toString().slice(2,6)
-        let colDef = {
-          name: colname,
-          label: colname,
-          type: 'string',
-          width: '100px',
-          validate: null,
-          change: null,
-          link: null,
-          keyField: false,
-          sticky: false,
-          tabStop: true,
-          allowKeys: null,
-          mandatory: false,
-          lengthLimit: 0,
-          autocomplete: this.autocomplete,
-          initStyle: 'left',
-          invisible: false,
-          readonly: this.readonly,
-          pos: 0,
-          options: null,
-          summary: null,
-          toValue: t => t,
-          toText: t => t,
-          register: null
-        }
-        if (this.addColumn) colDef = this.addColumn(colDef)
-        this.insertColumn(colDef, pos)
+        this.insertColumn(pos)
       }
       this.focused = false
       const getStyleVal = (elm, css) => {
