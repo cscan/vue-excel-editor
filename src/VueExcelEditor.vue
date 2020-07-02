@@ -2646,7 +2646,7 @@ input:focus, input:active:focus, input.active:focus {
   border-bottom: 1px solid lightgray;
 }
 .systable thead th {
-  background-color: #e9ecef !important;
+  background-color: #e9ecef;
   cursor: s-resize;
   z-index: 6;
 }
@@ -2692,6 +2692,8 @@ input:focus, input:active:focus, input.active:focus {
 .systable .sticky-column {
   position: sticky;
   z-index: 2;
+}
+.systable tbody td.sticky-column {
   background-color: white;
 }
 .systable thead th.sticky-column {
