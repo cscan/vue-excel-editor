@@ -88,10 +88,12 @@ In your template
 | localized-label | Optional  | Object   | Customize labels and messages for localization purpose |
 | n-filter-count  | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
 | remember        | Optional  | Boolean  | Remember the setting in localStorage, default is false |
-| enterToEast     | Optional  | Boolean  | Move the cell to right instead of bottom when hits enter |
+| enterToSouth    | Optional  | Boolean  | Move the cell to bottom instead of right when hits enter |
 | allow-add-col   | Optional  | Boolean  | Allow to show the add column button during column resize |
 | add-column      | Optional  | Function | Func to return the column definition when column is adding |
 | no-header-edit  | Optional  | Boolean  | Not allow header label editing |
+| spellcheck      | Optional  | Boolean  | Turn on spellcheck during editing |
+| new-if-bottom   | Optional  | Boolean  | New record if focusing cell reach bottom |
 
 ### Component: vue-excel-column
 

@@ -151,7 +151,7 @@
                       autocomplete="off"
                       autocorrect="off"
                       autocompitaize="off"
-                      spellcheck="false"></textarea>
+                      :spellcheck="spellcheck"></textarea>
           </div>
         </div>
 
@@ -302,7 +302,7 @@ export default {
     noPaging: {type: Boolean, default: false},
     noNumCol: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
-    enterToEast: {type: Boolean, default: false},   // default enter to south
+    enterToSouth: {type: Boolean, default: false},  // default enter to south
     nFilterCount: {type: Number, default: 1000},    // show top n values in filter dialog
     height: {type: String, default: ''},
     width: {type: String, default: '100%'},
@@ -314,6 +314,8 @@ export default {
     allowAddCol: {type: Boolean, default: false},
     noHeaderEdit: {type: Boolean, default: false},
     addColumn: {type: Function, default: null},
+    spellcheck: {type: Boolean, default: false},
+    newIfBottom: {type: Boolean, default: false},
     localizedLabel: {
       type: Object,
       default () {
@@ -1275,10 +1277,10 @@ export default {
             if (!this.focused) return
             e.preventDefault()
             if (this.autocompleteInputs.length === 0 || this.autocompleteSelect === -1) {
-              if (this.enterToEast)
-                this.moveEast(e)
-              else
+              if (this.enterToSouth)
                 this.moveSouth(e)
+              else
+                this.moveEast(e)
             }
             else if (this.autocompleteSelect !== -1 && this.autocompleteSelect < this.autocompleteInputs.length) {
               this.inputAutocompleteText(this.autocompleteInputs[this.autocompleteSelect])
@@ -1990,7 +1992,14 @@ export default {
       return false
     },
     moveSouth () {
-      if (this.focused && this.currentRowPos < this.table.length) {
+      if (this.focused) {
+        if (this.currentRowPos + 1 >= this.table.length) {
+          if (this.readonly) return false
+          if (!this.newIfBottom) return false
+          this.newRecord({}, false, true)
+          setTimeout(this.moveSouth, 0)
+          return true
+        }
         const done = this.moveInputSquare(this.currentRowPos + 1, this.currentColPos)
         this.calVScroll()
         if (this.$refs.vScrollButton) {
@@ -2015,6 +2024,7 @@ export default {
         if (this.currentField.link && e.altKey)
           setTimeout(() => this.currentField.link(this.currentCell.textContent, this.currentRecord, rowPos, colPos, this.currentField, this))
         if (e.target.offsetWidth - e.offsetX > 15) return
+        if (this.currentField.readonly) return
         this.inputBox.value = this.currentCell.textContent
         if (e.target.classList.contains('select')) this.calAutocompleteList(true)
         if (e.target.classList.contains('datepick')) this.showDatePickerDiv()
@@ -2152,6 +2162,7 @@ export default {
     },
     inputBoxMouseDown (e) {
       if (e.target.offsetWidth - e.offsetX > 15) return
+      if (this.currentField.readonly) return
       if (this.currentField.options) {
         e.preventDefault()
         this.calAutocompleteList(true)
@@ -2217,9 +2228,13 @@ export default {
     },
     newRecord (rec, selectAfterDone, noLastPage, isUndo) {
       if (typeof rec === 'undefined') rec = {}
-      this.fields.filter(f => f.keyField).map(f => {
-        if (typeof rec[f.name] === 'undefined')
-          rec[f.name] = '§' + this.tempKey()
+      this.fields.map(f => {
+        if (typeof rec[f.name] === 'undefined') {
+          if (f.keyField)
+            rec[f.name] = '§' + this.tempKey()
+          else
+            rec[f.name] = null
+        }
       })
       const id = rec.$id || this.tempKey()
       rec.$id = id
@@ -2246,6 +2261,7 @@ export default {
       this.selectedCount = 0
     },
     deleteRecord (valueRowPos, isUndo) {
+      if (this.currentRowPos === valueRowPos) this.moveNorth()
       const rec = this.value.splice(valueRowPos, 1)[0]
       setTimeout(() => {
         this.lazy(rec, (buf) => {
