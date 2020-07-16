@@ -97,6 +97,7 @@
               <template v-for="(item, p) in fields">
                 <td v-show="!item.invisible"
                     :id="`id-${record.$id}-${item.name}`"
+                    :cell-RC="`${rowPos}-${item.name}`"
                     :class="{
                       readonly: item.readonly,
                       error: errmsg[`id-${record.$id}-${item.name}`],
