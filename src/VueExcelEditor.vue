@@ -46,7 +46,7 @@
                           'sticky-column': item.sticky}"
                   :style="{left: item.left}"
                   @mousedown="headerClick($event, p)"
-                  @contextmenu.prevent="$refs.panelFilter.showPanel($refs[`filter-${item.name}`][0])">
+                  @contextmenu.prevent="panelFilterClick(item)">
                 <div :class="{'filter-sign': columnFilter[p]}">
                   <span :class="{'table-col-header': !noHeaderEdit}" v-html="headerLabel(item.label, item)"></span>
                 </div>
@@ -279,6 +279,18 @@ export default {
     'date-picker': DatePicker
   },
   props: {
+      disablePanelSetting: {
+      type: Boolean,
+      default() {
+        return false;
+      }
+    },
+    disablePanelFilter: {
+      type: Boolean,
+      default() {
+        return false;
+      }
+    },
     value: {type: Array, default () {return []}},
     rowStyle: {type: Function, default () {return {}}},
     cellStyle: {type: Function, default () {return {}}},
@@ -1632,8 +1644,15 @@ export default {
         fields: fields
       }
     },
-    settingClick () {
-      this.$refs.panelSetting.showPanel()
+
+    settingClick() {
+      if (!this.disablePanelSetting) 
+        this.$refs.panelSetting.showPanel();
+    },
+
+    panelFilterClick(item) {
+      if (!this.disablePanelFilter)
+        this.$refs.panelFilter.showPanel(this.$refs[`filter-${item.name}`][0]);
     },
 
     /* *** Import/Export ************************************************************************************
