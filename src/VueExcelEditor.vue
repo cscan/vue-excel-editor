@@ -2020,6 +2020,8 @@ export default {
         const row = e.target.parentNode
         const colPos = Array.from(row.children).indexOf(e.target) - 1
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
+        const selectedCell = {rowPos, colPos};
+        this.$emit('cellSelect', selectedCell);
         this.moveInputSquare(rowPos, colPos)
         if (this.currentField.link && e.altKey)
           setTimeout(() => this.currentField.link(this.currentCell.textContent, this.currentRecord, rowPos, colPos, this.currentField, this))
