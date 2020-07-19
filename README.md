@@ -65,35 +65,37 @@ In your template
 
 ### Component: vue-excel-editor
 
-| Name            | Mandatory | Type     | Description |
-| :---            | :---      | :---     | :---        |
-| v-model         | Mandatory | Array    | Edited data in Array Of Object | 
-| page            | Optional  | Number   | Specific page size, default is auto-calculating by screen height |
-| no-paging       | Optional  | Boolean  | Disable paging feature, default is false |
-| no-num-col      | Optional  | Boolean  | No number column, default is false |
-| filter-row      | Optional  | Boolean  | Show fixed filter row, default is false |
-| no-footer       | Optional  | Boolean  | No footer row, default is false |
-| no-finding      | Optional  | Boolean  | Disable find key (ctrl-f) and finding dialog, default is false |
-| no-finding-next | Optional  | Boolean  | Disable find-next key (ctrl-g), default is false |
-| free-select     | Optional  | Boolean  | Select multiple rows without pressing ctrl/meta key |
-| autocomplete    | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
-| readonly        | Optional  | Boolean  | Set all columns read only, default is false |
-| readonly-style  | Optional  | Object   | The style of the read-only cell |
-| height          | Optional  | String   | Define the exact height in px of the component, default is 'auto' |
-| width           | Optional  | String   | Define the maximum width in px of the component, default is '100%' |
-| row-style       | Optional  | Function | Conditional row formatting, default is null |
-| cell-style      | Optional  | Function | Conditional cell formatting, default is null |
-| header-label    | Optional  | Function | Func to return the label, parameter are the field label, field object |
-| record-label    | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
-| localized-label | Optional  | Object   | Customize labels and messages for localization purpose |
-| n-filter-count  | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
-| remember        | Optional  | Boolean  | Remember the setting in localStorage, default is false |
-| enterToSouth    | Optional  | Boolean  | Move the cell to bottom instead of right when hits enter |
-| allow-add-col   | Optional  | Boolean  | Allow to show the add column button during column resize |
-| add-column      | Optional  | Function | Func to return the column definition when column is adding |
-| no-header-edit  | Optional  | Boolean  | Not allow header label editing |
-| spellcheck      | Optional  | Boolean  | Turn on spellcheck during editing |
-| new-if-bottom   | Optional  | Boolean  | New record if focusing cell reach bottom |
+| Name                  | Mandatory | Type     | Description |
+| :---                  | :---      | :---     | :---        |
+| v-model               | Mandatory | Array    | Edited data in Array Of Object | 
+| page                  | Optional  | Number   | Specific page size, default is auto-calculating by screen height |
+| no-paging             | Optional  | Boolean  | Disable paging feature, default is false |
+| no-num-col            | Optional  | Boolean  | No number column, default is false |
+| filter-row            | Optional  | Boolean  | Show fixed filter row, default is false |
+| no-footer             | Optional  | Boolean  | No footer row, default is false |
+| no-finding            | Optional  | Boolean  | Disable find key (ctrl-f) and finding dialog, default is false |
+| no-finding-next       | Optional  | Boolean  | Disable find-next key (ctrl-g), default is false |
+| free-select           | Optional  | Boolean  | Select multiple rows without pressing ctrl/meta key |
+| autocomplete          | Optional  | Boolean  | Enable autocomplete of all columns, default is false |
+| readonly              | Optional  | Boolean  | Set all columns read only, default is false |
+| readonly-style        | Optional  | Object   | The style of the read-only cell |
+| height                | Optional  | String   | Define the exact height in px of the component, default is 'auto' |
+| width                 | Optional  | String   | Define the maximum width in px of the component, default is '100%' |
+| row-style             | Optional  | Function | Conditional row formatting, default is null |
+| cell-style            | Optional  | Function | Conditional cell formatting, default is null |
+| header-label          | Optional  | Function | Func to return the label, parameter are the field label, field object |
+| record-label          | Optional  | Function | Func to return the label, parameters are recordPosition, record object |
+| localized-label       | Optional  | Object   | Customize labels and messages for localization purpose |
+| n-filter-count        | Optional  | Number   | Number of items to be listed in filter dialog. Default is 200 |
+| remember              | Optional  | Boolean  | Remember the setting in localStorage, default is false |
+| enterToSouth          | Optional  | Boolean  | Move the cell to bottom instead of right when hits enter |
+| allow-add-col         | Optional  | Boolean  | Allow to show the add column button during column resize |
+| add-column            | Optional  | Function | Func to return the column definition when column is adding |
+| no-header-edit        | Optional  | Boolean  | Not allow header label editing |
+| spellcheck            | Optional  | Boolean  | Turn on spellcheck during editing |
+| new-if-bottom         | Optional  | Boolean  | New record if focusing cell reach bottom |
+| disable-panel-setting | Optional  | Boolean  | Hide the setting panel |
+| disable-panel-filter  | Optional  | Boolean  | Hide the filter panel |
 
 ### Component: vue-excel-column
 
@@ -160,15 +162,14 @@ In your template
 
 ### Component: vue-excel-editor
 
-| Name    | Argument | Description |
-| :---    | :---     | :---        |
-| update  | AOA      | Update cell information |
-| delete  | AOA      | Delete row information |
-| select  | AOO      | Emit when rows are selected/unselected |
-| setting | setting  | Emit when setting (column width, invisible state) is changed |
-
-AOA = Array of Array, i.e. [[...], [...]]  
-AOO = Array of Object, i.e. [{...}, {...}]
+| Name       | Description |
+| :---       | :---        |
+| update     | Update cell information |
+| delete     | Delete row information |
+| select     | Emit when rows are selected/unselected |
+| cell-click | Emit when a cell be clicked before focus |
+| cell-focus | Emit when a cell got focus |
+| setting    | Emit when setting (column width, invisible state) is changed |
 
 ## Methods List
 
