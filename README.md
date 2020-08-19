@@ -278,7 +278,7 @@ export default {
 
 ### Work with redis for saving
 
-You may capture the @delete and @update event for saving purpose.
+You may capture the @delete and the @update event for saving purpose.
 
 ```html
 <vue-excel-editor v-model="jsondata" @delete="onDelete" @update="onUpdate">
@@ -453,7 +453,7 @@ methods: {
 }
 ```
 
- However, it is possible to make your webpage has performance issue. I suggest you use validation prop to show the wrong content in grid with the validation error.
+However, the promise routine may cause your web page has low performance. I suggest you use a validation prop to show the wrong content in a grid with the validation error.
 
 ### Other Features
 
@@ -561,13 +561,13 @@ The options prop required to provide the mapping of the value and text.
 
 #### Select
 
-Click the row label to select the row. Component supports Excel-style which using shift-click and ctrl-click (Meta for OSX) combination to select multiple rows. You may also intereset in the free-select prop to select the multiple rows without holding the shift key.
+Click the row label to select the row. The component supports Excel-style which using Shift-click and Ctrl-click (Meta for OSX) combination to select multiple rows. You may also interested in the free-select prop to select the multiple rows without holding the shift key.
 
 ![Select](https://i.imgur.com/x0Lkwf8.png "Select")
 
 #### Multi-Update
 
-When user updates any cell during selecting multiple rows, all cells of the same column of those selected rows will be updated.
+When the user updates any cell during select multiple rows, all cells of the same column of those selected rows will be updated.
 
 ![Multi-Update](https://i.imgur.com/iFSPxDQ.png "Multi-Update")
 
@@ -577,7 +577,7 @@ When user updates any cell during selecting multiple rows, all cells of the same
 <vue-excel-column field="user" label="User ID" type="string" width="80px" key-field sticky />
 ```
 
-Specified "sticky" means the specified column is freeze when horizontal scrolling. Most likely sticky columns are leftmost.
+Specified "sticky" means the specified column is frozen when horizontal scrolling. Most likely sticky columns are leftmost.
 
 #### Paging
 
@@ -587,7 +587,7 @@ Specified "sticky" means the specified column is freeze when horizontal scrollin
 </vue-excel-editor>
 ```
 
-To gain better performance, I suggest you use paging by not specify "no-paging" prop. The component automatically calculate the page size once detecting the outer boundary resized. If you want to set the page size manually, try the prop "page". If more than 1 page is detected, the footer (horizontal scroll bar) will show the first/previous/next/last links for page navigation. You may customize these links by "localized-label" prop.
+To gain better performance, I suggest you use paging by not specify "no-paging" prop. The component automatically calculates the page size once detecting the outer boundary resized. If you want to set the page size manually, try the prop "page". If more than 1 page is detected, the footer (horizontal scroll bar) will show the first/previous/next/last links for page navigation. You may customize these links by "localized-label" prop.
 
 ### Validation
 
@@ -627,7 +627,7 @@ Use this with care. The summary calculation eats resource, so it only calculates
 
 ### Link
 
-This is a nice feature in enterprice application. Actually I was learnt from SAP UI. When user holds the function key (Alt-key here) and move the mouse over the cell content, the text will show as a link. If user clicks on the link, your custom function will be triggered. The following example shows how to route to user profile page by clicking on the name column cell.
+This is a nice feature in enterprise applications. Actually, I was learning from SAP UI. When the user holds the function key (Alt-key here) and move the mouse over the cell content, the text will show as a link. If user clicks on the link, your custom function will be triggered. The following example shows how to route to the user profile page by clicking on the name column cell.
 
 ```html
 <vue-excel-column field="name" label="Name" type="string" width="150px" :link="routeToUserFunc" />
@@ -644,7 +644,7 @@ methods: {
 
 ### Text/Value conversion
 
-Sometimes displaying text and the store value will be different. In order to deal with this, you could use column proproties to-text and to-value.
+Sometimes displaying text and the store value will be different. In order to deal with this, you could use column properties to-text and to-value.
 
 ```html
 <vue-excel-column field="phone" label="Contact" type="string" width="130px" :to-text="phoneToText" :to-value="phoneToVal" />
@@ -665,7 +665,7 @@ methods: {
 
 ### Localization
 
-Developer may override the default values through localized-label prop.
+The developer may override the default values through localized-label prop.
 
 ```html
 <template>
