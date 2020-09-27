@@ -69,7 +69,7 @@ export default {
       type: Function,
       default (val) {
         // § magic to hide the temp key
-        if (this.keyField && val && val.startsWith('§')) return ''
+        if (this.keyField && val && val.toString().startsWith('§')) return ''
 
         switch (this.type) {
           case 'date':
