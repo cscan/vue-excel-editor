@@ -358,6 +358,39 @@ The grid setting such as column width can be saved in the localStorage of client
 
 You may also capture the @setting event to handle more specifics.
 
+### Export the content
+
+The following provides the button to export the grid content.
+
+```html
+<template>
+    <button @click="exportAsExcel"> Export Excel </button>
+    <button @lcick="exportAsCsv"> Export CSV </button>
+    <vue-excel-editor ref="grid" ...>
+        ...
+    </vue-excel-editor>
+</template>
+```
+
+```js
+methods: {
+    exportAsExcel () {
+        const format = 'xlsx'
+        const exportSelectedOnly = true
+        const filename = 'test'
+        this.$refs.grid.exportTable(format, exportSelectedOnly, filename)
+    }
+    exportAsCsv () {
+        const format = 'csv'
+        const exportSelectedOnly = true
+        const filename = 'test'
+        this.$refs.grid.exportTable(format, exportSelectedOnly, filename)
+    }
+}
+```
+
+Note that only xlsx format supports compression.
+
 ### Do something when user select/unselect the rows
 
 The selected or unselected rows will be passed to the provided trigger method
