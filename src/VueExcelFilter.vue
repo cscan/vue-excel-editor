@@ -8,6 +8,7 @@
     class="cell column-filter"
     :style="filterRowTop"
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+    tabindex="-1"
     v-on="listeners"
     @focus="onFocus"
     @blur="onBlur"

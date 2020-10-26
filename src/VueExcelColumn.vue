@@ -98,6 +98,7 @@ export default {
   },
   methods: {
     init () {
+      const self = this
       let style = this.initStyle
       let validate = this.validate
       let allowKeys = this.allowKeys
@@ -193,10 +194,14 @@ export default {
         lengthLimit: Number(lengthLimit),
         textTransform: this.textTransform,
 
-        autocomplete: this.autocomplete === null ? this.$parent.autocomplete : this.autocomplete,
+        get autocomplete () {
+          return self.autocomplete === null ? self.$parent.autocomplete : self.autocomplete
+        },
         initStyle: style,
         invisible: this.invisible,
-        readonly: this.readonly === null ? this.$parent.readonly : this.readonly,
+        get readonly () {
+          return self.readonly === null ? self.$parent.readonly : self.readonly
+        },
         pos: Number(this.pos),
         options: this.options,
         summary: this.summary,

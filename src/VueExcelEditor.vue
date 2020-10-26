@@ -250,7 +250,8 @@
       <input type="file"
              ref="importFile"
              accept=".xlsx, .xls, xlsm, .csv"
-             style="width:0; height: 0; opacity:0; z-index:-1"
+             style="position: absolute; top: 0; left: 0; width:0; height: 0; opacity:0; z-index:-1"
+             @keyup="componentTabInto"
              @change="doImport" />
 
       <panel-filter ref="panelFilter" :n-filter-count="nFilterCount" :localized-label="localizedLabel" />
@@ -582,6 +583,12 @@ export default {
     }
   },
   methods: {
+    componentTabInto (e) {
+      if (e.keyCode === 9) {
+        if (!this.moveInputSquare(this.currentRowPos, this.currentColPos))
+          this.moveInputSquare(0, 0)
+      }
+    },
     reset () {
       this.errmsg = {}
       this.redo = []
@@ -998,12 +1005,14 @@ export default {
     /* *** Date Picker *********************************************************************************
      */
     showDatePickerDiv () {
+      if (!this.$refs.dpContainer) return
       const cellRect = this.currentCell.getBoundingClientRect()
       this.$refs.dpContainer.style.left = (cellRect.left) + 'px'
       this.$refs.dpContainer.style.top = (cellRect.bottom) + 'px'
       this.inputDateTime = this.currentCell.textContent
       this.showDatePicker = true
       this.lazy(() => {
+        if (!this.$refs.dpContainer) return
         const r = this.$refs.dpContainer.getBoundingClientRect()
         if (r.bottom > window.innerHeight)
           this.$refs.dpContainer.style.top = (cellRect.top - r.height) + 'px'
@@ -1062,7 +1071,10 @@ export default {
     vsbMouseUp () {
       window.removeEventListener('mousemove', this.vsbMouseMove)
       window.removeEventListener('mouseup', this.vsbMouseUp)
-      this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'))
+      this.lazy(() => {
+        if (!this.$refs.vScrollButton) return
+        this.$refs.vScrollButton.classList.remove('focus')
+      })
       this.vScroller.mouseY = 0
       if (!this.noPaging) {
         const ratio = this.vScroller.buttonTop / (this.vScroller.height - this.vScroller.buttonHeight)
@@ -1120,7 +1132,10 @@ export default {
     sbMouseUp () {
         window.removeEventListener('mousemove', this.sbMouseMove)
         window.removeEventListener('mouseup', this.sbMouseUp)
-        this.lazy(() => this.$refs.hScroll.classList.remove('focus'))
+        this.lazy(() => {
+          if (!this.$refs.hScroll) return
+          this.$refs.hScroll.classList.remove('focus')
+        })
         this.hScroller.mouseX = 0
         this.$forceUpdate()
     },
@@ -1589,7 +1604,10 @@ export default {
       if (this.$refs.vScrollButton) {
         setTimeout(() => {
           this.$refs.vScrollButton.classList.add('focus')
-          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+          this.lazy(() => {
+            if (!this.$refs.vScrollButton) return
+            this.$refs.vScrollButton.classList.remove('focus')
+          }, 1000)
         })
       }
     },
@@ -1600,7 +1618,10 @@ export default {
       if (this.$refs.vScrollButton) {
         setTimeout(() => {
           this.$refs.vScrollButton.classList.add('focus')
-          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+          this.lazy(() => {
+            if (!this.$refs.vScrollButton) return
+            this.$refs.vScrollButton.classList.remove('focus')
+          }, 1000)
         })
       }
     },
@@ -1611,7 +1632,10 @@ export default {
       if (this.$refs.vScrollButton) {
         setTimeout(() => {
           this.$refs.vScrollButton.classList.add('focus')
-          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+          this.lazy(() => {
+            if (!this.$refs.vScrollButton) return
+            this.$refs.vScrollButton.classList.remove('focus')
+          }, 1000)
         })
       }
     },
@@ -1623,7 +1647,10 @@ export default {
       if (this.$refs.vScrollButton) {
         setTimeout(() => {
           this.$refs.vScrollButton.classList.add('focus')
-          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+          this.lazy(() => {
+            if (!this.$refs.vScrollButton) return
+            this.$refs.vScrollButton.classList.remove('focus')
+          }, 1000)
         })
       }
     },
@@ -2004,7 +2031,10 @@ export default {
         if (this.$refs.vScrollButton) {
           setTimeout(() => {
             this.$refs.vScrollButton.classList.add('focus')
-            this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+            this.lazy(() => {
+              if (!this.$refs.vScrollButton) return
+              this.$refs.vScrollButton.classList.remove('focus')
+            }, 1000)
           })
         }
         return done
@@ -2025,7 +2055,10 @@ export default {
         if (this.$refs.vScrollButton) {
           setTimeout(() => {
             this.$refs.vScrollButton.classList.add('focus')
-            this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+            this.lazy(() => {
+              if (!this.$refs.vScrollButton) return
+              this.$refs.vScrollButton.classList.remove('focus')
+            }, 1000)
           })
         }
         return done
@@ -2205,6 +2238,7 @@ export default {
         this.updateCell(recPos, field, field.toValue(setText))
     },
     inputBoxBlur () {
+      if (!this.$refs.dpContainer) return
       if (this.$refs.dpContainer.querySelector(':hover')) return
       if (this.inputBoxChanged) {
         this.inputCellWrite(this.inputBox.value)
@@ -2419,6 +2453,7 @@ export default {
           this.autocompleteInputs = list
           const rect = this.currentCell.getBoundingClientRect()
           this.lazy(() => {
+            if (!this.$refs.autocomplete) return
             this.$refs.autocomplete.style.minWidth = rect.width + 'px'
             const r = this.$refs.autocomplete.getBoundingClientRect()
             if (rect.bottom + r.height > window.innerHeight) {
