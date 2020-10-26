@@ -176,6 +176,9 @@ export default {
       if (this.textAlign) style.textAlign = this.textAlign
       if (this.readonly && this.$parent.readonlyStyle) style = Object.assign(style, this.$parent.readonlyStyle)
 
+      this._autocomplete = self.autocomplete
+      this._readonly = self.readonly
+
       this.$parent.registerColumn({
         name: this.field,
         label: this.label === null ? this.field : this.label,
@@ -195,12 +198,18 @@ export default {
         textTransform: this.textTransform,
 
         get autocomplete () {
-          return self.autocomplete === null ? self.$parent.autocomplete : self.autocomplete
+          return self._autocomplete === null ? self.$parent.autocomplete : self._autocomplete
+        },
+        set autocomplete (val) {
+          self._autocomplete = val
         },
         initStyle: style,
         invisible: this.invisible,
         get readonly () {
-          return self.readonly === null ? self.$parent.readonly : self.readonly
+          return self._readonly === null ? self.$parent.readonly : self._readonly
+        },
+        set readonly (val) {
+          self._readonly = val
         },
         pos: Number(this.pos),
         options: this.options,

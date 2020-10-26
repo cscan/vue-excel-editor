@@ -89,8 +89,13 @@
                 :class="{select: typeof selected[pageTop + rowPos] !== 'undefined'}"
                 :style="rowStyle(record)">
               <td class="center-text first-col"
-                  :class="{hide: noNumCol}"
+                  :id="`rid-${record.$id}`"
+                  :class="{
+                    hide: noNumCol,
+                    error: rowerr[`rid-${record.$id}`]
+                  }"
                   :pos="rowPos"
+                  @mouseover="numcolMouseOver"
                   @click="rowLabelClick">
                 <span v-html="recordLabel(pageTop + rowPos + 1, record)"></span>
               </td>
@@ -330,6 +335,7 @@ export default {
     addColumn: {type: Function, default: null},
     spellcheck: {type: Boolean, default: false},
     newIfBottom: {type: Boolean, default: false},
+    validate: {type: Function, default: null},
     localizedLabel: {
       type: Object,
       default () {
@@ -367,6 +373,7 @@ export default {
           noRecordIsRead: 'No record is read',
           readonlyColumnDetected: 'Readonly column detected',
           columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
+          rowHasValidationError: (row, name, err) => `Row ${row} has validation error for column ${name}: ${err}`,
           noMatchedColumnName: 'No matched column name',
           invalidInputValue: 'Invalid input value',
           missingKeyColumn: 'Missing key column'
@@ -414,6 +421,7 @@ export default {
       autocompleteSelect: -1,
 
       errmsg: {},
+      rowerr: {},
       tip: '',
 
       colHash: '',
@@ -1318,6 +1326,7 @@ export default {
               this.inputBoxShow = 0
               this.inputBoxChanged = false
             }
+            this.inputBoxComplete()
             break
           case 27:  // Esc
             if (!this.focused) return
@@ -1349,9 +1358,9 @@ export default {
             }
             if (this.currentField.readonly) return
             if (this.autocompleteInputs.length) return
+            this.inputBoxChanged = true
             this.inputBox.value = ''
-            this.inputCellWrite('')
-            // }
+            this.inputBoxComplete()
             break
           default:
             if (!this.focused) return
@@ -1762,6 +1771,11 @@ export default {
                       if ((err = field.validate(val, rec[field.name], rec, field)))
                         throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.columnHasValidationError(field.name, err))
                     }
+                    if (this.validate) {
+                      let err
+                      if ((err = this.validate(val, rec[field.name], rec, field)))
+                        throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.rowHasValidationError(i + 1, field.name, err))
+                    }
                   }
                   if (val !== null) rec[field.name] = val
                   else if (field.mandatory)
@@ -1848,12 +1862,16 @@ export default {
             if (!filename.endsWith('.xlsx')) filename = filename + '.xlsx'
             break
         }
-        XLSX.writeFile(wb, filename, {
-          compression: 'DEFLATE',
-          compressionOptions: {
-            level: 6
-          }
-        })
+        if (filename.endsWith('.xlsx'))
+          XLSX.writeFile(wb, filename, {
+            compression: 'DEFLATE',
+            compressionOptions: {
+              level: 6
+            }
+          })
+        else
+          XLSX.writeFile(wb, filename)
+
         this.processing = false
       }, 500)
     },
@@ -2103,6 +2121,16 @@ export default {
       this.$refs.tooltip.style.left = (rect.right + 8) + 'px'
       cell.addEventListener('mouseout', this.cellMouseOut)
     },
+    numcolMouseOver (e) {
+      const cell = e.target
+      if (!cell.classList.contains('error')) return
+      if (this.tipTimeout) clearTimeout(this.tipTimeout)
+      if ((this.tip = this.rowerr[cell.getAttribute('id')]) === '') return
+      const rect = cell.getBoundingClientRect()
+      this.$refs.tooltip.style.top = (rect.top - 14) + 'px';
+      this.$refs.tooltip.style.left = (rect.right + 8) + 'px'
+      cell.addEventListener('mouseout', this.cellMouseOut)
+    },
     cellMouseOut (e) {
       this.tipTimeout = setTimeout(() => {
         this.tip = ''
@@ -2240,17 +2268,23 @@ export default {
     inputBoxBlur () {
       if (!this.$refs.dpContainer) return
       if (this.$refs.dpContainer.querySelector(':hover')) return
+      this.inputBoxComplete()
+      this.focused = false
+      if (this.currentRowPos !== -1 && this.currentRowPos < this.recordBody.children.length) {
+        this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
+        this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
+      }
+    },
+    inputBoxComplete () {
       if (this.inputBoxChanged) {
         this.inputCellWrite(this.inputBox.value)
         this.inputBoxChanged = false
       }
       this.inputBoxShow = 0
-      this.focused = false
       this.showDatePicker = false
-      if (this.currentRowPos !== -1 && this.currentRowPos < this.recordBody.children.length) {
-        this.recordBody.children[this.currentRowPos].children[0].classList.remove('focus')
-        this.labelTr.children[this.currentColPos + 1].classList.remove('focus')
-      }
+      // Without this, the cell cannot refresh, dont know why
+      this.focused = false
+      this.focused = true
     },
 
     /* *** Update *******************************************************************************************
@@ -2390,7 +2424,28 @@ export default {
           const selector = this.systable.querySelector('td#'+id)
           if (selector) selector.classList.add('error')
         }
-        else delete this.errmsg[id]
+        else
+        if (this.errmsg[id]) {          
+          delete this.errmsg[id]
+          const selector = this.systable.querySelector('td#'+id)
+          if (selector) selector.classList.remove('error')
+        }
+
+        if (this.validate !== null) {
+          const rid = `rid-${row.$id}`
+          transaction.rowerr = this.validate(newVal, oldVal, row, field)
+          if (transaction.rowerr) {
+            this.rowerr[rid] = transaction.rowerr
+            const selector = this.systable.querySelector('td#'+rid)
+            if (selector) selector.classList.add('error')
+          }
+          else
+          if (this.rowerr[rid]) {
+            delete this.rowerr[rid]
+            const selector = this.systable.querySelector('td#'+rid)
+            if (selector) selector.classList.remove('error')
+          }
+        }
 
         if (field.summary)
           this.calSummary(field.name)
@@ -2430,13 +2485,15 @@ export default {
             if (field.options.constructor.name.endsWith('Function')) {
               list = await field.options(value, this.currentRecord)
               if (field.type === 'map') list = Object.values(list)
+              list = list.filter(element => element.toUpperCase().startsWith(value))
               list.sort().splice(10)
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
             }
             else if (Object.values(field.options).length > 0) {
               list = field.options
               if (field.type === 'map') list = Object.values(list)
-              list.sort()
+              list = list.filter(element => element.toUpperCase().startsWith(value))
+              list.sort().splice(10)
               this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
             }
           }
