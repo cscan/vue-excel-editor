@@ -1278,12 +1278,16 @@ export default {
               if (!this.moveWest(e)) {
                 if (this.moveNorth(e))
                   this.moveToEast(e)
+                else
+                  return this.inputBoxBlur()
               }
             }
             else {
               if (!this.moveEast(e)) {
                 if (this.moveSouth(e))
                   this.moveToWest(e)
+                else
+                  return this.inputBoxBlur()
               }
             }
             e.preventDefault()
@@ -2157,12 +2161,16 @@ export default {
           // move the whole page down 1 record
           if (this.pageTop + this.pageSize < this.table.length)
             this.pageTop += 1
+          else
+            return false
           row = this.recordBody.children[--rowPos]
         }
         else {
           // move the whole page up 1 record
           if (this.pageTop - 1 >= 0)
             this.pageTop -= 1
+          else
+            return false
           row = this.recordBody.children[++rowPos]
         }
       }

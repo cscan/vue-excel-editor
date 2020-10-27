@@ -624,13 +624,15 @@ To gain better performance, I suggest you use paging by not specify "no-paging" 
 
 ### Validation
 
+The following is for column validation.
+
 ```html
 <vue-excel-column field="phone" label="Contact" type="string" width="130px" :validate="validPhoneNum" />
 ```
 
 ```js
 methods: {
-    validPhoneNum (content) {
+    validPhoneNum (content, oldContent, record, field) {
         if (content === '') return 'Mandatory field'
         if (!/^[0-9]{1}-[0-9]{3}-[0-9]{7}$/.test(content)) return 'Invalid Phone Number'
         return '' // return empty string if there is no error
@@ -639,6 +641,21 @@ methods: {
 ```
 
 ![Validation](https://i.imgur.com/VV6RQYw.png "Validation")
+
+The following is for row validation. It will be triggered for any changes. The error message will be shown at number column.
+
+```html
+<vue-excel-editor :validate="validWholeRecord">
+```
+
+```js
+methods: {
+    validWholeRecord (content, oldContent, record, field) {
+        if (record.age !== moment().diff(record.birth, 'years')) return 'The age and birth do not match'
+        return '' // return empty string if there is no error
+    }
+}
+```
 
 ### Summary
 
