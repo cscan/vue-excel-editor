@@ -2488,7 +2488,7 @@ export default {
           const field = this.currentField
           const name = field.name
           const value = this.inputBox.value.toUpperCase()
-          let list
+          let list = []
           if (field.options) {
             if (field.options.constructor.name.endsWith('Function')) {
               list = await field.options(value, this.currentRecord)
@@ -2506,7 +2506,6 @@ export default {
             }
           }
           else {
-            list = []
             for(let i=0; i<this.value.length; i++) {
               const rec = this.value[i]
               if (typeof rec[name] !== 'undefined' && rec[name].toString().toUpperCase().startsWith(value) && list.indexOf(rec[name]) === -1)
