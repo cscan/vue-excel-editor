@@ -1701,7 +1701,7 @@ export default {
     importTable (cb) {
       this.$refs.importFile.click()
       this.importCallback = cb
-    },
+    },   
     doImport (e) {
       this.processing = true
       // this.refresh()
@@ -1718,7 +1718,11 @@ export default {
             const wb = XLSX.read(data, {type: 'binary', cellDates: true, cellStyle: false})
             const sheet = wb.SheetNames[0]
             let importData = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheet])
-            importData = importData.map((rec) => {
+            importData = importData.filter(rec => Object.keys(rec).length > 2).map((rec) => {
+              if (rec.key_1) {
+                rec.key = rec.key_1  // Fixed the XLSX issue where key is set to be reserved word
+                delete rec.key_1
+              }
               Object.keys(rec).forEach(k => {
                 if (typeof rec[k] === 'string') rec[k] = rec[k].replace(/[ \r\n\t]+$/g, '')
               })
@@ -1736,8 +1740,8 @@ export default {
             let updated = 0
             while (pass < 2) {
               const keys = this.fields.filter(f => f.keyField)
+              let uniqueKeys = []
               await Promise.all(importData.map(async (line, i) => {
-
                 let rowPos = -1
                 if (keys.length) {
                   // locate match record
@@ -1746,7 +1750,14 @@ export default {
                       typeof v[f.name] !== 'undefined' 
                       && (v[f.name] === line[f.name] || v[f.name] === line[f.label])).length === keys.length
                   )
-
+                  if (rowPos === -1) {
+                    // If this is a new line, avoid the line with duplicate key
+                    const linekey = keys.map(k => line[k.name] || line[k.label]).join(':')
+                    if (linekey) {
+                      if (uniqueKeys.includes(linekey)) return
+                      uniqueKeys.push(linekey)
+                    }
+                  }
                 }
 
                 // if no match found, find an empty record

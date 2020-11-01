@@ -174,7 +174,7 @@ export default {
 
       if (this.textTransform) style.textTransform = this.textTransform
       if (this.textAlign) style.textAlign = this.textAlign
-      if (this.readonly && this.$parent.readonlyStyle) style = Object.assign(style, this.$parent.readonlyStyle)
+      // if (this.readonly && this.$parent.readonlyStyle) style = Object.assign(style, this.$parent.readonlyStyle)
 
       this._autocomplete = self.autocomplete
       this._readonly = self.readonly
