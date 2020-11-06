@@ -2504,16 +2504,18 @@ export default {
             if (field.options.constructor.name.endsWith('Function')) {
               list = await field.options(value, this.currentRecord)
               if (field.type === 'map') list = Object.values(list)
-              list = list.filter(element => element.toUpperCase().startsWith(value))
+              if (this.inputBoxShow)
+                list = list.filter(element => element.toUpperCase().includes(value))
               list.sort().splice(10)
-              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().includes(value))
             }
             else if (Object.values(field.options).length > 0) {
               list = field.options
               if (field.type === 'map') list = Object.values(list)
-              list = list.filter(element => element.toUpperCase().startsWith(value))
+              if (this.inputBoxShow)
+                list = list.filter(element => element.toUpperCase().includes(value))
               list.sort().splice(10)
-              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().includes(value))
             }
           }
           else {
