@@ -2504,6 +2504,7 @@ export default {
             if (field.options.constructor.name.endsWith('Function')) {
               list = await field.options(value, this.currentRecord)
               if (field.type === 'map') list = Object.values(list)
+              else list = list.slice()
               if (this.inputBoxShow)
                 list = list.filter(element => element.toUpperCase().includes(value))
               list.sort().splice(10)
@@ -2512,6 +2513,7 @@ export default {
             else if (Object.values(field.options).length > 0) {
               list = field.options
               if (field.type === 'map') list = Object.values(list)
+              else list = list.slice()
               if (this.inputBoxShow)
                 list = list.filter(element => element.toUpperCase().includes(value))
               list.sort().splice(10)
