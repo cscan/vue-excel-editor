@@ -1718,7 +1718,7 @@ export default {
             const wb = XLSX.read(data, {type: 'binary', cellDates: true, cellStyle: false})
             const sheet = wb.SheetNames[0]
             let importData = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheet])
-            importData = importData.filter(rec => Object.keys(rec).length > 2).map((rec) => {
+            importData = importData.filter(rec => Object.keys(rec).length > 0).map((rec) => {
               if (rec.key_1) {
                 rec.key = rec.key_1  // Fixed the XLSX issue where key is set to be reserved word
                 delete rec.key_1
