@@ -2559,12 +2559,12 @@ export default {
     },
     inputAutocompleteText (text, e) {
       if (e) e.preventDefault()
+      this.autocompleteInputs = []
+      this.autocompleteSelect = -1
+      this.inputBoxShow = 0
+      this.inputBoxChanged = false
       setTimeout(() => {
         this.inputCellWrite(text)
-        this.autocompleteInputs = []
-        this.autocompleteSelect = -1
-        this.inputBoxShow = 0
-        this.inputBoxChanged = false
       })
     },
 
