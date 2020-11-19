@@ -346,7 +346,7 @@ The component will generate the corresponding @delete events. You may also inter
 
 ### Remember the grid setting
 
-The grid setting such as column width can be saved in the localStorage of client browser by specified "remember" prop:
+The grid setting such as column width and column label can be saved in the localStorage of client browser by specified "remember" prop:
 
 ```html
 <template>
@@ -357,6 +357,18 @@ The grid setting such as column width can be saved in the localStorage of client
 ```
 
 You may also capture the @setting event to handle more specifics.
+
+### Change the column label
+
+You may specify the column label in vue-excel-column label prop. However, it will persist after mounted. If you want to change the column label after mounted, you may try to update the variable fields. For example
+
+```js
+    this.$refs.grid.fields.forEach((field) => {
+        if (field.name === 'col23') field.label = 'Product'
+        if (field.label === '') field.label = '(' + field.name + ')'
+    })
+    this.$forceUpdate()  // remember to call vue update to reflesh the display
+```
 
 ### Export the content
 
