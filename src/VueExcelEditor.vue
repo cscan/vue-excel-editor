@@ -326,6 +326,7 @@ export default {
     height: {type: String, default: ''},
     width: {type: String, default: '100%'},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
+    autocompleteCount: {type: Number, default: 50},
     readonly: {type: Boolean, default: false},
     readonlyStyle: {type: Object, default () {return {}}},
     remember: {type: Boolean, default: false},
@@ -1266,11 +1267,17 @@ export default {
             if (this.autocompleteInputs.length === 0)
               this.moveNorth()
             else
-            if (this.autocompleteSelect > 0)
+            if (this.autocompleteSelect > 0) {
               this.autocompleteSelect--
+              const showTop = this.autocompleteSelect * 23
+              if (showTop < this.$refs.autocomplete.scrollTop)
+                this.$refs.autocomplete.scrollTop = showTop
+            }
             else
-            if (this.autocompleteSelect === -1)
-              this.autocompleteSelect = this.autocompleteInputs.length - 1
+            if (this.autocompleteSelect === -1) {
+              this.autocompleteSelect = 0
+              // this.autocompleteSelect = this.autocompleteInputs.length - 1
+            }
             break
           case 9:  // Tab
             if (!this.focused) return
@@ -1311,7 +1318,15 @@ export default {
             if (this.autocompleteInputs.length === 0)
               this.moveSouth(e)
             else
-              if (this.autocompleteSelect < this.autocompleteInputs.length - 1) this.autocompleteSelect++
+              if (this.autocompleteSelect < this.autocompleteInputs.length - 1) {
+                this.autocompleteSelect++
+                if (this.autocompleteSelect >= 10) {
+                  const showTop = this.autocompleteSelect * 23 - 206
+                  const scrollTop = this.$refs.autocomplete.scrollTop
+                  if (scrollTop < showTop)
+                    this.$refs.autocomplete.scrollTop = showTop
+                }
+              }
             break
           case 13:  // Enter
             if (!this.focused) return
@@ -1698,9 +1713,10 @@ export default {
 
     /* *** Import/Export ************************************************************************************
      */
-    importTable (cb) {
+    importTable (cb, errCb) {
       this.$refs.importFile.click()
       this.importCallback = cb
+      this.importErrorCallback = errCb
     },   
     doImport (e) {
       this.processing = true
@@ -1729,11 +1745,16 @@ export default {
               return rec
             })
             const keyStart = String(new Date().getTime() % 1e8)
-            if (importData.length === 0) throw new Error('VueExcelEditor: ' + this.localizedLabel.noRecordIsRead)
+            if (importData.length === 0) {
+              if (this.importErrorCallback) this.importErrorCallback('noRecordIsRead')
+              throw new Error('VueExcelEditor: ' + this.localizedLabel.noRecordIsRead)
+            }
             if (this.fields
               .filter(f => f.keyField)
-              .filter(f => typeof importData[0][f.name] === 'undefined' && typeof importData[0][f.label] === 'undefined').length > 0)
-              throw new Error(`VueExcelEditor: ${this.localizedLabel.missingKeyColumn}`)
+              .filter(f => typeof importData[0][f.name] === 'undefined' && typeof importData[0][f.label] === 'undefined').length > 0) {
+                if (this.importErrorCallback) this.importErrorCallback('missingKeyColumn')
+                throw new Error(`VueExcelEditor: ${this.localizedLabel.missingKeyColumn}`)
+              }
 
             let pass = 0
             let inserted = 0
@@ -1775,26 +1796,37 @@ export default {
                   if (typeof val === 'undefined') val = line[field.label]
                   if (typeof val === 'undefined') val = null
                   else {
-                    if (field.readonly) throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected + ': ' + field.name)
+                    if (field.readonly) {
+                      if (this.importErrorCallback) this.importErrorCallback('readonlyColumnDetected', i+1)
+                      throw new Error(`VueExcelEditor: [row=${i+1}] ` + this.localizedLabel.readonlyColumnDetected + ': ' + field.name)
+                    }
                     if (field.change) {
                       let result = await field.change(val, rec[field.name], rec, field)
-                      if (result === false)
+                      if (result === false) {
+                        if (this.importErrorCallback) this.importErrorCallback('columnHasValidationError', i+1)
                         throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.columnHasValidationError(field.name, ''))
+                      }
                     }
                     if (field.validate) {
                       let err
-                      if ((err = field.validate(val, rec[field.name], rec, field)))
+                      if ((err = field.validate(val, rec[field.name], rec, field))) {
+                        if (this.importErrorCallback) this.importErrorCallback('columnHasValidationError', i+1, val)
                         throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.columnHasValidationError(field.name, err))
+                      }
                     }
                     if (this.validate) {
                       let err
-                      if ((err = this.validate(val, rec[field.name], rec, field)))
+                      if ((err = this.validate(val, rec[field.name], rec, field))) {
+                        if (this.importErrorCallback) this.importErrorCallback('rowHasValidationError', i+1, val)
                         throw new Error(`VueExcelEditor: [row=${i+1}, val=${val}] ` + this.localizedLabel.rowHasValidationError(i + 1, field.name, err))
+                      }
                     }
                   }
                   if (val !== null) rec[field.name] = val
-                  else if (field.mandatory)
+                  else if (field.mandatory) {
+                    if (this.importErrorCallback) this.importErrorCallback(field.mandatory, i+1, val)
                     throw new Error(`VueExcelEdutor: [row=${i+1}, val=${val}] ` + field.mandatory)
+                  }
                 }))
 
                 // Do actual insert/update if 2nd pass
@@ -1824,6 +1856,7 @@ export default {
             }
           }
           catch (e) {
+            if (this.importErrorCallback) this.importErrorCallback(e.message)
             throw new Error('VueExcelEditor: ' + e.stack)
           }
           finally {
@@ -1834,6 +1867,7 @@ export default {
         fileReader.onerror = (e) => {
           this.processing = false
           this.$refs.importFile.value = ''
+          if (this.importErrorCallback) this.importErrorCallback(e.message)
           throw new Error('VueExcelEditor: ' + e.stack)
         }
         fileReader.readAsBinaryString(file)
@@ -2499,6 +2533,7 @@ export default {
           const field = this.currentField
           const name = field.name
           const value = this.inputBox.value.toUpperCase()
+          const listCount = this.autocompleteCount
           let list = []
           if (field.options) {
             if (field.options.constructor.name.endsWith('Function')) {
@@ -2507,8 +2542,8 @@ export default {
               else list = list.slice()
               if (this.inputBoxShow)
                 list = list.filter(element => element.toUpperCase().includes(value))
-              list.sort().splice(10)
-              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().includes(value))
+              list.sort().splice(listCount)
+              // this.autocompleteSelect = list.findIndex(element => element.toUpperCase().includes(value))
             }
             else if (Object.values(field.options).length > 0) {
               list = field.options
@@ -2516,8 +2551,8 @@ export default {
               else list = list.slice()
               if (this.inputBoxShow)
                 list = list.filter(element => element.toUpperCase().includes(value))
-              list.sort().splice(10)
-              this.autocompleteSelect = list.findIndex(element => element.toUpperCase().includes(value))
+              list.sort().splice(listCount)
+              // this.autocompleteSelect = list.findIndex(element => element.toUpperCase().includes(value))
             }
           }
           else {
@@ -2525,10 +2560,11 @@ export default {
               const rec = this.value[i]
               if (typeof rec[name] !== 'undefined' && rec[name].toString().toUpperCase().startsWith(value) && list.indexOf(rec[name]) === -1)
                 list.push(rec[name])
-              if (list.length >= 10) break
+              if (list.length >= listCount) break
             }
             list.sort()
           }
+          this.autocompleteSelect = list.findIndex(element => element.toUpperCase().includes(value))
           this.autocompleteInputs = list
           const rect = this.currentCell.getBoundingClientRect()
           this.lazy(() => {
@@ -2548,6 +2584,8 @@ export default {
               this.$refs.autocomplete.style.top = (window.innerWidth - r.width) + 'px'
             else
               this.$refs.autocomplete.style.left = rect.left + 'px'
+            const showTop = this.autocompleteSelect * 23 - 206
+            this.$refs.autocomplete.scrollTop = showTop > 0 ? showTop : 0
           })
           return this.autocompleteSelect
         }
@@ -2634,9 +2672,11 @@ input:focus, input:active:focus, input.active:focus {
   margin: -1px;
   background-color: lightyellow;
   border: 1px solid rgb(108, 143, 108);
-  height: fit-content;
+  /*height: fit-content;*/
+  overflow-y: scroll;
   font-size: 0.88rem;
   max-width: 300px;
+  max-height: 235px;
 }
 .autocomplete-result {
   list-style: none;
