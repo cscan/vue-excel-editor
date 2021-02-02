@@ -1,6 +1,11 @@
 <template>
   <div class="vue-excel-editor" :style="{display: 'inline-block', 'max-width': width}">
     <div class="component-content">
+      <!-- No record -->
+      <div v-if="localizedLabel.noRecordIndicator && pagingTable.length == 0" class="norecord" :style="{bottom: noFooter? '12px' : '37px'}">
+        {{ localizedLabel.noRecordIndicator }}
+      </div>
+
       <div ref="tableContent"
            class="table-content"
            :class="{'no-footer': noFooter}"
@@ -84,7 +89,11 @@
             </tr>
           </thead>
           <tbody @mousedown="mouseDown">
-            <tr v-for="(record, rowPos) in pagingTable"
+            <tr v-if="localizedLabel.noRecordIndicator && pagingTable.length == 0">
+              <td colspan="100%" style="height:40px; vertical-align: middle; text-align: center"></td>
+            </tr>
+            <tr v-else
+                v-for="(record, rowPos) in pagingTable"
                 :key="rowPos"
                 :class="{select: typeof selected[pageTop + rowPos] !== 'undefined'}"
                 :style="rowStyle(record)">
@@ -120,7 +129,7 @@
             </tr>
           </tbody>
           <tfoot>
-            <tr v-show="summaryRow">
+            <tr v-show="pagingTable.length && summaryRow">
               <td class="row-summary first-col">&nbsp;</td>
               <template v-for="(field, p) in fields">
                 <td v-show="!field.invisible"
@@ -377,7 +386,8 @@ export default {
           rowHasValidationError: (row, name, err) => `Row ${row} has validation error for column ${name}: ${err}`,
           noMatchedColumnName: 'No matched column name',
           invalidInputValue: 'Invalid input value',
-          missingKeyColumn: 'Missing key column'
+          missingKeyColumn: 'Missing key column',
+          noRecordIndicator: 'No record'
         }
       }
     },
@@ -2142,7 +2152,7 @@ export default {
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
         this.$emit('cellClick', {rowPos, colPos})
         this.moveInputSquare(rowPos, colPos)
-        if (this.currentField.link && e.altKey)
+        if (this.currentField && this.currentField.link && e.altKey)
           setTimeout(() => this.currentField.link(this.currentCell.textContent, this.currentRecord, rowPos, colPos, this.currentField, this))
         if (e.target.offsetWidth - e.offsetX > 15) return
         if (this.currentField.readonly) return
@@ -3150,5 +3160,12 @@ a:disabled {
   border-right: 8px solid red;
   left: -8px;
   top: 8px;
+}
+.norecord {
+  z-index: 1;
+  font-size: smaller;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
 </style>

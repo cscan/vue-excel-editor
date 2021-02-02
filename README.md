@@ -776,7 +776,8 @@ data: {
         columnHasValidationError: (name, err) => `Column ${name} has validation error: ${err}`,
         noMatchedColumnName: 'No matched column name',
         invalidInputValue: 'Invalid input value',
-        missingKeyColumn: 'Missing key column'
+        missingKeyColumn: 'Missing key column',
+        noRecordIndicator: 'No record'
     }
 }
 ```
@@ -821,7 +822,8 @@ data: {
         columnHasValidationError: (name, err) => `纪录栏位 ${name} 发生核实错误: ${err}`,
         noMatchedColumnName: '没有能配对之栏位',
         invalidInputValue: '输入错误内容',
-        missingKeyColumn: '找不到关键栏位'
+        missingKeyColumn: '找不到关键栏位',
+        noRecordIndicator: '沒有纪录'
     }
 }
 ```
