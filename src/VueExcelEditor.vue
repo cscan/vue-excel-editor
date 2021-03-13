@@ -553,6 +553,12 @@ export default {
         this.frontdrop.style.height = rect.height + 'px'
         this.frontdrop.style.width = rect.width + 'px'
       }
+    },
+    pageTop (newVal) {
+      this.$emit('page-changed', newVal, newVal + this.pageSize - 1)
+    },
+    pageSize (newVal) {
+      this.$emit('page-changed', this.pageTop, this.pageTop + newVal - 1)
     }
   },
   beforeDestroy () {
@@ -2150,7 +2156,7 @@ export default {
         const row = e.target.parentNode
         const colPos = Array.from(row.children).indexOf(e.target) - 1
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
-        this.$emit('cellClick', {rowPos, colPos})
+        this.$emit('cell-click', {rowPos, colPos})
         this.moveInputSquare(rowPos, colPos)
         if (this.currentField && this.currentField.link && e.altKey)
           setTimeout(() => this.currentField.link(this.currentCell.textContent, this.currentRecord, rowPos, colPos, this.currentField, this))
@@ -2270,7 +2276,7 @@ export default {
       this.currentCell = cell
       this.currentRecord = this.table[top + rowPos]
 
-      this.$emit('cellFocus', {rowPos, colPos, cell, record: this.currentRecord})
+      this.$emit('cell-focus', {rowPos, colPos, cell, record: this.currentRecord})
 
       // Off all editors
       if (this.showDatePicker) this.showDatePicker = false

@@ -63,7 +63,7 @@ In your template
 
 ## Props List
 
-### Component: vue-excel-editor
+### Prop Component: vue-excel-editor
 
 | Name                  | Mandatory | Type     | Description |
 | :---                  | :---      | :---     | :---        |
@@ -98,7 +98,7 @@ In your template
 | disable-panel-setting | Optional  | Boolean  | Hide the setting panel |
 | disable-panel-filter  | Optional  | Boolean  | Hide the filter panel |
 
-### Component: vue-excel-column
+### Prop Component: vue-excel-column
 
 | Name           | Mandatory | Type              | Description |
 | :---           | :---      | :---              | :---        |
@@ -161,20 +161,21 @@ In your template
 
 ## Events List
 
-### Component: vue-excel-editor
+### Event Component: vue-excel-editor
 
-| Name       | Description |
-| :---       | :---        |
-| update     | Update cell information |
-| delete     | Delete row information |
-| select     | Emit when rows are selected/unselected |
-| cell-click | Emit when a cell be clicked before focus |
-| cell-focus | Emit when a cell got focus |
-| setting    | Emit when setting (column width, invisible state) is changed |
+| Name         | Arguemnts                   | Description |
+| :---         | :---                        | :---        |
+| update       | updateItemArray             | Update cell information |
+| delete       | deleteItemArray             | Delete row information |
+| select       | selectIdArray, direction    | Emit when rows are selected/unselected |
+| cell-click   | rowPos, colPos              | Emit when a cell be clicked before focus |
+| cell-focus   | {rowPos, colPos, cell, rec} | Emit when a cell got focus |
+| page-changed | pageTopPos, pageBottomPos   | Emit when the page has changed |
+| setting      | setting                     | Emit when setting (column width, invisible state) is changed |
 
 ## Methods List
 
-### Component: vue-excel-editor
+### Method Component: vue-excel-editor
 
 | Name                  | Arguments  | Description |
 | :---                  | :---       | :---        |
@@ -215,7 +216,7 @@ In your template
 
 ## Variable List
 
-#### Component: vue-excel-editor
+### Variable Component: vue-excel-editor
 
 | Name          | Type    | Description |
 | :---          | :---    | :---        |
@@ -233,7 +234,7 @@ In your template
 AOA = Array of Array, i.e. [[...], [...]]  
 AOO = Array of Object, i.e. [{...}, {...}]
 
-I suppose you try to read them only. Do not try to modify any value of the above variables, unless you deeply walk through all the codes and know the consequences.
+I suppose you try to read all the above variables only. Do not try to modify any value of the above variables, unless you deeply walk through the codes and know the consequences.
 
 ## Example
 
@@ -367,6 +368,17 @@ You may specify the column label in vue-excel-column label prop. However, it wil
     this.$refs.grid.fields.forEach((field) => {
         if (field.name === 'col23') field.label = 'Product'
         if (field.label === '') field.label = '(' + field.name + ')'
+    })
+    this.$forceUpdate()  // remember to call vue update to reflesh the display
+```
+
+### Change the column invisibility
+
+Same as column label, you may make the column visible/invisible in vue-excel-column label prop. However, it will persist after mounted. If you want to change it after mounted, you may try to update the variable fields. For example
+
+```js
+    this.$refs.grid.fields.forEach((field) => {
+        if (field.name === 'col23') field.invisible = false
     })
     this.$forceUpdate()  // remember to call vue update to reflesh the display
 ```
