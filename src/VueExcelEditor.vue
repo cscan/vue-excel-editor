@@ -2790,9 +2790,10 @@ input:focus, input:active:focus, input.active:focus {
   border: 0;
   border-collapse: separate;
   border-spacing: 0;
+  /*
   margin-bottom: -1px;
   border-bottom: 1px solid lightgray;
-  /* margin-left: 40px; */
+  */
 }
 .systable .last-col {
   width: 12px;
