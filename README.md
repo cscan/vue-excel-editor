@@ -97,6 +97,7 @@ In your template
 | new-if-bottom         | Optional  | Boolean  | New record if focusing cell reach bottom |
 | disable-panel-setting | Optional  | Boolean  | Hide the setting panel |
 | disable-panel-filter  | Optional  | Boolean  | Hide the filter panel |
+| no-mouse-scroll       | Optional  | Boolean  | Disable the vertical scrolling by mouse |
 
 ### Prop Component: vue-excel-column
 

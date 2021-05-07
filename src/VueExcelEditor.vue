@@ -329,6 +329,7 @@ export default {
     noFooter: {type: Boolean, default: false},
     noPaging: {type: Boolean, default: false},
     noNumCol: {type: Boolean, default: false},
+    noMouseScroll: {type: Boolean, default: false},
     page: {type: Number, default: 0},               // prefer page size, auto-cal if not provided
     enterToSouth: {type: Boolean, default: false},  // default enter to south
     nFilterCount: {type: Number, default: 1000},    // show top n values in filter dialog
@@ -567,6 +568,7 @@ export default {
     window.removeEventListener('keydown', this.winKeydown)
     window.removeEventListener('keyup', this.winKeyup)
     window.removeEventListener('scroll', this.winScroll)
+    window.removeEventListener('wheel', this.mousewheel)
   },
   mounted () {
     this.tableContent = this.$refs.tableContent
@@ -597,6 +599,7 @@ export default {
     window.addEventListener('keydown', this.winKeydown)
     window.addEventListener('keyup', this.winKeyup)
     window.addEventListener('scroll', this.winScroll)
+    window.addEventListener('wheel', this.mousewheel, {passive: false})
 
     if (this.remember) {
       const saved = localStorage[window.location.pathname + '.' + this.token]
@@ -1205,6 +1208,23 @@ export default {
     winScroll () {
       this.showDatePicker = false
       this.autocompleteInputs = []
+    },
+    mousewheel (e) {
+      if (this.noMouseScroll || !this.mousein || !e.deltaY) return
+      let adjust = 0
+      if (e.deltaY > 30 && this.pageTop + this.pageSize < this.table.length) adjust = 1
+      else if (e.deltaY < -30 && this.pageTop > 0) adjust = -1
+      if (adjust) {
+        this.pageTop += adjust
+        setTimeout(this.calVScroll)
+        if (this.$refs.vScrollButton) {
+          this.$refs.vScrollButton.classList.add('focus')
+          this.lazy(() => this.$refs.vScrollButton.classList.remove('focus'), 1000)
+        }
+      }
+      e.preventDefault()
+      e.stopPropagation()
+      return false
     },
     winResize () {
       this.lazy(this.refreshPageSize, 200)
