@@ -66,7 +66,7 @@
               <span>{{ item }}</span>
             </div>
           </div>
-          <div v-if="filteredSortedUniqueValueList.length>500" class="normal-text" style="float:right">
+          <div v-if="filteredSortedUniqueValueList.length>nFilterCount" class="normal-text" style="float:right">
             <span v-html="localizedLabel.listFirstNValuesOnly(nFilterCount)" />
           </div>
         </div>
