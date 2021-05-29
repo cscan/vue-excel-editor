@@ -108,7 +108,7 @@ input:focus, button:focus {
   border: 0;
   box-shadow: none;
   padding: 0.6rem;
-  width: calc(100% - 2.2rem);
+  width: 100%;
   font-size: 0.88rem;
   background-color: transparent;
 }

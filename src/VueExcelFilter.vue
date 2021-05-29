@@ -85,11 +85,21 @@ export default {
     onFocus () {
       setTimeout(() => {
         this.colLabel.classList.add('focus')
-        document.execCommand('selectAll', false, null)
+        // document.execCommand('selectAll', false, null)
+        this.selectAll(this.cell)
         this.$parent.currentColPos = this.colPos
         this.$parent.currentRowPos = -1
         this.$parent.labelTr.children[this.$parent.currentColPos + 1].classList.add('focus')
       }, 0)
+    },
+    selectAll(node) {
+      const selection = window.getSelection()
+      if (selection) {
+        const range = document.createRange()
+        range.selectNodeContents(node)
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
     },
     onBlur (e) {
       this.updateValue(e)
@@ -99,21 +109,20 @@ export default {
     keyWest (e) {
       const sel = document.getSelection()
       if (e.target.textContent === sel.toString() || sel.focusOffset === 0) {
-        let td = e.target.previousSibling
-        if (td && td.style && td.style.display === 'none') td = td.previousSibling
+        let td = e.target.previousElementSibling
+        while (td && td.style && td.style.display === 'none') td = td.previousElementSibling
         if (!td) return td
-        if (!td.tagName) td = td.previousSibling
         if (td.focus) td.focus()
         return td
       }
+      return e.target
     },
     keyEast (e) {
       const sel = document.getSelection()
       if (e.target.textContent === sel.toString() || sel.focusOffset >= e.target.textContent.length) {
-        let td = e.target.nextSibling
-        if (td && td.style && td.style.display === 'none') td = td.nextSibling
+        let td = e.target.nextElementSibling
+        while (td && td.style && td.style.display === 'none') td = td.nextElementSibling
         if (!td) return td
-        if (!td.tagName) td = td.nextSibling
         if (td.focus) td.focus()
         return td
       }
@@ -121,7 +130,8 @@ export default {
     },
     keyEnter (e) {
       e.preventDefault()
-      document.execCommand('selectAll', false, null)
+      // document.execCommand('selectAll', false, null)
+      this.selectAll(this.cell)
       // if (!this.$parent.keyEast(e))
       this.updateValue(e)
     },
