@@ -164,54 +164,59 @@ In your template
 
 ### Event Component: vue-excel-editor
 
-| Name         | Arguemnts                   | Description |
-| :---         | :---                        | :---        |
-| update       | updateItemArray             | Update cell information |
-| delete       | deleteItemArray             | Delete row information |
-| select       | selectIdArray, direction    | Emit when rows are selected/unselected |
-| cell-click   | rowPos, colPos              | Emit when a cell be clicked before focus |
-| cell-focus   | {rowPos, colPos, cell, rec} | Emit when a cell got focus |
-| page-changed | pageTopPos, pageBottomPos   | Emit when the page has changed |
-| setting      | setting                     | Emit when setting (column width, invisible state) is changed |
+| Name           | Arguemnts                   | Description |
+| :---           | :---                        | :---        |
+| update         | updateItemArray             | Update cell information |
+| delete         | deleteItemArray             | Delete row information |
+| select         | selectIdArray, direction    | Emit when rows are selected/unselected |
+| cell-click     | rowPos, colPos              | Emit when a cell be clicked before focus |
+| cell-focus     | {rowPos, colPos, cell, rec} | Emit when a cell got focus |
+| page-changed   | pageTopPos, pageBottomPos   | Emit when the page has changed |
+| setting        | setting                     | Emit when setting (column width, invisible state) is changed |
+| validate-error | error, row, field           | Emit when validation (both field and row level) occured |
 
 ## Methods List
 
 ### Method Component: vue-excel-editor
 
-| Name                  | Arguments  | Description |
-| :---                  | :---       | :---        |
-| firstPage             |            | Move to the first page |
-| lastPage              |            | Move to the last page |
-| prevPage              |            | Move to the previous page |
-| nextPage              |            | Move to the next page |
-| moveNorth             |            | Move the cursor cell to upper cell |
-| moveSouth             |            | Move the cursor cell to lower cell |
-| moveWest              |            | Move the cursor cell to previous cell |
-| moveEast              |            | Move the cursor cell to next cell |
-| moveTo                | row, col*  | Move the cursor cell to cell(row, col) |
-| moveToNorthWest       |            | Move the cursor cell to 1st row 1st col |
-| moveToNorthEast       |            | Move the cursor cell to 1st row last col |
-| moveToSouthWest       |            | Move the cursor cell to last row 1st col |
-| moveToSouthEast       |            | Move the cursor cell to last row last col |
-| doFind                | text       | Find the specified text in whole table and locate the cursor cell |
-| doFindNext            |            | Contnue the last find |
-| sort                  | n, pos     | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
-| newRecord             | rec*       | Call this to new an empty record, return the rec pointer |
-| deleteRecord          | rowpos     | Delete the record in pos rowpos |
-| deleteSelectedRecords |            | Delete all the selected records |
-| selectRecord          | row        | Select the row |
-| selectRecordByKeys    | keys       | Select the row by keys hash |
-| selectRecordById      | id         | Select the row by $id |
-| unSelectRecord        | row        | UnSelect the row |
-| clearAllSelected      |            | Unselect all selected rows |
-| getSelectedRecords    |            | Get an array of the selected row hash |
-| exportTable           | fmt*       | Export the filtered table as xlsx/csv |
-| importTable           | callback*  | Import the specified formatted xlsx |
-| undoTransaction       |            | Undo the last update |
-| setFilter             | name, text | Set the filter text on column name |
-| clearFilter           | name*      | Clear the filter text on column name |
-| columnSuppress        |            | Hide the column if all values are null or empty |
-| calSummary            |            | Calculate the summary of all columns |
+| Name                  | Arguments         | Description |
+| :---                  | :---              | :---        |
+| firstPage             |                   | Move to the first page |
+| lastPage              |                   | Move to the last page |
+| prevPage              |                   | Move to the previous page |
+| nextPage              |                   | Move to the next page |
+| moveNorth             |                   | Move the cursor cell to upper cell |
+| moveSouth             |                   | Move the cursor cell to lower cell |
+| moveWest              |                   | Move the cursor cell to previous cell |
+| moveEast              |                   | Move the cursor cell to next cell |
+| moveTo                | row, col*         | Move the cursor cell to cell(row, col) |
+| moveToNorthWest       |                   | Move the cursor cell to 1st row 1st col |
+| moveToNorthEast       |                   | Move the cursor cell to 1st row last col |
+| moveToSouthWest       |                   | Move the cursor cell to last row 1st col |
+| moveToSouthEast       |                   | Move the cursor cell to last row last col |
+| doFind                | text              | Find the specified text in whole table and locate the cursor cell |
+| doFindNext            |                   | Contnue the last find |
+| sort                  | n, pos            | Sort the column specified by pos, n = 1 (ascending) or -1 (descending) |
+| newRecord             | rec*              | Call this to new an empty record, return the rec pointer |
+| deleteRecord          | rowpos            | Delete the record in pos rowpos |
+| deleteSelectedRecords |                   | Delete all the selected records |
+| selectRecord          | row               | Select the row |
+| selectRecordByKeys    | keys              | Select the row by keys hash |
+| selectRecordById      | id                | Select the row by $id |
+| unSelectRecord        | row               | UnSelect the row |
+| clearAllSelected      |                   | Unselect all selected rows |
+| getSelectedRecords    |                   | Get an array of the selected row hash |
+| exportTable           | fmt*              | Export the filtered table as xlsx/csv |
+| importTable           | callback*         | Import the specified formatted xlsx |
+| undoTransaction       |                   | Undo the last update |
+| setFilter             | name, text        | Set the filter text on column name |
+| clearFilter           | name*             | Clear the filter text on column name |
+| columnSuppress        |                   | Hide the column if all values are null or empty |
+| calSummary            |                   | Calculate the summary of all columns |
+| getFieldByName        | name              | Get the field object by name |
+| getFieldByLabel       | label             | Get the field object by label |
+| setRowError           | error, row        | Set the row validation error |
+| setFieldError         | error, row, field | Set the row validation error |
 
 &#42; = optional argument
 
@@ -391,7 +396,7 @@ The following provides the button to export the grid content.
 ```html
 <template>
     <button @click="exportAsExcel"> Export Excel </button>
-    <button @lcick="exportAsCsv"> Export CSV </button>
+    <button @click="exportAsCsv"> Export CSV </button>
     <vue-excel-editor ref="grid" ...>
         ...
     </vue-excel-editor>
@@ -679,6 +684,21 @@ methods: {
     validWholeRecord (content, oldContent, record, field) {
         if (record.age !== moment().diff(record.birth, 'years')) return 'The age and birth do not match'
         return '' // return empty string if there is no error
+    }
+}
+```
+
+You may want to receive the validation error. Component will emit an event "validation-error" if row or field validation error changed.
+
+```html
+<vue-excel-editor @validate-error="logValidationError">
+```
+
+```js
+methods: {
+    logValidationError (error, row, field) {
+        // For row validation, the field argument will be null value
+        console.log(error, row, field)
     }
 }
 ```
