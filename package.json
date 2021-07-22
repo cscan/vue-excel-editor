@@ -8,7 +8,7 @@
     "moment": "^2.24.0",
     "vue2-datepicker": "^3.3.0",
     "vuedraggable": "^2.23.2",
-    "xlsx": "^0.15.3"
+    "xlsx": "^0.17.0"
   },
   "scripts": {
     "build": "npm run build:umd & npm run build:es & npm run build:unpkg",
