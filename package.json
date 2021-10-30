@@ -2,7 +2,7 @@
   "name": "vue-excel-editor",
   "email": "apple.6502@gmail.com",
   "description": "Vue2 plugin for displaying and editing the array-of-object in Excel style",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "main": "src/main.js",
   "dependencies": {
     "moment": "^2.24.0",
