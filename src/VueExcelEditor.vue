@@ -22,7 +22,7 @@
               ondragenter="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
           <colgroup>
-            <col style="width:40px">
+            <col v-if="!noNumCol" style="width:40px">
             <col v-for="(item, p) in fields" v-show="!item.invisible" :key="p" :style="{width: item.width}">
             <col v-if="vScroller.buttonHeight < vScroller.height" style="width:12px">
           </colgroup>
