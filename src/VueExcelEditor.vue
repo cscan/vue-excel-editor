@@ -1475,7 +1475,9 @@ export default {
         window.getComputedStyle(elm, null).getPropertyValue(css)
       }
       this.sep = {}
-      this.sep.curCol = this.colgroupTr.children[Array.from(this.labelTr.children).indexOf(e.target.parentElement)]
+      // this.sep.curCol = this.colgroupTr.children[Array.from(this.labelTr.children).indexOf(e.target.parentElement)]
+      this.sep.curCol = this.colgroupTr.children[
+        Array.from(this.labelTr.children).indexOf(e.target.parentElement) - (!this.noNumCol ? 0 : 1)]
       // this.sep.nxtCol = this.sep.curCol.nextElementSibling
       this.sep.pageX = e.pageX
       let padding = 0
