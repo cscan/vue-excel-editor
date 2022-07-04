@@ -108,41 +108,39 @@
                   @click="rowLabelClick">
                 <span v-html="recordLabel(pageTop + rowPos + 1, record)"></span>
               </td>
-              <template v-for="(item, p) in fields">
-                <td v-show="!item.invisible"
-                    :id="`id-${record.$id}-${item.name}`"
-                    :cell-RC="`${rowPos}-${item.name}`"
-                    :class="{
-                      readonly: item.readonly,
-                      error: errmsg[`id-${record.$id}-${item.name}`],
-                      link: item.link,
-                      select: item.options,
-                      datepick: item.type == 'date',
-                      'sticky-column': item.sticky
-                    }"
-                    :style="Object.assign(cellStyle(record, item), renderColumnCellStyle(item))"
-                    :key="p"
-                    @mouseover="cellMouseOver"
-                    @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
-              </template>
+              <td v-for="(item, p) in fields"
+                  v-show="!item.invisible"
+                  :id="`id-${record.$id}-${item.name}`"
+                  :cell-RC="`${rowPos}-${item.name}`"
+                  :class="{
+                    readonly: item.readonly,
+                    error: errmsg[`id-${record.$id}-${item.name}`],
+                    link: item.link,
+                    select: item.options,
+                    datepick: item.type == 'date',
+                    'sticky-column': item.sticky
+                  }"
+                  :style="Object.assign(cellStyle(record, item), renderColumnCellStyle(item))"
+                  :key="p"
+                  @mouseover="cellMouseOver"
+                  @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
               <td v-if="vScroller.buttonHeight < vScroller.height" class="last-col"></td>
             </tr>
           </tbody>
           <tfoot>
             <tr v-show="pagingTable.length && summaryRow">
               <td class="row-summary first-col">&nbsp;</td>
-              <template v-for="(field, p) in fields">
-                <td v-show="!field.invisible"
-                    class="row-summary"
-                    :colspan="p === fields.length - 1 && vScroller.buttonHeight < vScroller.height ? 2: 1"
-                    :class="{
-                      'sticky-column': field.sticky,
-                      'summary-column1': p+1 < fields.length && fields[p+1].summary,
-                      'summary-column2': field.summary
-                    }"
-                    :style="renderColumnCellStyle(field)"
-                    :key="`f${p}`">{{ summary[field.name] }}</td>
-              </template>
+              <td v-for="(field, p) in fields"
+                  v-show="!field.invisible"
+                  class="row-summary"
+                  :colspan="p === fields.length - 1 && vScroller.buttonHeight < vScroller.height ? 2: 1"
+                  :class="{
+                    'sticky-column': field.sticky,
+                    'summary-column1': p+1 < fields.length && fields[p+1].summary,
+                    'summary-column2': field.summary
+                  }"
+                  :style="renderColumnCellStyle(field)"
+                  :key="`f${p}`">{{ summary[field.name] }}</td>
             </tr>
           </tfoot>
           <slot></slot>
@@ -276,7 +274,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import VueExcelFilter from './VueExcelFilter.vue'
 import PanelFilter from './PanelFilter.vue'
 import PanelSetting from './PanelSetting.vue'
@@ -2685,11 +2682,9 @@ export default {
 
       if (this.lazyTimeout[hash]) clearTimeout(this.lazyTimeout[hash])
       this.lazyTimeout[hash] = setTimeout(() => {
-        Vue.nextTick(() => {
-          p(this.lazyBuffer[hash])
-          delete this.lazyTimeout[hash]
-          delete this.lazyBuffer[hash]
-        })
+        p(this.lazyBuffer[hash])
+        delete this.lazyTimeout[hash]
+        delete this.lazyBuffer[hash]
       }, delay)
     }
   }

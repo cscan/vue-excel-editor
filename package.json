@@ -5,7 +5,7 @@
   "version": "1.5.5",
   "main": "src/main.js",
   "dependencies": {
-    "moment": "^2.24.0",
+    "moment": "^2.29.3",
     "vue2-datepicker": "^3.3.0",
     "vuedraggable": "^2.23.2",
     "xlsx": "^0.17.0"
