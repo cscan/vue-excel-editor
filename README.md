@@ -24,6 +24,8 @@ Vue2 plugin for displaying and editing the array-of-object in Excel style. It su
 - Copy & Paste
 - Mass import Excel data
 
+For Vue 3 version, please refer to https://github.com/cscan/vue3-excel-editor
+
 ## Getting started
 
 Get the package:
