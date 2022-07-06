@@ -3,8 +3,6 @@
 </template>
 
 <script>
-import moment from 'moment'
-
 export default {
   props: {
     field: {type: String, default: ''},
@@ -44,11 +42,14 @@ export default {
         }
         switch (this.type) {
           case 'datetick':
-            return moment(text, 'YYYY-MM-DD').valueOf()
+            // return moment(text, 'YYYY-MM-DD').valueOf()
+            return new Date(text + ' GMT+0').getTime()
           case 'datetimetick':
-            return moment(text, 'YYYY-MM-DD HH:mm').valueOf()
+            // return moment(text, 'YYYY-MM-DD HH:mm').valueOf()
+            return new Date(text + ' GMT+0').getTime()
           case 'datetimesectick':
-            return moment(text, 'YYYY-MM-DD HH:mm:ss').valueOf()
+            // return moment(text, 'YYYY-MM-DD HH:mm:ss').valueOf()
+            return new Date(text + ' GMT+0').getTime()
           case 'check10':
           case 'checkYN':
           case 'checkTF':
@@ -70,17 +71,20 @@ export default {
       default (val) {
         // § magic to hide the temp key
         if (this.keyField && val && val.toString().startsWith('§')) return ''
-
+        const offset = new Date().getTimezoneOffset() * 60 * 1000
         switch (this.type) {
           case 'date':
-            return val? moment(val).format('YYYY-MM-DD'): ''
+            return val? new Date(new Date(val) - offset).toISOString().split('T')[0] : ''
+            // return val? moment(val).format('YYYY-MM-DD'): ''
           case 'datetick':
-            return val? moment(Number(val)).format('YYYY-MM-DD'): ''
+            // return val? moment(Number(val)).format('YYYY-MM-DD'): ''
+            return val? new Date(Number(val)).toISOString().replace('T', ' ').slice(10) : ''
           case 'datetimetick':
-            return val? moment(Number(val)).format('YYYY-MM-DD HH:mm'): ''
+            // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm'): ''
+            return val? new Date(Number(val)).toISOString().replace('T', ' ').slice(16) : ''
           case 'datetimesectick':
-            if (!val) return ''
-            return val? moment(Number(val)).format('YYYY-MM-DD HH:mm:ss'): ''
+            // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm:ss'): ''
+            return val? new Date(Number(val)).toISOString().replace('T', ' ').slice(19) : ''
           case 'map':
             if (this.options.constructor.name.endsWith('Function'))
               return this.options(val)[val]
@@ -113,7 +117,8 @@ export default {
           allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-']
           if (!validate) validate = (val) => {
             if (val === '') return ''
-            if (!moment(val, 'YYYY-MM-DD', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
+            // if (!moment(val, 'YYYY-MM-DD', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) return this.$parent.localizedLabel.invalidInputValue
             return ''
           }
           break
@@ -121,7 +126,8 @@ export default {
           allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
           if (!validate) validate = (val) => {
             if (val === '') return ''
-            if (!moment(val, 'YY-MM-DD hh:mm', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
+            // if (!moment(val, 'YY-MM-DD hh:mm', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
+            if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(val)) return this.$parent.localizedLabel.invalidInputValue
             return ''
           }
           break
@@ -129,7 +135,8 @@ export default {
           allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
           if (!validate) validate = (val) => {
             if (val === '') return ''
-            if (!moment(val, 'YY-MM-DD hh:mm:ss', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
+            // if (!moment(val, 'YY-MM-DD hh:mm:ss', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
+            if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(val)) return this.$parent.localizedLabel.invalidInputValue
             return ''
           }
           break
