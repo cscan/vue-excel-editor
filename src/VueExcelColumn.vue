@@ -74,17 +74,17 @@ export default {
         const offset = new Date().getTimezoneOffset() * 60 * 1000
         switch (this.type) {
           case 'date':
-            return val? new Date(new Date(val) - offset).toISOString().split('T')[0] : ''
+            return val? new Date(new Date(val) - offset).toISOString().slice(0, 10) : ''
             // return val? moment(val).format('YYYY-MM-DD'): ''
           case 'datetick':
             // return val? moment(Number(val)).format('YYYY-MM-DD'): ''
-            return val? new Date(Number(val)).toISOString().replace('T', ' ').slice(10) : ''
+            return val? new Date(Number(val) - offset).toISOString().slice(0, 10) : ''
           case 'datetimetick':
             // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm'): ''
-            return val? new Date(Number(val)).toISOString().replace('T', ' ').slice(16) : ''
+            return val? new Date(Number(val) - offset).toISOString().replace('T', ' ').slice(0, 16) : ''
           case 'datetimesectick':
             // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm:ss'): ''
-            return val? new Date(Number(val)).toISOString().replace('T', ' ').slice(19) : ''
+            return val? new Date(Number(val) - offset).toISOString().replace('T', ' ').slice(0, 19) : ''
           case 'map':
             if (this.options.constructor.name.endsWith('Function'))
               return this.options(val)[val]
