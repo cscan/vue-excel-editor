@@ -72,19 +72,32 @@ export default {
         // § magic to hide the temp key
         if (this.keyField && val && val.toString().startsWith('§')) return ''
         const offset = new Date().getTimezoneOffset() * 60 * 1000
+        let d
         switch (this.type) {
           case 'date':
-            return val? new Date(new Date(val) - offset).toISOString().slice(0, 10) : ''
+            d = new Date(val).getTime()
+            if (!d) return ''
+            return new Date(d - offset).toISOString().slice(0, 10)
+            // return val? new Date(new Date(val) - offset).toISOString().slice(0, 10) : ''
             // return val? moment(val).format('YYYY-MM-DD'): ''
           case 'datetick':
+            d = new Date(val).getTime()
+            if (!d) return ''
+            return new Date(d - offset).toISOString().slice(0, 10)
             // return val? moment(Number(val)).format('YYYY-MM-DD'): ''
-            return val? new Date(Number(val) - offset).toISOString().slice(0, 10) : ''
+            // return val? new Date(Number(val) - offset).toISOString().slice(0, 10) : ''
           case 'datetimetick':
+            d = new Date(val).getTime()
+            if (!d) return ''
+            return new Date(d - offset).toISOString().replace('T', ' ').slice(0, 16)
             // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm'): ''
-            return val? new Date(Number(val) - offset).toISOString().replace('T', ' ').slice(0, 16) : ''
+            // return val? new Date(Number(val) - offset).toISOString().replace('T', ' ').slice(0, 16) : ''
           case 'datetimesectick':
+            d = new Date(val).getTime()
+            if (!d) return ''
+            return new Date(d - offset).toISOString().replace('T', ' ').slice(0, 19)
             // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm:ss'): ''
-            return val? new Date(Number(val) - offset).toISOString().replace('T', ' ').slice(0, 19) : ''
+            // return val? new Date(Number(val) - offset).toISOString().replace('T', ' ').slice(0, 19) : ''
           case 'map':
             if (this.options.constructor.name.endsWith('Function'))
               return this.options(val)[val]
