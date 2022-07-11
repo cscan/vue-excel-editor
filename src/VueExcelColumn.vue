@@ -115,30 +115,36 @@ export default {
           break
         case 'date':
           allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-']
+          /*
           if (!validate) validate = (val) => {
             if (val === '') return ''
             // if (!moment(val, 'YYYY-MM-DD', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
             if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) return this.$parent.localizedLabel.invalidInputValue
             return ''
           }
+          */
           break
         case 'datetime':
           allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
+          /*
           if (!validate) validate = (val) => {
             if (val === '') return ''
             // if (!moment(val, 'YY-MM-DD hh:mm', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
             if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(val)) return this.$parent.localizedLabel.invalidInputValue
             return ''
           }
+          */
           break
         case 'datetimesec':
           allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
+          /*
           if (!validate) validate = (val) => {
             if (val === '') return ''
             // if (!moment(val, 'YY-MM-DD hh:mm:ss', true).isValid()) return this.$parent.localizedLabel.invalidInputValue
             if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(val)) return this.$parent.localizedLabel.invalidInputValue
             return ''
           }
+          */
           break
         case 'datetick':
           allowKeys = allowKeys || ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ' ', ':']
