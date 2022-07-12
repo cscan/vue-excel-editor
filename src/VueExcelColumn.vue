@@ -81,19 +81,19 @@ export default {
             // return val? new Date(new Date(val) - offset).toISOString().slice(0, 10) : ''
             // return val? moment(val).format('YYYY-MM-DD'): ''
           case 'datetick':
-            d = new Date(val).getTime()
+            d = new Date(val * 1 ? val * 1 : val).getTime()
             if (!d) return ''
             return new Date(d - offset).toISOString().slice(0, 10)
             // return val? moment(Number(val)).format('YYYY-MM-DD'): ''
             // return val? new Date(Number(val) - offset).toISOString().slice(0, 10) : ''
           case 'datetimetick':
-            d = new Date(val).getTime()
+            d = new Date(val * 1 ? val * 1 : val).getTime()
             if (!d) return ''
             return new Date(d - offset).toISOString().replace('T', ' ').slice(0, 16)
             // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm'): ''
             // return val? new Date(Number(val) - offset).toISOString().replace('T', ' ').slice(0, 16) : ''
           case 'datetimesectick':
-            d = new Date(val).getTime()
+            d = new Date(val * 1 ? val * 1 : val).getTime()
             if (!d) return ''
             return new Date(d - offset).toISOString().replace('T', ' ').slice(0, 19)
             // return val? moment(Number(val)).format('YYYY-MM-DD HH:mm:ss'): ''
