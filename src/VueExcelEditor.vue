@@ -1042,7 +1042,8 @@ export default {
       if (!count) return
 
       const fullWidth = this.editor.getBoundingClientRect().width
-      const viewWidth = this.fields.filter(f => !f.invisible).reduce((c, f) => c - -f.width.replace(/px$/, ''), 0) + 40
+      const viewWidth = this.fields.filter(f => !f.invisible).reduce((c, f) => c - -f.width.replace(/px$/, ''), 0)
+        + (this.noNumCol ? 0 : 40)
       const fillWidth = viewWidth - fullWidth + 2
       if (fillWidth)
         doFields.forEach(f => f.minWidth = (f.width.replace(/px$/, '') - fillWidth / count) + 'px')
@@ -2167,7 +2168,8 @@ export default {
     },
     moveSouth () {
       if (this.focused) {
-        if (this.currentRowPos + 1 >= this.table.length) {
+        // if (this.currentRowPos + 1 >= this.table.length) {
+        if (this.currentRowPos+1 >= (this.pageBottom - this.pageTop) && this.pageBottom >= this.table.length) {
           if (this.readonly) return false
           if (!this.newIfBottom) return false
           this.newRecord({}, false, true)
