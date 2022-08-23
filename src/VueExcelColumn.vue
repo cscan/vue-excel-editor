@@ -20,6 +20,7 @@ export default {
     validate: {type: Function, default: null},
     change: {type: Function, default: null},
     link: {type: Function, default: null},
+    autoFillWidth: {type: Boolean, default: false},
 
     allowKeys: {type: [Array, Function], default () {return null}},
     mandatory: {type: String, default: ''},
@@ -210,6 +211,7 @@ export default {
         label: this.label === null ? this.field : this.label,
         type: this.type,
         width: this.width,
+        autoFillWidth: this.autoFillWidth,
 
         validate: validate,
         change: this.change,

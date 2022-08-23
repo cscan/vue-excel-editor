@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-excel-editor" :style="{display: 'inline-block', 'max-width': width}">
+  <div ref="editor" class="vue-excel-editor" :style="{display: 'inline-block', width}">
     <div class="component-content">
       <!-- No record -->
       <div v-if="localizedLabel.noRecordIndicator && pagingTable.length == 0" class="norecord" :style="{bottom: noFooter? '12px' : '37px'}">
@@ -23,7 +23,7 @@
               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
           <colgroup>
             <col v-if="!noNumCol" style="width:40px">
-            <col v-for="(item, p) in fields" v-show="!item.invisible" :key="p" :style="{width: item.width}">
+            <col v-for="(item, p) in fields" v-show="!item.invisible" :key="p" :style="{width: item.width, 'min-width': item.minWidth || item.width}">
             <col v-if="vScroller.buttonHeight < vScroller.height" style="width:12px">
           </colgroup>
           <thead class="center-text">
@@ -292,7 +292,7 @@ export default {
     'date-picker': DatePicker
   },
   props: {
-      disablePanelSetting: {
+    disablePanelSetting: {
       type: Boolean,
       default() {
         return false;
@@ -568,6 +568,7 @@ export default {
     window.removeEventListener('wheel', this.mousewheel)
   },
   mounted () {
+    this.editor = this.$refs.editor
     this.tableContent = this.$refs.tableContent
     this.systable = this.$refs.systable
     this.colgroupTr = this.systable.children[0]
@@ -1033,6 +1034,20 @@ export default {
       // this.refresh()
     },
 
+    columnFillWidth () {
+      if (this.table.length === 0) return
+      if (!this.editor) return
+      const doFields = this.fields.filter(f => f.autoFillWidth)
+      const count = doFields.length
+      if (!count) return
+
+      const fullWidth = this.editor.getBoundingClientRect().width
+      const viewWidth = this.fields.filter(f => !f.invisible).reduce((c, f) => c - -f.width.replace(/px$/, ''), 0) + 40
+      const fillWidth = viewWidth - fullWidth + 2
+      if (fillWidth)
+        doFields.forEach(f => f.minWidth = (f.width.replace(/px$/, '') - fillWidth / count) + 'px')
+    },
+
     /* *** Date Picker *********************************************************************************
      */
     showDatePickerDiv () {
@@ -1230,7 +1245,7 @@ export default {
       return false
     },
     winResize () {
-      this.lazy(this.refreshPageSize, 200)
+      this.lazy(this.refreshPageSize, 500)
     },
     winPaste (e) {
       if (e.target.tagName !== 'TEXTAREA') return
@@ -1664,6 +1679,7 @@ export default {
         h = Math.min(24 * (this.table.length - this.pageTop) + offset, h)
         this.systable.parentNode.style.height = h + 'px'
       }
+      this.columnFillWidth()
       setTimeout(this.calVScroll)
     },
     firstPage (e) {

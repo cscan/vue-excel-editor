@@ -113,6 +113,7 @@ In your template
 | sticky         | Optional  | Boolean           | Fixed column at left of the table, no response on horizontal scrolling |
 | invisible      | Optional  | Boolean           | Column visibility, default is false |
 | width          | Optional  | String            | Specified column width, default is '100px' |
+| autoFillWidth  | Optional  | Boolean           | Extend the width of this column to fill the editor width, default is false |
 | change         | Optional  | Function@         | The function to be triggered when the data of this column changed |
 | validate       | Optional  | Function          | The function to validate and return the error message |
 | key-field      | Optional  | Boolean           | Specified the key field which is included in keys parameter in @update event |
