@@ -23,7 +23,7 @@
               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'">
           <colgroup>
             <col v-if="!noNumCol" style="width:40px">
-            <col v-for="(item, p) in fields" v-show="!item.invisible" :key="p" :style="{width: item.width, 'min-width': item.minWidth}">
+            <col v-for="(item, p) in fields" v-show="!item.invisible" :key="p" :style="{width: item.width}">
             <col v-if="vScroller.buttonHeight < vScroller.height" style="width:12px">
           </colgroup>
           <thead class="center-text">
@@ -1046,7 +1046,7 @@ export default {
         + (this.noNumCol ? 0 : 40)
       const fillWidth = viewWidth - fullWidth + 2
       if (fillWidth)
-        doFields.forEach(f => f.minWidth = (f.width.replace(/px$/, '') - fillWidth / count) + 'px')
+        doFields.forEach(f => f.width = (f.width.replace(/px$/, '') - fillWidth / count) + 'px')
     },
 
     /* *** Date Picker *********************************************************************************
