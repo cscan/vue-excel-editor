@@ -1643,7 +1643,7 @@ export default {
               }
         }
         this.value.sort((a, b) => {
-          return sorting(a, b) * -n
+          return sorting(a, b, n, colPos, name) * -n
         })
         this.sortPos = colPos
         this.sortDir = n
