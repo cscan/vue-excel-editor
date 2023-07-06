@@ -340,6 +340,7 @@ export default {
     register: {type: Function, default: null},
     allowAddCol: {type: Boolean, default: false},
     noHeaderEdit: {type: Boolean, default: false},
+    noSort: { type: Boolean, default: false },
     addColumn: {type: Function, default: null},
     spellcheck: {type: Boolean, default: false},
     newIfBottom: {type: Boolean, default: false},
@@ -1610,13 +1611,14 @@ export default {
         e.target.addEventListener('focusout', this.completeHeaderChange)
         return
       }
-      if (e.which === 1) {
+      if (!this.noSort && e.which === 1) {
         e.preventDefault()
         if (this.sortPos === colPos && this.sortDir > 0)
           this.sort(-1, colPos)
         else
           this.sort(1, colPos)
       }
+      this.$emit("header-click", { colPos });
     },
     completeHeaderChange (e) {
       const th = e.target.parentElement.parentElement
