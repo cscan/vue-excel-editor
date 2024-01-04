@@ -332,6 +332,7 @@ export default {
     nFilterCount: {type: Number, default: 1000},    // show top n values in filter dialog
     height: {type: String, default: ''},
     width: {type: String, default: '100%'},
+    wheelSensitivity: {type: Number, default: 30},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     autocompleteCount: {type: Number, default: 50},
     readonly: {type: Boolean, default: false},
@@ -467,7 +468,7 @@ export default {
       summaryRow: false,
       summary: {},
       showFilteredOnly: true,
-      showSelectedOnly: false
+      showSelectedOnly: false,
     }
     return dataset
   },
@@ -1231,8 +1232,8 @@ export default {
     mousewheel (e) {
       if (this.noMouseScroll || !this.mousein || !e.deltaY) return
       let adjust = 0
-      if (e.deltaY > 30 && this.pageTop + this.pageSize < this.table.length) adjust = 1
-      else if (e.deltaY < -30 && this.pageTop > 0) adjust = -1
+      if (e.deltaY > 1 * this.wheelSensitivity && this.pageTop + this.pageSize < this.table.length) adjust = 1
+      else if (e.deltaY < -1 * this.wheelSensitivity && this.pageTop > 0) adjust = -1
       if (adjust) {
         this.pageTop += adjust
         setTimeout(this.calVScroll)
