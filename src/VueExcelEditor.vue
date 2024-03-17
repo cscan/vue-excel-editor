@@ -120,8 +120,8 @@
                     datepick: item.type == 'date',
                     'sticky-column': item.sticky
                   }"
-                  :style="Object.assign(cellStyle(record, item), renderColumnCellStyle(item))"
                   :key="p"
+                  :style="Object.assign(cellStyle(record, item), renderColumnCellStyle(item))"
                   @mouseover="cellMouseOver"
                   @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
               <td v-if="vScroller.buttonHeight < vScroller.height" class="last-col"></td>
@@ -139,8 +139,9 @@
                     'summary-column1': p+1 < fields.length && fields[p+1].summary,
                     'summary-column2': field.summary
                   }"
+                  :key="`f${p}`"
                   :style="renderColumnCellStyle(field)"
-                  :key="`f${p}`">{{ summary[field.name] }}</td>
+                  >{{ summary[field.name] }}</td>
             </tr>
           </tfoot>
           <slot></slot>
@@ -180,7 +181,7 @@
       </div>
 
       <!-- Vertical Scroll Bar -->
-      <div v-if="vScroller.buttonHeight < vScroller.height"
+      <div v-show="vScroller.buttonHeight < vScroller.height"
            ref="vScroll"
            class="v-scroll"
            :style="{top: `${vScroller.top}px`, height: `${vScroller.height}px`}"
@@ -460,7 +461,7 @@ export default {
       leftMost: 0,
 
       showDatePicker: false,
-      inputDateTime: '',
+      inputDateTime: new Date(),
 
       table: [],
       filteredValue: [],
@@ -468,7 +469,7 @@ export default {
       summaryRow: false,
       summary: {},
       showFilteredOnly: true,
-      showSelectedOnly: false,
+      showSelectedOnly: false
     }
     return dataset
   },
@@ -593,6 +594,7 @@ export default {
       this.calStickyLeft()
     }, 200)
 
+    if (ResizeObserver) new ResizeObserver(this.winResize).observe(this.tableContent)
     window.addEventListener('resize', this.winResize)
     window.addEventListener('paste', this.winPaste)
     window.addEventListener('keydown', this.winKeydown)
@@ -645,7 +647,7 @@ export default {
     },
     resetColumn () {
       this.fields = []
-      this.$slots.default.forEach(col => col.componentInstance? col.componentInstance.init() : 0)
+      //this.$slots.default.forEach(col => col.componentInstance? col.componentInstance.init() : 0)
       this.tableContent.scrollTo(0, this.tableContent.scrollTop)
       this.calStickyLeft()
     },
@@ -1453,7 +1455,7 @@ export default {
               else
                 if (this.currentField.allowKeys.indexOf(e.key.toUpperCase()) === -1) return e.preventDefault()
             }
-            if (this.currentField.lengthLimit && this.inputBox.value.length >= this.currentField.lengthLimit) return e.preventDefault()
+            if (this.inputBoxShow && this.currentField.lengthLimit && this.inputBox.value.length >= this.currentField.lengthLimit) return e.preventDefault()
             if (!this.inputBoxShow) {
               if (this.currentField.type === 'select' || this.currentField.type === 'map') {
                 setTimeout(() => this.calAutocompleteList(true))
@@ -2588,7 +2590,7 @@ export default {
     /* *** Autocomplete ****************************************************************************************
      */
     async calAutocompleteList (force) {
-      if (!force && !this.currentField.autocomplete) return
+      if (!this.currentField.autocomplete) return
       if (force || (this.inputBoxChanged && this.inputBox.value.length > 0)) {
         if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
         const doList = async () => {
@@ -2632,7 +2634,7 @@ export default {
             }
             list.sort()
           }
-          this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+          this.autocompleteSelect = list.findIndex(element => element?.toString().toUpperCase().startsWith(value))
           this.autocompleteInputs = list
           const rect = this.currentCell.getBoundingClientRect()
           this.lazy(() => {

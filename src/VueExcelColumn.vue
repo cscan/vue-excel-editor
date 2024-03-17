@@ -226,6 +226,7 @@ export default {
         textTransform: this.textTransform,
 
         get autocomplete () {
+          if (self.type === 'map' || self.type === 'select') return true
           return self._autocomplete === null ? self.$parent.autocomplete : self._autocomplete
         },
         set autocomplete (val) {
