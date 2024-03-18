@@ -120,8 +120,8 @@
                     datepick: item.type == 'date',
                     'sticky-column': item.sticky
                   }"
-                  :style="Object.assign(cellStyle(record, item), renderColumnCellStyle(item))"
                   :key="p"
+                  :style="Object.assign(cellStyle(record, item), renderColumnCellStyle(item))"
                   @mouseover="cellMouseOver"
                   @mousemove="cellMouseMove">{{ item.toText(record[item.name]) }}</td>
               <td v-if="vScroller.buttonHeight < vScroller.height" class="last-col"></td>
@@ -139,8 +139,9 @@
                     'summary-column1': p+1 < fields.length && fields[p+1].summary,
                     'summary-column2': field.summary
                   }"
+                  :key="`f${p}`"
                   :style="renderColumnCellStyle(field)"
-                  :key="`f${p}`">{{ summary[field.name] }}</td>
+                  >{{ summary[field.name] }}</td>
             </tr>
           </tfoot>
           <slot></slot>
@@ -180,7 +181,7 @@
       </div>
 
       <!-- Vertical Scroll Bar -->
-      <div v-if="vScroller.buttonHeight < vScroller.height"
+      <div v-show="vScroller.buttonHeight < vScroller.height"
            ref="vScroll"
            class="v-scroll"
            :style="{top: `${vScroller.top}px`, height: `${vScroller.height}px`}"
@@ -332,6 +333,7 @@ export default {
     nFilterCount: {type: Number, default: 1000},    // show top n values in filter dialog
     height: {type: String, default: ''},
     width: {type: String, default: '100%'},
+    wheelSensitivity: {type: Number, default: 30},
     autocomplete: {type: Boolean, default: false},  // Default autocomplete of all columns
     autocompleteCount: {type: Number, default: 50},
     readonly: {type: Boolean, default: false},
@@ -459,7 +461,7 @@ export default {
       leftMost: 0,
 
       showDatePicker: false,
-      inputDateTime: '',
+      inputDateTime: new Date(),
 
       table: [],
       filteredValue: [],
@@ -592,6 +594,7 @@ export default {
       this.calStickyLeft()
     }, 200)
 
+    if (ResizeObserver) new ResizeObserver(this.winResize).observe(this.tableContent)
     window.addEventListener('resize', this.winResize)
     window.addEventListener('paste', this.winPaste)
     window.addEventListener('keydown', this.winKeydown)
@@ -644,7 +647,7 @@ export default {
     },
     resetColumn () {
       this.fields = []
-      this.$slots.default.forEach(col => col.componentInstance? col.componentInstance.init() : 0)
+      //this.$slots.default.forEach(col => col.componentInstance? col.componentInstance.init() : 0)
       this.tableContent.scrollTo(0, this.tableContent.scrollTop)
       this.calStickyLeft()
     },
@@ -1231,8 +1234,8 @@ export default {
     mousewheel (e) {
       if (this.noMouseScroll || !this.mousein || !e.deltaY) return
       let adjust = 0
-      if (e.deltaY > 30 && this.pageTop + this.pageSize < this.table.length) adjust = 1
-      else if (e.deltaY < -30 && this.pageTop > 0) adjust = -1
+      if (e.deltaY > 1 * this.wheelSensitivity && this.pageTop + this.pageSize < this.table.length) adjust = 1
+      else if (e.deltaY < -1 * this.wheelSensitivity && this.pageTop > 0) adjust = -1
       if (adjust) {
         this.pageTop += adjust
         setTimeout(this.calVScroll)
@@ -2587,7 +2590,7 @@ export default {
     /* *** Autocomplete ****************************************************************************************
      */
     async calAutocompleteList (force) {
-      if (!force && !this.currentField.autocomplete) return
+      if (!this.currentField.autocomplete) return
       if (force || (this.inputBoxChanged && this.inputBox.value.length > 0)) {
         if (typeof this.recalAutoCompleteList !== 'undefined') clearTimeout(this.recalAutoCompleteList)
         const doList = async () => {
@@ -2631,7 +2634,7 @@ export default {
             }
             list.sort()
           }
-          this.autocompleteSelect = list.findIndex(element => element.toUpperCase().startsWith(value))
+          this.autocompleteSelect = list.findIndex(element => element?.toString().toUpperCase().startsWith(value))
           this.autocompleteInputs = list
           const rect = this.currentCell.getBoundingClientRect()
           this.lazy(() => {
