@@ -2651,7 +2651,7 @@ export default {
               this.$refs.autocomplete.style.top = rect.bottom + 'px'
             }
             if (rect.left + r.width > window.innerWidth)
-              this.$refs.autocomplete.style.top = (window.innerWidth - r.width) + 'px'
+              this.$refs.autocomplete.style.left = (rect.right - r.width) + 'px'
             else
               this.$refs.autocomplete.style.left = rect.left + 'px'
             const showTop = this.autocompleteSelect * 23 - 206
