@@ -5,7 +5,7 @@
 <script>
 export default {
   props: {
-    field: {type: String, default: ''},
+    field: {type: String, default: 'dummy'},
     label: {type: String, default: null},
     type: {type: String, default: 'string'},
     initStyle: {type: Object, default () {return {}}},
@@ -16,10 +16,12 @@ export default {
     textAlign: {type: String, default: null},
     keyField: {type: Boolean, default: false},
     sticky: {type: Boolean, default: false},
+    listByClick: {type: Boolean, default: null},
 
     validate: {type: Function, default: null},
     change: {type: Function, default: null},
     link: {type: Function, default: null},
+    cellClick: {type: Function, default: null},
     autoFillWidth: {type: Boolean, default: false},
 
     allowKeys: {type: [Array, Function], default () {return null}},
@@ -30,6 +32,9 @@ export default {
     options: {type: [Array, Object, Function], default () {return null}},
     summary: {type: String, default: null},
     sort: {type: Function, default: null},
+    masking: {type: String, default: '•'},
+    placeholder: {type: String, default: ''},
+
     toValue: {
       type: Function,
       default (text) {
@@ -104,6 +109,10 @@ export default {
               return this.options(val)[val]
             else
               return this.options[val]
+          case 'password':
+            return this.masking.repeat(val?.length || 0)
+          case 'action':
+            return this.placeholder || ''
           default:
             return val
         }
@@ -195,6 +204,11 @@ export default {
           break
         case 'string':
           break
+        case 'password':
+          break
+        case 'action':
+          this._listByClick = true
+          break
         default:
           throw new Error('VueExcelColumn: Not supported type:' + this.type)
       }
@@ -227,6 +241,7 @@ export default {
 
         get autocomplete () {
           if (self.type === 'map' || self.type === 'select') return true
+          if (self.type === 'password') return false
           return self._autocomplete === null ? self.$parent.autocomplete : self._autocomplete
         },
         set autocomplete (val) {
@@ -243,9 +258,13 @@ export default {
         pos: Number(this.pos),
         options: this.options,
         summary: this.summary,
+        masking: this.masking,
         toValue: this.toValue,
         toText: this.toText,
-        register: this.register
+        register: this.register,
+        placeholder: this.placeholder,
+        cellClick: this.cellClick,
+        listByClick: this.listByClick || this._listByClick
       })
     }
   }

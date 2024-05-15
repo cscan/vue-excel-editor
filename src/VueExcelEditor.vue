@@ -70,7 +70,7 @@
                   :style="{top: calCellTop2 + 'px'}"
                   @click="columnFilter = {}">
                 <span v-if="Object.keys(columnFilter).length > 0">
-                  <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eraser" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-eraser fa-w-16 fa-sm"><path fill="currentColor" d="M497.941 273.941c18.745-18.745 18.745-49.137 0-67.882l-160-160c-18.745-18.745-49.136-18.746-67.883 0l-256 256c-18.745 18.745-18.745 49.137 0 67.882l96 96A48.004 48.004 0 0 0 144 480h356c6.627 0 12-5.373 12-12v-40c0-6.627-5.373-12-12-12H355.883l142.058-142.059zm-302.627-62.627l137.373 137.373L265.373 416H150.628l-80-80 124.686-124.686z"></path></svg>                  
+                  <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eraser" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-eraser fa-w-16 fa-sm"><path fill="currentColor" d="M497.941 273.941c18.745-18.745 18.745-49.137 0-67.882l-160-160c-18.745-18.745-49.136-18.746-67.883 0l-256 256c-18.745 18.745-18.745 49.137 0 67.882l96 96A48.004 48.004 0 0 0 144 480h356c6.627 0 12-5.373 12-12v-40c0-6.627-5.373-12-12-12H355.883l142.058-142.059zm-302.627-62.627l137.373 137.373L265.373 416H150.628l-80-80 124.686-124.686z"></path></svg>
                 </span>
                 <!--
                 <svg v-if="selectedCount==table.length" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-times-circle fa-w-16 fa-sm"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"></path></svg>
@@ -149,6 +149,9 @@
 
         <!-- Tool Tip -->
         <div v-show="tip" ref="tooltip" class="tool-tip">{{ tip }}</div>
+
+        <!-- Text Tip -->
+        <div v-show="textTip" ref="texttip" class="text-tip">{{ textTip }}</div>
 
         <!-- Editor Square -->
         <div v-show="focused" ref="inputSquare" class="input-square" @mousedown="inputSquareClick">
@@ -434,6 +437,7 @@ export default {
       errmsg: {},
       rowerr: {},
       tip: '',
+      textTip: '',
 
       colHash: '',
       fields: [],
@@ -638,6 +642,7 @@ export default {
     toggleSelectView (e) {
       if (e) e.stopPropagation()
       this.showSelectedOnly = !this.showSelectedOnly
+      this.firstPage()
       return this.refresh()
     },
     toggleFilterView (e) {
@@ -693,7 +698,7 @@ export default {
         register: null
       }
       if (this.addColumn) colDef = this.addColumn(colDef)
-      this.newColumn(colDef, pos)      
+      this.newColumn(colDef, pos)
     },
     newColumn (field, pos) {
       this.fields.splice(pos, 0, field)
@@ -736,7 +741,7 @@ export default {
           toText: t => t,
           register: null
         })
-      })        
+      })
     },
     refresh () {
       // this.pageTop = 0
@@ -748,6 +753,7 @@ export default {
       this.refreshPageSize()
     },
     calTable () {
+      this.textTip = ''
       // add unique key to each row if no key is provided
       let seed = String(new Date().getTime() % 1e8)
       this.value.forEach((rec,i) => {
@@ -902,7 +908,7 @@ export default {
     },
     localeDate (d) {
       if (typeof d === 'undefined') d = new Date()
-      const pad = n => n < 10 ? '0'+n : n;    
+      const pad = n => n < 10 ? '0'+n : n;
       return d.getFullYear() + '-'
             + pad(d.getMonth() + 1) + '-'
             + pad(d.getDate()) + ' '
@@ -994,7 +1000,7 @@ export default {
       ref.$el.textContent = filterText
       ref.$emit('input', filterText)
     },
-    
+
     clearFilter(name) {
       if (!name) this.columnFilter = {}
       else this.setFilter(name, '')
@@ -1265,6 +1271,13 @@ export default {
     },
     winKeyup (e) {
       if (!e.altKey) this.systable.classList.remove('alt')
+      if (this.inputBoxShow && this.currentField.type === 'password') {
+        setTimeout(() => {
+          const v = this.inputBox.value.split('').map((c, i) => c === this.currentField.masking ? this.inputBox._value[i] : c)
+          this.inputBox._value = v.join('')
+          this.inputBox.value = this.currentField.masking.repeat(v.length)
+        })
+      }
     },
     winKeydown (e) {
       if (e.altKey) this.systable.classList.add('alt')
@@ -1457,7 +1470,7 @@ export default {
             }
             if (this.inputBoxShow && this.currentField.lengthLimit && this.inputBox.value.length >= this.currentField.lengthLimit) return e.preventDefault()
             if (!this.inputBoxShow) {
-              if (this.currentField.type === 'select' || this.currentField.type === 'map') {
+              if (['select', 'map', 'action'].includes(this.currentField.type)) {
                 setTimeout(() => this.calAutocompleteList(true))
                 if (e.keyCode === 32) return e.preventDefault()
                 this.inputBox.value = ''
@@ -1470,8 +1483,9 @@ export default {
               this.inputBox.focus()
               setTimeout(this.calAutocompleteList)
             }
-            else
+            else {
               setTimeout(() => this.calAutocompleteList(this.autocompleteInputs.length))
+            }
             this.inputBoxChanged = true
             break
         }
@@ -1764,7 +1778,7 @@ export default {
     },
 
     settingClick() {
-      if (!this.disablePanelSetting) 
+      if (!this.disablePanelSetting)
         this.$refs.panelSetting.showPanel();
     },
 
@@ -1779,7 +1793,7 @@ export default {
       this.$refs.importFile.click()
       this.importCallback = cb
       this.importErrorCallback = errCb
-    },   
+    },
     doImport (e) {
       this.processing = true
       // this.refresh()
@@ -1829,8 +1843,8 @@ export default {
                 if (keys.length) {
                   // locate match record
                   rowPos = this.table.findIndex(v =>
-                    keys.filter(f => 
-                      typeof v[f.name] !== 'undefined' 
+                    keys.filter(f =>
+                      typeof v[f.name] !== 'undefined'
                       && (v[f.name] === line[f.name] || v[f.name] === line[f.label])).length === keys.length
                   )
                   if (rowPos === -1) {
@@ -1933,7 +1947,7 @@ export default {
           throw new Error('VueExcelEditor: ' + e.stack)
         }
         fileReader.readAsBinaryString(file)
-      }, 500)      
+      }, 500)
     },
     exportTable (format, selectedOnly, filename) {
       this.processing = true
@@ -2054,7 +2068,7 @@ export default {
       }
     },
     selectRecordByKeys (keys) {
-      const rowPos = this.table.findIndex(v => 
+      const rowPos = this.table.findIndex(v =>
         this.fields.filter(f => f.keyField).filter(f => v[f.name] === keys[f.name]).length === keys.length)
       if (rowPos >= 0) this.selectRecord(rowPos)
     },
@@ -2203,11 +2217,36 @@ export default {
         const row = e.target.parentNode
         const colPos = Array.from(row.children).indexOf(e.target) - 1
         const rowPos = Array.from(row.parentNode.children).indexOf(row)
+        this.currentField = this.fields[colPos]
         this.$emit('cell-click', {rowPos, colPos})
+        if (typeof this.currentField.cellClick === 'function')
+          this.currentField.cellClick(this.currentCell.textContent, this.currentRecord, rowPos, colPos, this.currentField, this)
         this.moveInputSquare(rowPos, colPos)
-        if (this.currentField && this.currentField.link && e.altKey)
+        if (this.currentField && this.currentField.link /* && e.altKey */)
           setTimeout(() => this.currentField.link(this.currentCell.textContent, this.currentRecord, rowPos, colPos, this.currentField, this))
-        if (e.target.offsetWidth - e.offsetX > 15) return
+        if (this.currentField.listByClick) return this.calAutocompleteList(true)
+        if (e.target.offsetWidth - e.offsetX > 25) return
+        if (e.target.offsetWidth < e.target.scrollWidth) {
+          // show textTip
+          this.textTip = this.currentCell.textContent
+          this.$refs.texttip.style.opacity = 0
+          const rect = e.target.getBoundingClientRect()
+          setTimeout(() => {
+            const r = this.$refs.texttip.getBoundingClientRect()
+            if (rect.bottom + r.height > window.innerHeight) {
+              // show at top
+              this.$refs.texttip.style.top = (rect.top - r.height) + 'px'
+            }
+            else {
+              this.$refs.texttip.style.top = rect.bottom + 'px'
+            }
+            if (rect.left + r.width > window.innerWidth)
+              this.$refs.texttip.style.left = (rect.right - r.width) + 'px'
+            else
+              this.$refs.texttip.style.left = rect.left + 'px'
+            this.$refs.texttip.style.opacity = 1
+          })
+        }
         if (this.currentField.readonly) return
         this.inputBox.value = this.currentCell.textContent
         if (e.target.classList.contains('select')) this.calAutocompleteList(true)
@@ -2217,9 +2256,16 @@ export default {
     cellMouseMove (e) {
       let cursor = 'cell'
       if (this.inputBoxShow) cursor = 'default'
-      if (!e.target.classList.contains('readonly')
-        && (e.target.classList.contains('select') || e.target.classList.contains('datepick'))
-        && e.target.offsetWidth - e.offsetX < 15)
+      if (e.target.offsetWidth - e.offsetX < 25) {
+        if (!e.target.classList.contains('readonly') && (e.target.classList.contains('select') || e.target.classList.contains('datepick')))
+          cursor = 'pointer'
+        if (e.target.offsetWidth < e.target.scrollWidth)
+          cursor = 'pointer'
+      }
+      const row = e.target.parentNode
+      const colPos = Array.from(row.children).indexOf(e.target) - 1
+      const currentField = this.fields[colPos]
+      if (currentField.type === 'action')
         cursor = 'pointer'
       e.target.style.cursor = cursor
     },
@@ -2229,7 +2275,7 @@ export default {
       if (this.tipTimeout) clearTimeout(this.tipTimeout)
       if ((this.tip = this.errmsg[cell.getAttribute('id')]) === '') return
       const rect = cell.getBoundingClientRect()
-      this.$refs.tooltip.style.top = (rect.top - 14) + 'px';
+      this.$refs.tooltip.style.top = (rect.top - 14) + 'px'
       this.$refs.tooltip.style.left = (rect.right + 8) + 'px'
       cell.addEventListener('mouseout', this.cellMouseOut)
     },
@@ -2239,7 +2285,7 @@ export default {
       if (this.tipTimeout) clearTimeout(this.tipTimeout)
       if ((this.tip = this.rowerr[cell.getAttribute('id')]) === '') return
       const rect = cell.getBoundingClientRect()
-      this.$refs.tooltip.style.top = (rect.top - 14) + 'px';
+      this.$refs.tooltip.style.top = (rect.top - 14) + 'px'
       this.$refs.tooltip.style.left = (rect.right + 8) + 'px'
       cell.addEventListener('mouseout', this.cellMouseOut)
     },
@@ -2261,6 +2307,7 @@ export default {
     /* *** InputBox *****************************************************************************************
      */
     moveInputSquare (rowPos, colPos) {
+      this.textTip = ''
       if (colPos < 0) return false
       const top = this.pageTop
       let row = this.recordBody.children[rowPos]
@@ -2291,7 +2338,9 @@ export default {
       // Off the textarea when moving, write to value if changed
       if (this.inputBoxShow) this.inputBoxShow = 0
       if (this.inputBoxChanged) {
-        this.inputCellWrite(this.inputBox.value, this.currentColPos, top + this.currentRowPos)
+        const value = this.inputBox._value || this.inputBox.value
+        this.inputBox._value = ''
+        this.inputCellWrite(value, this.currentColPos, top + this.currentRowPos)
         this.inputBoxChanged = false
       }
 
@@ -2393,7 +2442,9 @@ export default {
     },
     inputBoxComplete () {
       if (this.inputBoxChanged) {
-        this.inputCellWrite(this.inputBox.value)
+        const value = this.inputBox._value || this.inputBox.value
+        this.inputBox._value = ''
+        this.inputCellWrite(value)
         this.inputBoxChanged = false
       }
       this.inputBoxShow = 0
@@ -2745,6 +2796,12 @@ input:focus, input:active:focus, input.active:focus {
   font-size: 0.88rem;
   max-width: 300px;
   max-height: 235px;
+  animation: 0.3s ease 0s normal forwards 1 fadein;
+}
+@keyframes fadein {
+  0% { opacity: 0; }
+  66% { opacity: 0; }
+  100% { opacity: 1; }
 }
 .autocomplete-result {
   list-style: none;
@@ -2878,10 +2935,12 @@ input:focus, input:active:focus, input.active:focus {
   text-overflow: ellipsis;
   /* animation: fadein 0.2s; */
 }
-.systable.alt tbody td.link:hover {
+.systable tbody td.link {
   color: blue;
-  text-decoration: underline;
   cursor: pointer !important;
+}
+.systable tbody td.link:hover {
+  text-decoration: underline;
 }
 .systable tbody td.error {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAAGZJREFUOBGlzjsOgDAMA9CwcQSO0PtP3K64Qyugv8S2ZMXTUw5DstmFk8qWAuhEbzSzbQ+oWIPKULAPpGAdxGJDiMGmUBRbQhFsC3kxF+TB3NAOC0ErLAzNMAoaYTT0xyTojclQxR5H5B1HhuS+WAAAAABJRU5ErkJggg==') !important;
